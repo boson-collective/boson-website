@@ -1,14 +1,21 @@
 "use client";
-import { useRef, useEffect, useLayoutEffect } from "react";
+import { useRef, useEffect, useLayoutEffect, forwardRef, useImperativeHandle } from "react";
 import { gsap } from "gsap";
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export default function Home() {
+const SoleNoir = forwardRef((props, ref) => {
+    
   const glowRef = useRef(null);
   const blackCircleRef = useRef(null);
   const textRef = useRef(null);
+  
+  useImperativeHandle(ref, () => ({
+    glowEl: glowRef.current,
+    blackEl: blackCircleRef.current,
+    logoEl: textRef.current,
+  }));
 
   const log = (msg) => console.log(`🧠 [Boson Debug] ${msg}`);
 
@@ -126,6 +133,11 @@ export default function Home() {
             opacity: 0,
             duration: 0,
             ease: "power4.out",
+            onComplete: () => {
+              // dispatch event ke parent page
+              const event = new Event("soleNoirComplete");
+              window.dispatchEvent(event);
+            },
           },
           "-=0.4"
         );
@@ -176,7 +188,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative min-h-screen bg-black overflow-hidden">
+    <main className="relative min-h-screen  overflow-hidden">
       {/* Glow merah */}
       <div
         ref={glowRef}
@@ -217,4 +229,7 @@ export default function Home() {
       />
     </main>
   );
-}
+})
+
+
+export default SoleNoir;
