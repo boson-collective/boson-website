@@ -1,1 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+
+
+
+/* SNSF - Helvetica Neue Desk Interface Variants */
+@font-face {
+  font-family: 'SNSF';
+  src: url('/fonts/snsf/_helveticaneuedeskinterface_bold.ttf') format('truetype');
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SNSF';
+  src: url('/fonts/snsf/_helveticaneuedeskinterface_regular.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SNSF';
+  src: url('/fonts/snsf/_helveticaneuedeskinterface_thin.ttf') format('truetype');
+  font-weight: 300; /* Thin */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SNSF';
+  src: url('/fonts/snsf/_helveticaneuedeskinterface_ultralightp2.ttf') format('truetype');
+  font-weight: 200; /* Ultralight */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Helvetica Now Interface Variants */
+@font-face {
+  font-family: 'Helvetica Now';
+  src: url('/fonts/helvetica-now/helveticanowtext-black-demo.ttf') format('truetype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SNSF';
+  src: url('/fonts/helvetica-now/helveticanowtext-bold-demo.ttf') format('truetype');
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}

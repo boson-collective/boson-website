@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
               {children}
             {/* </LoaderGate> */}
           {/* </main> */}
-          {/* <Footer /> */}
+          <Footer />  
         </Providers>
       </body>
     </html>

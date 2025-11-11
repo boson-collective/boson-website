@@ -105,7 +105,7 @@ function DynamicLighting() {
   const key = useRef(), rim = useRef(), fill = useRef()
   useFrame((_, delta) => {
     GlobalTime.update(delta)
-    Tempo.update(delta)
+    // Tempo.update(delta)
     GlobalPhase.update(GlobalTime.t, delta)
   
     const t = GlobalTime.t

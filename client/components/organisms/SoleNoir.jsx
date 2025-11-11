@@ -79,7 +79,7 @@ const SoleNoir = forwardRef((props, ref) => {
         // === PHASE 3 ===
         tl.fromTo(
           textRef.current,
-          { y: 250 },
+          { y: 250, scale: 1 },
           { y: 90, duration: 1, ease: "power1.in" },
           0
         ).to(
@@ -121,6 +121,7 @@ const SoleNoir = forwardRef((props, ref) => {
             scale: 0.3,    // sedikit mengecil
             duration: 2,
             ease: "power3.inOut",
+            force3D: true,
           },
           "-=2" // bersamaan dengan glow & circle membesar
         );
