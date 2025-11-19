@@ -47,19 +47,30 @@ export default function SubtleGridBackground() {
         new THREE.Float32BufferAttribute(positions, 3)
       );
 
-      // === Shader Material ===
+      // === Shader Uniforms ===
       uniforms = {
         uTime: { value: 0.0 },
+        // mouse in NDC (-1..1) — we'll compare with vScreen (also NDC)
+        uMouse: { value: new THREE.Vector2(9999, 9999) },
+        uPixelRatio: { value: window.devicePixelRatio || 1.0 },
       };
 
+      // === Track Mouse (NDC) ===
+      window.addEventListener("pointermove", (e) => {
+        const x = (e.clientX / window.innerWidth) * 2 - 1;
+        const y = -(e.clientY / window.innerHeight) * 2 + 1;
+        uniforms.uMouse.value.set(x, y);
+      });
+
+      // === Shader Material ===
       const material = new THREE.ShaderMaterial({
         uniforms,
         vertexShader: `
           uniform float uTime;
           varying vec2 vUv;
           varying vec3 vPos;
+          varying vec2 vScreen; // clip-space / NDC position to fragment
 
-          // noise sederhana berbasis sin/cos
           float random(vec2 st) {
             return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
           }
@@ -70,42 +81,59 @@ export default function SubtleGridBackground() {
 
             vec3 pos = position;
 
-            // normalisasi posisi ke 0..1 ruang "layar"
             vec2 norm = (position.xy + vec2(500.0)) / 1000.0;
-
-            // area terang (kiri atas & kanan bawah)
             float lightZone = smoothstep(0.0, 0.3, 1.0 - abs(norm.x - norm.y));
 
-            // noise chaotic untuk area gelap
             float chaos = random(position.xy * 0.4 + uTime * 0.1);
 
-            // kombinasi gerak wave & chaos
             float orderly = sin((pos.x + pos.y) * 0.05 + uTime * 0.8) * 5.0;
             float disorder = (chaos - 0.5) * 50.0;
 
-            // blend dua dunia: beraturan dan acak
             float zOffset = mix(disorder, orderly, lightZone);
             pos.z += zOffset;
 
             gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+
+            // compute NDC screen position (x,y) after projection, to account for perspective & zOffset
+            vScreen = gl_Position.xy / gl_Position.w;
+
             gl_PointSize = 2.4;
           }
         `,
         fragmentShader: `
+          uniform float uTime;
+          uniform vec2 uMouse; // NDC mouse
           varying vec2 vUv;
           varying vec3 vPos;
-          uniform float uTime;
+          varying vec2 vScreen;
 
           void main() {
+            // diagonal light zone (kept original logic)
             vec2 norm = (vUv + vec2(500.0)) / 1000.0;
-
-            // area terang diagonal (dua arah)
             float lightZone = smoothstep(0.0, 0.3, 1.0 - abs(norm.x - norm.y));
 
-            // warna dan alpha
+            // base colors
             vec3 bright = vec3(0.8, 0.8, 0.85);
-            vec3 dark = vec3(0.45, 0.45, 0.5);
-            vec3 color = mix(dark, bright, lightZone);
+            vec3 dark   = vec3(0.45, 0.45, 0.5);
+            vec3 color  = mix(dark, bright, lightZone);
+
+            // ----------------------
+            // ACCURATE SCREEN-SPACE HOVER
+            // ----------------------
+            // vScreen is NDC (-1..1) of the point after projection (includes zOffset)
+            // uMouse is NDC (-1..1) from pointer
+            float ndcDist = distance(vScreen, uMouse);
+
+            // radius in NDC units — tweak for tighter/looser hover
+            // 0.02 is tiny, 0.04 is larger. We pick a value that respects both density and feel.
+            float hover = smoothstep(0.035, 0.0, ndcDist);
+
+            // optionally mask with bright diagonal zone to keep original behavior
+            float boostMask = smoothstep(0.25, 1.0, lightZone);
+
+            float brightnessBoost = hover * boostMask * 0.9;
+
+            color += brightnessBoost;
 
             float alpha = 0.45 + 0.25 * sin(vPos.x * 0.05 + vPos.y * 0.05);
             gl_FragColor = vec4(color, alpha);

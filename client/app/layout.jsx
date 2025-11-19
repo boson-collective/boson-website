@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-neutral-950 text-neutral-100 min-h-screen">
         <Providers>
-          {/* <Navbar /> */}
+          {/* <Navbar />   */}
           {/* <main className="pt-16"> */}
             {/* <LoaderGate> */}
               {children}

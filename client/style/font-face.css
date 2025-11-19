@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
 
 /* SNSF - Helvetica Neue Desk Interface Variants */
@@ -48,6 +48,64 @@
   font-family: 'SNSF';
   src: url('/fonts/helvetica-now/helveticanowtext-bold-demo.ttf') format('truetype');
   font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}
+
+
+
+
+
+/* ================================
+   SF PRO DISPLAY
+   ================================ */
+
+/* Display Regular (400) */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro/SF-Pro-Display-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Display Semibold (600) */
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/sf-pro/SF-Pro-Display-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ================================
+   SF PRO TEXT
+   ================================ */
+
+/* Text Regular (400) */
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('/fonts/sf-pro/SF-Pro-Text-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Text Medium (500) */
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('/fonts/sf-pro/SF-Pro-Text-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Text Semibold (600) */
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('/fonts/sf-pro/SF-Pro-Text-Semibold.woff2') format('woff2');
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
