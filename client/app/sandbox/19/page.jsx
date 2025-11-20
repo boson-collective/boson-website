@@ -36,36 +36,42 @@ function LiminalBridge({ text }) {
 export default function VariantOmegaFinal() {
   const FIELDS = [
     {
+      index: "01",
       title: "Brand Composition",
       desc: "Structure that allows emotion to exist in form — geometry built to hold feeling without collapse.",
       whisper: "We listen before we touch the grid.",
       tag: "Foundation",
     },
     {
+      index: "02",
       title: "Spatial Identity",
       desc: "Designing awareness across dimensions — from the object to the atmosphere that receives it.",
       whisper: "Every space remembers who enters it.",
       tag: "Geometry",
     },
     {
+      index: "03",
       title: "Narrative Photography",
       desc: "Tracing how light remembers presence — every frame a vibration of time, not a capture of it.",
       whisper: "The image finds you when you stop looking.",
       tag: "Light",
     },
     {
+      index: "04",
       title: "Campaign Architecture",
       desc: "Translating motion into meaning — orchestrating attention so that ideas evolve, not repeat.",
       whisper: "Movement is only alive when it listens back.",
       tag: "Rhythm",
     },
     {
+      index: "05",
       title: "Conscious Media",
       desc: "Each post is a pulse — a moment of collective rhythm between silence and response.",
       whisper: "The feed is not noise — it’s a modern heartbeat.",
       tag: "Frequency",
     },
     {
+      index: "06",
       title: "Sonic Branding",
       desc: "Composing frequency that lingers in absence — sound that knows when to stop speaking.",
       whisper: "Silence is the loudest tone.",
@@ -144,49 +150,66 @@ export default function VariantOmegaFinal() {
         <LiminalBridge text="— the field takes pattern —" />
 
         {/* === 03: FIELDS OF PRACTICE (refined) === */}
-        <section className="w-full px-6 md:px-12 py-24">
-          <div className="max-w-[1200px] mx-auto">
-            <h3 className="text-2xl font-light tracking-[0.18em] mb-10">
-              Fields of Practice
-            </h3>
+        <section className="w-full bg-[#050505] text-white py-28 px-6 md:px-20 border-t border-white/10">
+      <div className="max-w-5xl mx-auto">
 
-            <div className="relative">
-              {/* vertical connector line left */}
-              <div className="hidden md:block absolute left-6 top-0 bottom-0 w-px bg-white/6" />
+        {/* SECTION LABEL */}
+        <div className="text-xs uppercase tracking-[0.22em] text-white/60 mb-10">
+          Fields of Practice
+        </div>
 
-              <div className="space-y-12 md:space-y-16">
-                {FIELDS.map((f, i) => (
-                  <div
-                    key={i}
-                    className="pl-12 md:pl-20 flex flex-col md:flex-row md:items-start gap-6"
-                  >
-                    <div className="w-12 flex-shrink-0">
-                      <div className="text-4xl font-black opacity-8 select-none">
-                        {String(i + 1).padStart(2, "0")}
-                      </div>
-                    </div>
+        {/* INTRO BLOCK */}
+        <div className="max-w-[64ch] mb-20">
+          <h2 className="text-[2.4rem] md:text-[3rem] font-extralight leading-[1.08] tracking-[-0.01em] mb-6">
+            How Boson perceives the field.
+          </h2>
+          <p className="text-white/60 text-[1.05rem] leading-relaxed">
+            These are the lenses through which we construct clarity — the mental
+            frameworks that shape every system, campaign, and interface we build.
+            Philosophy here is not decoration, but the operating layer beneath
+            every decision.
+          </p>
+        </div>
 
-                    <div className="flex-1 border-l border-white/6 pl-6">
-                      <h4 className="text-lg font-medium mb-2 tracking-wide">
-                        {f.title}
-                      </h4>
-                      <p className="text-sm text-gray-400 leading-relaxed max-w-[70ch] mb-3">
-                        {f.desc}
-                      </p>
-                      <p className="text-xs italic text-gray-600">
-                        {f.whisper}
-                      </p>
-                    </div>
+        {/* FIELDS LIST */}
+        <div className="space-y-16">
+          {FIELDS.map((f, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-12 gap-6 items-start"
+            >
+              {/* INDEX */}
+              <div className="col-span-2 md:col-span-1">
+                <div className="text-[2rem] md:text-[2.8rem] font-extralight text-white/20">
+                  {f.index}
+                </div>
+              </div>
 
-                    <div className="w-[80px] text-right text-[0.7rem] tracking-[0.2em] uppercase text-gray-500 mt-1 md:mt-0">
-                      {f.tag}
-                    </div>
-                  </div>
-                ))}
+              {/* MAIN CONTENT */}
+              <div className="col-span-10 md:col-span-9 border-l border-white/10 pl-6 md:pl-10">
+                <h4 className="text-xl font-light tracking-wide mb-2 text-white/90">
+                  {f.title}
+                </h4>
+                <p className="text-white/60 leading-relaxed max-w-[65ch] mb-3">
+                  {f.desc}
+                </p>
+                <p className="text-sm italic text-white/40">
+                  {f.whisper}
+                </p>
+              </div>
+
+              {/* TAG */}
+              <div className="hidden md:flex col-span-2 justify-end">
+                <div className="text-[0.75rem] tracking-[0.18em] uppercase text-white/40 mt-1">
+                  {f.tag}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          ))}
+        </div>
+
+      </div>
+    </section>
 
         <LiminalBridge text="— from tools, process arises —" />
 

@@ -161,12 +161,13 @@ export default function SubtleGridBackground() {
     <div
       ref={containerRef}
       style={{
-        position: "fixed",
+        position: "absolute",        // ← bukan fixed
         inset: 0,
-        width: "100vw",
-        height: "100vh",
+        width: "100%",
+        height: "100%",
         background: "#000",
         zIndex: -1,
+        pointerEvents: "none",       // ← ini sangat penting
         overflow: "hidden",
       }}
     />

@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Galery from '../22/page.jsx'
+import WhatWeDo from '../24/page.jsx'
+import MethodPreview from '../25/page.jsx'
 import dynamic from "next/dynamic"; 
 import * as THREE from "three";
 import gsap from "gsap";
@@ -10,6 +12,7 @@ import gsap from "gsap";
 const GradientPage = dynamic(() => import("../../../components/organisms/GradientPage.jsx"), {
   ssr: false,
 });
+
 
 
 function SubtleGridBackground() {
@@ -319,7 +322,7 @@ function useMicroDrift(ref, amplitude = 1.2, speed = 9500) {
     useMicroDrift(previewRef, 1, 12000);
   
     return (
-      <section className="relative min-h-[82vh] flex items-center overflow-hidden px-6 md:px-20 py-28">
+      <section className="relative min-h-[100vh] flex items-center overflow-hidden px-6 md:px-20 py-28">
   
         {/* GRID BACKGROUND — HANYA DI DALAM HERO */}
         <div className="absolute inset-0 z-[10] pointer-events-none">
@@ -488,6 +491,9 @@ function MicroPhilosophy() {
     </section>
   );
 }
+
+
+
 
 /* ===========================
 SECTION: SELECTED WORKS PREVIEW
@@ -679,56 +685,6 @@ function TrustGrid() {
   );
 }
 
-/* ===========================
-SECTION: METHOD PREVIEW
-=========================== */
-function MethodPreview() {
-  const steps = [
-    { id: 1, title: "Observe", text: "Collect signals and context." },
-    { id: 2, title: "Construct", text: "Define systems and scaffolding." },
-    { id: 3, title: "Design", text: "Design assets and behavior rules." },
-    { id: 4, title: "Operate", text: "Run, measure, iterate, scale." },
-  ];
-
-  return (
-    <section className="w-full  py-20 px-6 md:px-20 border-t border-white/10">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10">
-          <h3 className="text-2xl md:text-3xl font-light text-white/90">
-            The system behind Boson
-          </h3>
-          <p className="text-gray-500 mt-2 max-w-[64ch] mx-auto">
-            We design the machine, then we operate it — repeatably and
-            measurably.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-10">
-          {steps.map((s) => (
-            <div
-              key={s.id}
-              className="border border-white/[0.06] rounded-lg p-6 bg-white/[0.02]"
-            >
-              <div className="text-sm text-white/60 uppercase tracking-[0.2em] mb-3">
-                Step {s.id}
-              </div>
-              <div className="text-lg text-white/90 font-light mb-2">
-                {s.title}
-              </div>
-              <div className="text-white/80">{s.text}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 text-center">
-          <a href="/method" className="text-sm text-gray-300 underline">
-            View full methodology →
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ===========================
 SECTION: FINAL CTA
@@ -846,12 +802,12 @@ export default function BosonIndexV44() {
       <Galery/>
       <Desc/>
       <MicroPhilosophy />
-      <SelectedWorksPreview />
-      <ServicesPreview />
-      <TrustGrid />
+      <WhatWeDo />
+      {/* <SelectedWorksPreview /> */}
+      {/* <TrustGrid /> */}
       <MethodPreview />
       <FinalCTA />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
