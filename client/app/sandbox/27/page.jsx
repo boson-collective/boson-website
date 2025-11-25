@@ -978,13 +978,22 @@ function Footer() {
 /* ==========================================
    PAGE
    ========================================== */
+
    export default function Page() {
-    const ready = useContext(LoaderContext);
+    const ready = useContext(LoaderContext)
   
     useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+      window.scrollTo(0, 0)
+    }, [])
   
+    // =============================
+    // 1️⃣ — Kalau belum ready → return null
+    // =============================
+    if (!ready) return null
+  
+    // =============================
+    // 2️⃣ — Kalau ready → return full page
+    // =============================
     return (
       <div
         style={{
@@ -1006,48 +1015,23 @@ function Footer() {
           <Hero />
         </div>
   
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            width: "100%",
-            background: "#000",
-          }}
-        >
+        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
           <BosonNarrative />
         </div>
-        
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-           <Projects/>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Projects />
         </div>
-       
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-           <BigHeading/>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <BigHeading />
         </div>
-        
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-          }}
-        >
-           <WorksList/>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <WorksList />
         </div>
-        
-        
-        <Footer/>
-        
-         
+  
+        <Footer />
   
         <style jsx global>{`
           body {
@@ -1055,5 +1039,5 @@ function Footer() {
           }
         `}</style>
       </div>
-    );
+    )
   }
