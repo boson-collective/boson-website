@@ -796,17 +796,18 @@ export default function BosonIndexV44() {
 
   return (
     <div ref={wrapperRef} className="w-full text-white antialiased">
-      <div ref={heroPreviewRef}>
+      <GradientPage/>
+      {/* <div ref={heroPreviewRef}>
         <Hero />
-      </div>
-      <Galery/>
-      <Desc/>
-      <MicroPhilosophy />
-      <WhatWeDo />
+      </div> */}
+      {/* <Galery/> */}
+      {/* <Desc/> */}
+      {/* <MicroPhilosophy /> */}
+      {/* <WhatWeDo /> */}
       {/* <SelectedWorksPreview /> */}
       {/* <TrustGrid /> */}
-      <MethodPreview />
-      <FinalCTA />
+      {/* <MethodPreview /> */}
+      {/* <FinalCTA /> */}
       {/* <Footer /> */}
     </div>
   );
