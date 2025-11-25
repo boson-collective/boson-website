@@ -19,7 +19,7 @@ import Services from '../../components/organisms/Services'
 const SoleNoir = dynamic(() => import("../../components/organisms/SoleNoir"), { ssr: false });
 import Beginning from '../sandbox/13/page'
 
-import Chadash from '../sandbox/23/page'
+import Chadash from '../sandbox/27/page'
 
 export default function Page() {
   return (

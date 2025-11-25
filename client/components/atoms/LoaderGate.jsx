@@ -1,33 +1,38 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState, createContext } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+export const LoaderContext = createContext(false);
 
 export default function LoaderGate({ children }) {
-  const [ready, setReady] = useState(false)
-  const [boot, setBoot] = useState(0)
+  const [ready, setReady] = useState(false);
+  const [boot, setBoot] = useState(0);
 
-  // Simulate subtle boot messaging
+  // boot text sequencing
   useEffect(() => {
-    let step = 0
+    let step = 0;
     const seq = setInterval(() => {
-      step += 1
-      setBoot(step)
-      if (step >= 3) clearInterval(seq)
-    }, 420)
-  }, [])
+      step += 1;
+      setBoot(step);
+      if (step >= 3) clearInterval(seq);
+    }, 420);
+  }, []);
 
+  // wait for actual page load
   useEffect(() => {
     const handleReady = () => {
-      setTimeout(() => setReady(true), 900) // delay for elegance
-    }
-    if (document.readyState === 'complete') handleReady()
-    else window.addEventListener('load', handleReady)
-    return () => window.removeEventListener('load', handleReady)
-  }, [])
+      setTimeout(() => setReady(true), 900);
+    };
+
+    if (document.readyState === "complete") handleReady();
+    else window.addEventListener("load", handleReady);
+
+    return () => window.removeEventListener("load", handleReady);
+  }, []);
 
   return (
-    <>
+    <LoaderContext.Provider value={ready}>
       <AnimatePresence>
         {!ready && (
           <motion.div
@@ -36,11 +41,11 @@ export default function LoaderGate({ children }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* GRID SCAN LIGHT */}
+            {/* SCAN LIGHT */}
             <motion.div
               className="absolute inset-0"
-              initial={{ y: '60%', opacity: 0 }}
-              animate={{ y: '-60%', opacity: 0.27 }}
+              initial={{ y: "60%", opacity: 0 }}
+              animate={{ y: "-60%", opacity: 0.27 }}
               transition={{
                 duration: 1.6,
                 ease: [0.16, 1, 0.3, 1],
@@ -51,29 +56,28 @@ export default function LoaderGate({ children }) {
 
             {/* BOOT TEXT */}
             <div className="absolute bottom-10 left-10 text-[12px] tracking-[0.08em] font-light text-white/40">
-              {boot === 0 && 'Calibrating system...'}
-              {boot === 1 && 'Initializing structure...'}
-              {boot === 2 && 'Preparing environment...'}
-              {boot >= 3 && 'Launching Boson…'}
+              {boot === 0 && "Calibrating system..."}
+              {boot === 1 && "Initializing structure..."}
+              {boot === 2 && "Preparing environment..."}
+              {boot >= 3 && "Launching BOSON"}
             </div>
 
-            {/* SPLIT GATE */}
-            {/* LEFT PANEL */}
+            {/* PANELS */}
             <motion.div
               className="absolute inset-y-0 left-0 w-1/2 bg-black"
-              initial={{ x: '0%' }}
-              animate={{ x: '-100%' }}
+              initial={{ x: "0%" }}
+              animate={{ x: "-100%" }}
               transition={{
                 duration: 1.4,
                 delay: 0.6,
                 ease: [0.22, 1, 0.36, 1],
               }}
             />
-            {/* RIGHT PANEL */}
+
             <motion.div
               className="absolute inset-y-0 right-0 w-1/2 bg-black"
-              initial={{ x: '0%' }}
-              animate={{ x: '100%' }}
+              initial={{ x: "0%" }}
+              animate={{ x: "100%" }}
               transition={{
                 duration: 1.4,
                 delay: 0.6,
@@ -84,17 +88,14 @@ export default function LoaderGate({ children }) {
         )}
       </AnimatePresence>
 
-      {/* PAGE CONTENT */}
+      {/* Children fade in AFTER loader */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: ready ? 1 : 0 }}
-        transition={{
-          duration: 1.2,
-          ease: [0.22, 1, 0.36, 1],
-        }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
       >
         {children}
       </motion.div>
-    </>
-  )
+    </LoaderContext.Provider>
+  );
 }

@@ -811,4 +811,3 @@ export default function BosonIndexV44() {
     </div>
   );
 }
-
