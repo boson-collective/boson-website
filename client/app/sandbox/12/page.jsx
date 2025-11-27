@@ -5,7 +5,7 @@ import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-thr
 import { Perf } from 'r3f-perf'
 import * as THREE from 'three'
 import { useRef, useMemo, Suspense, useEffect } from 'react'
-
+import GUI from 'lil-gui';
 
 // ---------------------------
 // Global time + tempo system
@@ -18,8 +18,8 @@ const Tempo = {
   beat() { return (Math.sin(this.phase * Math.PI * 2) * 0.5 + 0.5) }
 }
 
-function hueCascade(baseHue, phase, offset) {
-  return (baseHue + Math.sin(phase * 0.5) * offset + 1.0) % 1.0;
+function hueCascade(baseHue, phase, spread) {
+  return (baseHue + Math.sin(phase * 0.5) * spread + 1.0) % 1.0;
 }
 
 // ---------------------------
@@ -83,6 +83,63 @@ const GlobalPhase = {
   }
 }
 
+
+const GUIParams = {
+  // ===== Global =====
+  bpm: Tempo.bpm,
+  timeSpeed: 1.0,
+
+  // ===== Phase Engine =====
+  coreRate: GlobalPhase.coreRate,
+  shellCouple: GlobalPhase.shellCouple,
+  shellDamp: GlobalPhase.shellDamp,
+  swarmCouple: GlobalPhase.swarmCouple,
+  swarmDamp: GlobalPhase.swarmDamp,
+
+  // ===== Colors =====
+  baseHue: 0.5,
+  hueSpread: 0.18,
+
+  // ===== Space / Room =====
+  volumetricRadius: 4.2,
+  swarmOrbitRadius: 8.0,
+  fogDensity: 0.8,
+  fogExtinction: 0.25,
+  zone1Radius: 3.2,
+  zone2Radius: 2.6,
+
+  // ===== Volumetric Flow =====
+  flowSpeed: 0.25,
+  noiseScale: 0.45,
+
+  // ===== Lighting =====
+  keyIntensity: 1.0,
+  rimIntensity: 0.8,
+  fillIntensity: 0.4,
+
+  // ===== Shell PBR =====
+  shellRoughness: 0.28,
+  shellMetalness: 0.0,
+  iridescenceMix: 0.22,
+
+  // ===== Inner Core =====
+  corePower: 1.0,
+};
+
+
+// Runtime container for GUI → World binding
+const SpaceRuntime = {
+  volumetricRadius: GUIParams.volumetricRadius,
+  swarmOrbitRadius: GUIParams.swarmOrbitRadius,
+  fogDensity: GUIParams.fogDensity,
+  fogExtinction: GUIParams.fogExtinction,
+  zone1Radius: GUIParams.zone1Radius,
+  zone2Radius: GUIParams.zone2Radius,
+};
+
+
+
+
 // ---------------------------
 // Dynamic lighting & global updates
 // ---------------------------
@@ -92,38 +149,54 @@ function DynamicLighting() {
     GlobalTime.update(delta)
     Tempo.update(delta)
     GlobalPhase.update(GlobalTime.t, delta)
-
+  
     const t = GlobalTime.t
     const beat = Tempo.beat()
-
-    // update global time/beat/phase (push to GlobalUniforms)
+  
+    // sync global uniforms
     GlobalUniforms.uTime.value = t
     GlobalUniforms.uBeat.value = beat
     GlobalUniforms.uPhaseCore.value = GlobalPhase.core
     GlobalUniforms.uPhaseShell.value = GlobalPhase.shell
     GlobalUniforms.uPhaseSwarm.value = GlobalPhase.swarm
-    GlobalUniforms.uCollapse.value = Math.pow(beat, 2.2) // smooth collapse variable
-
-    // base hue slowly drifting
-    const baseHue = (Math.sin(t * 0.08) * 0.5 + 0.5) // 0..1
+    GlobalUniforms.uCollapse.value = Math.pow(beat, 2.2)
+  
+    // base hue drift
+    const baseHue = (Math.sin(t * 0.08) * 0.5 + 0.5)
     GlobalUniforms.uHue.value = baseHue
+  
+// NEW: hue spread controlled by GUIParams.hueSpread
+    const s = GUIParams.hueSpread
 
-    // compute cascaded hues based on propagated phase (makes color "travel")
-    GlobalUniforms.uHueCore.value = hueCascade(baseHue, GlobalPhase.core, 0.14)
-    GlobalUniforms.uHueShell.value = hueCascade(baseHue, GlobalPhase.shell, 0.10)
-    GlobalUniforms.uHueSwarm.value = hueCascade(baseHue, GlobalPhase.swarm, 0.18)
+    GlobalUniforms.uHueCore.value  = hueCascade(baseHue, GlobalPhase.core,  s * 1.00)
+    GlobalUniforms.uHueShell.value = hueCascade(baseHue, GlobalPhase.shell, s * 0.75)
+    GlobalUniforms.uHueSwarm.value = hueCascade(baseHue, GlobalPhase.swarm, s * 1.35)
 
-    // lights move & breathe
+  
+    // === LIGHTING FIX (connecting lil-gui sliders) ===
     if (key.current && rim.current && fill.current) {
+      const breathe = 0.5 + Math.sin(t * 0.8) * 0.3
+  
+      // scaler kuat dari GUIParams
+      key.current.intensity =
+        GUIParams.keyIntensity *
+        (1.0 + breathe * 0.45 * (0.6 + beat * 0.8))
+  
+      rim.current.intensity =
+        GUIParams.rimIntensity *
+        (0.8 + breathe * 0.35)
+  
+      fill.current.intensity =
+        GUIParams.fillIntensity *
+        (0.22 + breathe * 0.14)
+  
+      // posisi tetap sama
       key.current.position.x = Math.sin(t * 0.45) * 3
       key.current.position.y = Math.cos(t * 0.35) * 2
       rim.current.position.z = Math.cos(t * 0.4) * 3.5
-      const breathe = 0.5 + Math.sin(t * 0.8) * 0.3
-      key.current.intensity = 1.0 + breathe * 0.45 * (0.6 + beat * 0.8)
-      rim.current.intensity = 0.8 + breathe * 0.35
-      fill.current.intensity = 0.22 + breathe * 0.14
     }
   })
+  
 
   return (
     <>
@@ -140,21 +213,40 @@ function DynamicLighting() {
 // ---------------------------
 function VolumetricShell({ radius = 4.2 }) {
   const matRef = useRef()
+  const meshRef = useRef()
   const { camera } = useThree()
 
-  useFrame(() => {
-    if (!matRef.current) return
-    matRef.current.uniforms.uTime.value = GlobalUniforms.uTime.value
-    // use base hue for volumetric shell but nudge with propagated shell phase for color flow
-    matRef.current.uniforms.uHue.value = GlobalUniforms.uHue.value + 0.02 * Math.sin(GlobalPhase.shell * 1.4)
-    matRef.current.uniforms.uBeat.value = GlobalUniforms.uBeat.value
-    matRef.current.uniforms.uCamPos.value = camera.position
-    if (matRef.current.uniforms.uCollapse) matRef.current.uniforms.uCollapse.value = GlobalUniforms.uCollapse.value
-  })
+    // rebuild geometry if radius changes
+    useEffect(() => {
+      if (!meshRef.current) return
+      meshRef.current.geometry.dispose()
+      meshRef.current.geometry = new THREE.SphereGeometry(
+        SpaceRuntime.volumetricRadius, 64, 48
+      )
+    }, [])
+  
+    useFrame(() => {
+      const r = SpaceRuntime.volumetricRadius
+  
+      // update geometry radius live
+      if (meshRef.current) {
+        meshRef.current.geometry.parameters.radius = r
+        meshRef.current.geometry.needsUpdate = true
+      }
+  
+      if (matRef.current) {
+        matRef.current.uniforms.uRadius.value = r
+        matRef.current.uniforms.uTime.value = GlobalUniforms.uTime.value
+        matRef.current.uniforms.uHue.value = GlobalUniforms.uHue.value
+        matRef.current.uniforms.uBeat.value = GlobalUniforms.uBeat.value
+        matRef.current.uniforms.uCamPos.value = camera.position
+        matRef.current.uniforms.uCollapse.value = GlobalUniforms.uCollapse.value
+      }
+    })
 
   return (
     <mesh position={[0, 0, 0]}>
-      <sphereGeometry args={[radius, 64, 48]} />
+      <sphereGeometry args={[SpaceRuntime.volumetricRadius, 64, 48]} />
       <shaderMaterial
         ref={matRef}
         side={THREE.BackSide}
@@ -513,8 +605,10 @@ function useOrbitGPU_VelPos(renderer, size = 512, baseRadius = 8.0, GlobalUnifor
     velMat.uniforms.uVelTex.value = velRead.texture
     velMat.uniforms.uTime.value = t
     velMat.uniforms.uBeat.value = beat
+    velMat.uniforms.uBaseRadius.value = SpaceRuntime.swarmOrbitRadius
     velMat.uniforms.uPhaseSwarm.value = phase
     velMat.uniforms.uDelta.value = delta
+    
 
     // velocity pass
     renderer.setRenderTarget(velWrite)
@@ -1091,6 +1185,16 @@ useEffect(() => {
     // temporal accumulation texture
     mat.uniforms.tPrevAccum.value = accumRead.texture
   
+    // --- fog control
+    mat.uniforms.uFogDensity.value = SpaceRuntime.fogDensity
+    mat.uniforms.uExtinction.value = SpaceRuntime.fogExtinction
+
+    // --- zone control
+    mat.uniforms.uZoneRadius.value[0] = SpaceRuntime.zone1Radius
+    mat.uniforms.uZoneRadius.value[1] = SpaceRuntime.zone2Radius
+    mat.uniforms.uZoneRadius.needsUpdate = true
+  
+    
     // others
     mat.uniforms.uFrameIndex.value = state.clock.frame % 65536
     mat.uniforms.uLightPos.value.copy(lightPos)
@@ -1534,6 +1638,149 @@ function AuroraSphere() {
 // Scene & FX
 // ---------------------------
 function Scene() {
+   
+  useEffect(() => {
+    const gui = new GUI({ width: 340 });
+  
+    // ===========================
+    // GLOBAL TIME & BPM
+    // ===========================
+    const fGlobal = gui.addFolder('⏱ Global');
+    fGlobal.add(GUIParams, 'bpm', 20, 180, 1)
+      .name('BPM')
+      .onChange(v => Tempo.bpm = v);
+  
+    fGlobal.add(GUIParams, 'timeSpeed', 0.1, 5.0, 0.01)
+      .name('Time Speed')
+      .onChange(v => GlobalTime.speed = v);
+  
+  
+    // ===========================
+    // PHASE ENGINE
+    // ===========================
+    const fPhase = gui.addFolder('🌐 Phase Engine');
+  
+    fPhase.add(GUIParams, 'coreRate', 0.1, 3.0, 0.01)
+      .name('Core Rate')
+      .onChange(v => GlobalPhase.coreRate = v);
+  
+    fPhase.add(GUIParams, 'shellCouple', 0.01, 0.8, 0.01)
+      .name('Shell Couple')
+      .onChange(v => GlobalPhase.shellCouple = v);
+  
+    fPhase.add(GUIParams, 'shellDamp', 0.5, 1.0, 0.01)
+      .name('Shell Damping')
+      .onChange(v => GlobalPhase.shellDamp = v);
+  
+    fPhase.add(GUIParams, 'swarmCouple', 0.01, 0.8, 0.01)
+      .name('Swarm Couple')
+      .onChange(v => GlobalPhase.swarmCouple = v);
+  
+    fPhase.add(GUIParams, 'swarmDamp', 0.5, 1.0, 0.01)
+      .name('Swarm Damping')
+      .onChange(v => GlobalPhase.swarmDamp = v);
+  
+  
+    // ===========================
+    // GLOBAL COLOR SYSTEM
+    // ===========================
+    const fColor = gui.addFolder('🎨 Colors');
+  
+    fColor.add(GUIParams, 'baseHue', 0, 1, 0.001)
+      .name('Base Hue')
+      .onChange(v => GlobalUniforms.uHue.value = v);
+  
+    fColor.add(GUIParams, 'hueSpread', 0.0, 0.4, 0.001)
+      .name('Hue Spread');
+  
+      // ===========================
+      // SPACE CONTROL (Live Bind)
+      // ===========================
+      const fSpace = gui.addFolder('📦 Space / Room');
+
+      fSpace.add(GUIParams, 'volumetricRadius', 1.0, 10.0, 0.1)
+        .name('Volumetric Radius')
+        .onChange(v => SpaceRuntime.volumetricRadius = v);
+
+      fSpace.add(GUIParams, 'swarmOrbitRadius', 2.0, 18.0, 0.1)
+        .name('Swarm Orbit Radius')
+        .onChange(v => SpaceRuntime.swarmOrbitRadius = v);
+
+      fSpace.add(GUIParams, 'fogDensity', 0.1, 2.0, 0.01)
+        .name('Fog Density')
+        .onChange(v => SpaceRuntime.fogDensity = v);
+
+      fSpace.add(GUIParams, 'fogExtinction', 0.05, 1.2, 0.01)
+        .name('Fog Extinction')
+        .onChange(v => SpaceRuntime.fogExtinction = v);
+
+      fSpace.add(GUIParams, 'zone1Radius', 0.1, 6.0, 0.1)
+        .name('Zone 1 Radius')
+        .onChange(v => SpaceRuntime.zone1Radius = v);
+
+      fSpace.add(GUIParams, 'zone2Radius', 0.1, 6.0, 0.1)
+        .name('Zone 2 Radius')
+        .onChange(v => SpaceRuntime.zone2Radius = v);
+
+  
+    // ===========================
+    // VOLUMETRIC FLOW
+    // ===========================
+    const fFlow = gui.addFolder('🌫 Volumetric Flow');
+  
+    fFlow.add(GUIParams, 'flowSpeed', 0.01, 1.2, 0.01)
+      .name('Flow Speed');
+  
+    fFlow.add(GUIParams, 'noiseScale', 0.1, 2.0, 0.01)
+      .name('Noise Scale');
+  
+  
+    // ===========================
+    // LIGHTING
+    // ===========================
+    const fLight = gui.addFolder('💡 Lighting');
+  
+    fLight.add(GUIParams, 'keyIntensity', 0.1, 3.0, 0.01)
+      .name('Key Light');
+  
+    fLight.add(GUIParams, 'rimIntensity', 0.1, 3.0, 0.01)
+      .name('Rim Light');
+  
+    fLight.add(GUIParams, 'fillIntensity', 0.1, 3.0, 0.01)
+      .name('Fill Light');
+  
+  
+    // ===========================
+    // INNER CORE
+    // ===========================
+    const fCore = gui.addFolder('🔥 Inner Core');
+  
+    fCore.add(GUIParams, 'corePower', 0.2, 4.0, 0.01)
+      .name('Core Power');
+  
+  
+    // ===========================
+    // SHELL PBR
+    // ===========================
+    const fPBR = gui.addFolder('💎 Shell PBR');
+  
+    fPBR.add(GUIParams, 'shellRoughness', 0.02, 1.0, 0.01)
+      .name('Roughness');
+  
+    fPBR.add(GUIParams, 'shellMetalness', 0.0, 1.0, 0.01)
+      .name('Metalness');
+  
+    fPBR.add(GUIParams, 'iridescenceMix', 0.0, 1.0, 0.01)
+      .name('Iridescence');
+  
+  
+    return () => gui.destroy();
+  }, []);
+  
+  
+  
+  
+  
   return (
     <>
       <Perf position="top-left" />

@@ -1,13 +1,15 @@
 "use client";
 
-import { useLayoutEffect, useRef, useContext, useState, useEffect } from "react";
+import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffect, useMemo } from "react";
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
 
-import { motion, useScroll, useTransform, useAnimation } from "framer-motion";
+import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 
+import Carousel from '../1/page';
 
 
 
@@ -43,17 +45,22 @@ function Hero() {
 </motion.div>
 
 
-      {/* TITLE */}
-      <motion.div
-        style={{ y }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2.1, duration: 0.8, ease: "easeOut" }}
-        className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center text-center select-none"
-      >
-        <span className="text-[72px] font-light tracking-[-0.03em] text-white/95 leading-[0.82]">boson</span>
-        <span className="text-[72px] font-light tracking-[-0.03em] text-white/95 leading-[0.82] -mt-[6px]">collective</span>
-      </motion.div>
+{/* TITLE (Replaced with Image) */}
+<motion.div
+  style={{ y }}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 2.1, duration: 0.8, ease: "easeOut" }}
+  className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center text-center select-none"
+>
+  <img
+    src="/png/boson-white.png"
+    alt="Boson Collective"
+    className="w-[280px] object-contain"
+    draggable="false"
+  />
+</motion.div>
+
 
       {/* SIDE LEFT */}
       <motion.div
@@ -247,6 +254,7 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   );
 }
 
+
 function Projects() {
   const scrollRef = useRef(null);
 
@@ -348,54 +356,82 @@ function Projects() {
   });
 
   // ============================
-  // SHARED MOVEMENT/DEPTH builders
+  // RANDOM SEEDS per image (stabil antar render)
   // ============================
-  const createXRight = (b) => useTransform(b, [0, 1], [0, 1300]);
-  const createXLeft = (b) => useTransform(b, [0, 1], [0, -1300]);
-  const createYDown = (b) => useTransform(b, [0, 1], [0, 1000]);
-  const createYUp = (b) => useTransform(b, [0, 1], [0, -1000]);
-
-  const createZDepth = (b) => useTransform(b, [0, 1], [-2000, 0]);
-  const createDepthScale = (b) => useTransform(b, [0, 1], [0.01, 2]);
-  const createBurstScale = (b) => useTransform(b, [0, 1], [1, 3]);
-  const createFinalScale = (b) => {
-    const d = createDepthScale(b);
-    const s = createBurstScale(b);
-    return useTransform([d, s], ([a, c]) => a * c);
-  };
+  const randomSeedsRef = useRef(null);
+  if (!randomSeedsRef.current) {
+    randomSeedsRef.current = images.map(() => ({
+      xOffset: (Math.random() - 0.5) * 80,    // -40..40
+      yOffset: (Math.random() - 0.5) * 80,    // -40..40
+      zOffset: (Math.random() - 0.5) * 800,   // -400..400
+      rotStart: (Math.random() - 0.5) * 4,    // -2..2 deg
+      rotEnd: (Math.random() - 0.5) * 10,     // -5..5 deg
+      blurBoost: Math.random(),               // 0..1
+    }));
+  }
+  const randomSeeds = randomSeedsRef.current;
 
   // ============================
-  // Per-image motion props using loop & index%4 for position pattern
-  // pattern: 0 -> bottom-right, 1 -> bottom-left, 2 -> top-right, 3 -> top-left
-  // then repeats for subsequent images (looping)
+  // FORWARD MOTION VECTOR — Combo DEWA
+  // A: cepat dekat kamera
+  // B: smooth keluar frame
+  // D: motion blur
+  // E: randomization halus
+  // ============================
+  function createMotionVector(b, pattern, seed) {
+    // Z: piecewise — cepat ke kamera, halus keluar
+    const z = useTransform(
+      b,
+      [0, 0.4, 1],
+      [-3000, 0, 5000 + seed.zOffset]
+    );
+
+    // base arah 4-kuadran
+    const baseX =
+      pattern === 0 ? 220 : // right-top
+      pattern === 1 ? -220 : // left-top
+      pattern === 2 ? 220 :  // right-bottom
+                      -220;  // left-bottom;
+
+    const baseY = pattern <= 1 ? -200 : 200;
+
+    // XY + random offset halus
+    const x = useTransform(b, [0, 1], [0, baseX + seed.xOffset]);
+    const y = useTransform(b, [0, 1], [0, baseY + seed.yOffset]);
+
+    // scale natural berbasis depth (nggak meledak)
+    const scale = useTransform(b, [0, 1], [0.3, 1.2]);
+ 
+    
+ 
+
+    return { x, y, z, scale };
+  }
+
+  // ============================
+  // motion props per image
   // ============================
   const motionPropsList = bursts.map((b, idx) => {
     const pattern = idx % 4;
-    let xTransform, yTransform;
+    const seed = randomSeeds[idx % randomSeeds.length];
 
-    if (pattern === 0) {
-      xTransform = createXRight(b); // bottom-right
-      yTransform = createYDown(b);
-    } else if (pattern === 1) {
-      xTransform = createXLeft(b); // bottom-left
-      yTransform = createYDown(b);
-    } else if (pattern === 2) {
-      xTransform = createXRight(b); // top-right
-      yTransform = createYUp(b);
-    } else {
-      xTransform = createXLeft(b); // top-left
-      yTransform = createYUp(b);
-    }
+    const { x, y, z, scale } = createMotionVector(
+      b,
+      pattern,
+      seed
+    );
 
     return {
       burst: b,
-      x: xTransform,
-      y: yTransform,
-      z: createZDepth(b),
-      scale: createFinalScale(b),
+      x,
+      y,
+      z,
+      scale,
       opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
     };
   });
+
+
 
   // ---------------------------
   // Render
@@ -580,42 +616,199 @@ function BigHeading() {
 }
 
 
-function WorksList() {
+function MarqueeOverlay({ item, active }) {
+  const trackRef = useRef(null);
+  const x = useMotionValue(0);
+  const segmentWidthRef = useRef(0);
+
+  // ====== MEASURE WIDTH ======
+  useLayoutEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const total = el.scrollWidth;
+      if (!total) return;
+      segmentWidthRef.current = total / 2;
+    };
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+
+    const onResize = () => measure();
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  // ====== INFINITE SCROLL ======
+  useAnimationFrame((t, delta) => {
+    const segmentWidth = segmentWidthRef.current;
+    if (!segmentWidth) return;
+
+    const speed = active ? 180 : 30;
+    const move = (speed * delta) / 1000;
+
+    let next = x.get() - move;
+
+    if (next <= -segmentWidth) {
+      const overshoot = next + segmentWidth;
+      next = overshoot;
+    }
+
+    x.set(next);
+  });
+
+  // ============ DETECT LOGO ============
+  const isLogo = (src) => {
+    const l = src.toLowerCase();
+    return l.includes("logo") || l.endsWith(".png");
+  };
+
+  // ============ RENDER IMAGE / LOGO ============
+  const renderImageCard = (src, key) => {
+    if (isLogo(src)) {
+      return (
+        <img
+          key={key}
+          src={src}
+          draggable={false}
+          style={{
+            height: "18vh",
+            width: "auto",
+            objectFit: "contain",
+            filter: "invert(1) brightness(0)", // jadi hitam
+            flexShrink: 0,
+          }}
+        />
+      );
+    }
+
+    return (
+      <img
+        key={key}
+        src={src}
+        draggable={false}
+        style={{
+          height: "18vh",
+          width: "32vh",
+          borderRadius: "2vh",
+          objectFit: "cover",
+          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+          flexShrink: 0,
+          background: "black",
+        }}
+      />
+    );
+  };
+
+  // Base images untuk marquee
+  const baseImages = useMemo(
+    () => [item.image1, item.image2, item.image1, item.image2],
+    [item.image1, item.image2]
+  );
+
+  const segmentImages = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 3; i++) out.push(...baseImages);
+    return out;
+  }, [baseImages]);
+
+  const renderSegment = (key) => (
+    <div
+      key={key}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "4vw",
+        paddingRight: "4vw",
+      }}
+    >
+      {segmentImages.map((src, idx) =>
+        renderImageCard(src, `${key}-${idx}`)
+      )}
+    </div>
+  );
+
+  return (
+    <motion.div
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: 0,
+        width: "100%",
+        height: "22vh",
+        transform: "translateY(-50%)",
+        overflow: "hidden",
+        zIndex: 2,
+        pointerEvents: "none",
+        background: active ? "white" : "transparent",
+        opacity: active ? 1 : 0,
+        display: "flex",
+        alignItems: "center",
+        padding: "0 3vw",
+      }}
+      animate={{ opacity: active ? 1 : 0 }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <motion.div
+        ref={trackRef}
+        style={{
+          display: "flex",
+          flexShrink: 0,
+          x,
+          willChange: "transform",
+        }}
+      >
+        {renderSegment("seg-1")}
+        {renderSegment("seg-2")}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+
+ function WorksList() {
   const items = [
     {
       industry: "Fitness",
       name: "Tender Touch",
       year: "© 2025",
       image1: "/clients/tender-touch/2.jpg",
-      image2: "/clients/tender-touch/4.jpg",
+      image2: "/clients/tender-touch/main.jpg",
     },
     {
       industry: "Real Estate",
       name: "Hidden City Ubud",
       year: "© 2025",
       image1: "/clients/hidden-city-ubud/main.jpg",
-      image2: "/clients/hidden-city-ubud/mockup.png",
+      image2: "/clients/hidden-city-ubud/2.jpg",
     },
     {
       industry: "Real Estate",
       name: "DWM",
       year: "© 2025",
-      image1: "/clients/dwm/2.jpg",
-      image2: "/clients/dwm/3.jpg",
+      image1: "/clients/dwm/5.jpg",
+      image2: "/clients/dwm/logo.png",
     },
     {
       industry: "Food & Beverage",
       name: "Marrosh",
       year: "© 2025",
-      image1: "/clients/marrosh/3.jpg",
-      image2: "/clients/marrosh/mockup.png",
+      image1: "/clients/marrosh/9.jpg",
+      image2: "/clients/marrosh/logo.png",
     },
     {
       industry: "Real Estate",
       name: "NOVO",
       year: "© 2025",
       image1: "/clients/novo-ampang/main.jpg",
-      image2: "/clients/novo-ampang/main.jpg",
+      image2: "/clients/novo-ampang/logo.png",
     },
   ];
 
@@ -648,9 +841,7 @@ function WorksList() {
             overflow: "hidden",
           }}
         >
-          {/* =============================== */}
-          {/*           WHITE OVERLAY          */}
-          {/* =============================== */}
+          {/* WHITE OVERLAY */}
           <motion.div
             style={{
               position: "absolute",
@@ -668,104 +859,10 @@ function WorksList() {
             }}
           />
 
-{/* =============================== */}
-{/*       MARQUEE LOOP (HOVER)       */}
-{/* =============================== */}
-<motion.div
-  style={{
-    position: "absolute",
-    top: "50%",
-    left: 0,
-    width: "100%",
-    height: "22vh",
-    transform: "translateY(-50%)",
-    overflow: "hidden",
-    zIndex: 2,
-    pointerEvents: "none",
+          {/* MARQUEE OVERLAY */}
+          <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
-    background: hoveredIndex === i ? "white" : "transparent",
-    opacity: hoveredIndex === i ? 1 : 0,
-
-    display: "flex",
-    alignItems: "center",
-    padding: "0 3vw",
-  }}
-  animate={{ opacity: hoveredIndex === i ? 1 : 0 }}
-  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
->
-  {/* TRACK bergerak */}
-  <motion.div
-    style={{
-      display: "flex",
-      flexShrink: 0,
-      gap: "4vw",
-    }}
-    animate={{ x: ["0%", "-50%"] }}
-    transition={{
-      duration: 12,
-      repeat: Infinity,
-      ease: "linear",
-    }}
-  >
-    {/* ============================ */}
-    {/*   ROW 1 — A B               */}
-    {/* ============================ */}
-    <div style={{ display: "flex", gap: "4vw" }}>
-      <img
-        src={item.image1}
-        style={{
-          height: "18vh",
-          width: "32vh",
-          borderRadius: "2vh",
-          objectFit: "cover",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        }}
-      />
-      <img
-        src={item.image2}
-        style={{
-          height: "18vh",
-          width: "32vh",
-          borderRadius: "2vh",
-          objectFit: "cover",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        }}
-      />
-    </div>
-
-    {/* ============================ */}
-    {/*   ROW 2 — COPY EXACT         */}
-    {/*   (kunci infinite perfeita)  */}
-    {/* ============================ */}
-    <div style={{ display: "flex", gap: "4vw" }}>
-      <img
-        src={item.image1}
-        style={{
-          height: "18vh",
-          width: "32vh",
-          borderRadius: "2vh",
-          objectFit: "cover",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        }}
-      />
-      <img
-        src={item.image2}
-        style={{
-          height: "18vh",
-          width: "32vh",
-          borderRadius: "2vh",
-          objectFit: "cover",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        }}
-      />
-    </div>
-  </motion.div>
-</motion.div>
-
-
-          {/* =============================== */}
-          {/*             TEXT ROW             */}
-          {/* =============================== */}
+          {/* TEXT ROW */}
           <div
             style={{
               position: "relative",
@@ -815,36 +912,89 @@ function WorksList() {
   );
 }
 
+
+
 function Footer() {
   return (
     <div className="footer-section">
-      {/* LEFT — Rotated Chrome Logo */}
+      {/* LEFT — Rotated Chrome Logo (UNCHANGED CSS) */}
       <div className="footer-chrome" />
 
-      {/* RIGHT — Boson Narrative */}
-      <div className="footer-text">
-        <div className="footer-title">
-          Designing systems that  
-          <br />
-          align humans, tools,  
-          <br />
-          and the shape of tomorrow.
-        </div>
+      {/* RIGHT — BOSON CREATIVE FOOTER */}
+      <div className="ml-auto w-[62%] z-[10] grid grid-cols-2 gap-28 items-start">
 
-        <div className="footer-contact">
-          For collaboration:
-          <br />
-          <span>boson.studio@gmail.com</span>
-        </div>
+{/* COL 1 — BOSON CTA */}
+<div className="flex flex-col gap-6">
+  <h1 className="text-[42px] font-light leading-tight tracking-tight max-w-md">
+    LET’S WORK TOGETHER
+  </h1>
 
-        <div className="footer-socials">
-          <span>Behance</span>
-          <span>Dribbble</span>
-          <span>LinkedIn</span>
-          <span>Medium</span>
+  <p className="text-sm opacity-60 leading-relaxed max-w-xs">
+    If your work requires intention, clarity, or engineered precision,  
+    this is where the conversation begins.
+  </p>
+
+  <a
+    href="mailto:boson.studio@gmail.com"
+    className="text-lg font-light mt-4 inline-flex items-center gap-2 hover:opacity-100 opacity-90"
+  >
+    boson.studio@gmail.com →
+  </a>
+</div>
+
+
+        {/* COL 2 — NORDIC META + CHANNELS + MAP */}
+        <div className="flex flex-col gap-14 text-sm">
+
+          {/* NORDIC INFO */}
+          <div className="flex flex-col gap-6 opacity-75">
+            <div>
+              <div className="flex flex-col gap-1 mt-3">
+                <span>Based in Bali</span>
+                <span>Working across the World</span>
+                <span>Since 2021</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="uppercase tracking-wider text-xs opacity-60">FOCUS</h4>
+              <div className="flex flex-col gap-1 mt-3">
+                <span>Design</span>
+                <span>Architecture</span>
+                <span>Engineering</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CHANNELS */}
+          <div>
+            <h4 className="uppercase tracking-wider text-xs opacity-60">CHANNELS</h4>
+            <div className="flex gap-6 opacity-75 mt-4">
+              {["Behance", "Dribbble", "LinkedIn", "Medium"].map((txt) => (
+                <span key={txt} className="cursor-pointer hover:opacity-100">
+                  {txt}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* MAP */}
+          <div>
+            <h4 className="uppercase tracking-wider text-xs opacity-60">MAP</h4>
+            <div className="flex flex-col gap-2 opacity-75 mt-4">
+              {["Home", "Work", "Systems", "Approach", "Contact"].map((item) => (
+                <span key={item} className="cursor-pointer hover:opacity-100">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
+ 
 
+      {/* LEFT CSS — DO NOT TOUCH */}
       <style jsx>{`
         .footer-section {
           position: sticky;
@@ -854,21 +1004,19 @@ function Footer() {
           background: #000;
           overflow: hidden;
           display: flex;
-          justify-content: space-between;
           align-items: center;
           padding: 0 80px;
           color: white;
         }
 
-        /* LEFT CHROME (portrait rotated) */
         .footer-chrome {
           position: absolute;
           left: -10%;
           top: 50%;
-          transform: translateY(-50%) rotate(90deg); /* Rotate to portrait */
+          transform: translateY(-50%) rotate(90deg);
 
           width: 1200px;
-          height: 2000px; /* Tall enough for portrait chrome */
+          height: 2000px;
 
           mask-image: url("/boson-white.png");
           -webkit-mask-image: url("/boson-white.png");
@@ -878,98 +1026,27 @@ function Footer() {
 
           opacity: 0.9;
 
-          /* SAME gradients as Hero, untouched */
           background:
-            linear-gradient(
-              110deg,
-              rgba(255, 255, 255, 0) 0%,
-              rgba(255, 255, 255, 0.65) 4%,
-              rgba(255, 255, 255, 0.25) 7%,
-              rgba(255, 255, 255, 0) 11%
-            ),
-            linear-gradient(
-              140deg,
-              rgba(255, 255, 255, 0) 0%,
-              rgba(255, 255, 255, 0.35) 3%,
-              rgba(255, 255, 255, 0) 8%
-            ),
-            radial-gradient(
-              circle at 50% 30%,
-              rgba(255, 255, 255, 0.28),
-              rgba(255, 255, 255, 0) 60%
-            ),
-            radial-gradient(
-              circle at 50% 78%,
-              rgba(0, 0, 0, 0.4),
-              rgba(0, 0, 0, 0) 70%
-            ),
-            radial-gradient(
-              circle at 50% 70%,
-              rgba(0, 0, 0, 0) 25%,
-              rgba(0, 0, 0, 0.35) 55%,
-              rgba(0, 0, 0, 0.85) 85%,
-              rgba(0, 0, 0, 1) 100%
-            ),
-            linear-gradient(
-              90deg,
-              rgba(0, 0, 0, 0) 0%,
-              rgba(0, 0, 0, 0.5) 60%,
-              rgba(0, 0, 0, 1) 100%
-            ),
-            linear-gradient(
-              180deg,
-              rgba(255, 255, 255, 0.6),
-              rgba(30, 30, 30, 0.85) 45%,
-              rgba(0, 0, 0, 1) 95%
-            );
-
-          background-blend-mode: screen, screen, screen, multiply, multiply,
-            multiply, multiply, overlay;
+            linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 4%, rgba(255,255,255,0.25) 7%, rgba(255,255,255,0) 11%),
+            linear-gradient(140deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 3%, rgba(255,255,255,0) 8%),
+            radial-gradient(circle at 50% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%),
+            radial-gradient(circle at 50% 78%, rgba(0,0,0,0.4), rgba(0,0,0,0) 70%),
+            radial-gradient(circle at 50% 70%, rgba(0,0,0,0) 25%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,1) 100%),
+            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,1) 100%),
+            linear-gradient(180deg, rgba(255,255,255,0.6), rgba(30,30,30,0.85) 45%, rgba(0,0,0,1) 95%);
+          background-blend-mode: screen, screen, screen, multiply, multiply, multiply, multiply, overlay;
         }
-
-        /* RIGHT SIDE TEXT */
-        .footer-text {
-          margin-left: auto;
-          z-index: 10;
-          max-width: 420px;
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
-        }
-
-        .footer-title {
-          font-size: 26px;
-          line-height: 1.3;
-          font-weight: 300;
-          opacity: 0.92;
-        }
-
-        .footer-contact {
-          font-size: 14px;
-          opacity: 0.7;
-          line-height: 1.6;
-        }
-        .footer-contact span {
-          opacity: 0.9;
-        }
-
-        .footer-socials {
-          font-size: 13px;
-          opacity: 0.55;
-          display: flex;
-          gap: 32px;
-        }
-
       `}</style>
     </div>
   );
 }
+
+
+
+
  
 
-
-
-
-
+ 
 
 
 
@@ -1029,6 +1106,10 @@ function Footer() {
   
         <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
+        </div>
+        
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Carousel />
         </div>
   
         <Footer />
