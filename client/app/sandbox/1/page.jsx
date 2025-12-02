@@ -188,7 +188,7 @@ const CanvasMirror = ({ index, src, onTextureReady }) => {
 };
 
 /* -----------------------
-   Pipeline 1
+   Pipeline 1 (optimized)
    ----------------------- */
 const CarouselPipeline1 = forwardRef((_, ref) => {
   const texturesRef = useRef([]);
@@ -203,19 +203,17 @@ const CarouselPipeline1 = forwardRef((_, ref) => {
 
   return (
     <div className="absolute inset-0 -z-10">
+      {/* OPTIMIZED:
+         Hapus Next/Image full-screen di sini.
+         Pipeline ini cuma buat supply texture ke WebGL lewat CanvasMirror.
+         Visual utama tetap dari DOM <Image> di bawah. */}
       {SLIDES.map((s, i) => (
-        <Image
+        <CanvasMirror
           key={s.id}
+          index={i}
           src={s.src}
-          alt=""
-          fill
-          className="object-cover absolute inset-0 -z-20"
-          priority
+          onTextureReady={handleTextureReady}
         />
-      ))}
-
-      {SLIDES.map((s, i) => (
-        <CanvasMirror key={s.id} index={i} src={s.src} onTextureReady={handleTextureReady} />
       ))}
     </div>
   );
@@ -238,9 +236,13 @@ export default function CarouselFullFixed() {
   const quadRef = useRef(null);
   const rafRef = useRef(null);
   const resizeObserverRef = useRef(null);
+  const intersectObserverRef = useRef(null);
 
   const texturesRef = useRef([]);
   const [ready, setReady] = useState(false);
+
+  // section visibility (buat idle optimization)
+  const visibleRef = useRef(true);
 
   // pointer bubble
   const mouseX = useMotionValue(0);
@@ -252,7 +254,7 @@ export default function CarouselFullFixed() {
   const domProgress = useMotionValue(0);
 
   /* -----------------------
-     🔥 ZOOM PATCH INSERTED HERE
+     ZOOM PATCH
      ----------------------- */
   const { scrollYProgress } = useScroll({
     target: scrollDriverRef,
@@ -261,30 +263,27 @@ export default function CarouselFullFixed() {
 
   const zoomTransition = useMotionValue(1);
   const zoomScroll = useTransform(scrollYProgress, [0, 1], [1.05, 1]);
-  const zoomCombined = useTransform([zoomScroll, zoomTransition], ([a, b]) => a * b);
+  const zoomCombined = useTransform(
+    [zoomScroll, zoomTransition],
+    ([a, b]) => a * b
+  );
 
-  /* -----------------------
-     Continue… (scroll handlers, shader, etc)
-     ----------------------- */
+  // current visible segment
+  const currentSegmentRef = useRef(0);
+  const [currentSegmentUI, setCurrentSegmentUI] = useState(0);
 
-  // current visible segment (integer) maintained by our internal state
-  const currentSegmentRef = useRef(0); // starts at 0
-  const [currentSegmentUI, setCurrentSegmentUI] = useState(0); // used for DOM opacity snapping after transition
-
-  // anim state for shader: uProgressAnim (0..1), controlled by internal animation timeline
-  const uProgressAnimRef = useRef(0); // what we feed to shader during animation
+  // anim state for shader
+  const uProgressAnimRef = useRef(0);
   const animatingRef = useRef(false);
   const animRafRef = useRef(null);
-
-  // settle anim state
   const settleAnimRef = useRef(0);
 
   // transition config
-  const TRANSITION_DURATION = 0.75; // seconds (phase1)
-  const SETTLE_DURATION = 0.25; // seconds (phase2)
-  const TRANSITION_EASE = (t) => t * t * (3 - 2 * t); // smoothstep-like
+  const TRANSITION_DURATION = 0.75;
+  const SETTLE_DURATION = 0.25;
+  const TRANSITION_EASE = (t) => t * t * (3 - 2 * t);
 
-  // slide opacity transforms (driven by internal currentSegmentUI)
+  // slide opacity transforms
   const slide1 = useTransform(domProgress, (v) => {
     const raw = v / SEGMENT;
     const seg = Math.floor(raw);
@@ -312,24 +311,31 @@ export default function CarouselFullFixed() {
     return 0;
   });
 
-  // progress bar segments (we'll snap domProgress when transition completes)
+  // progress bar segments
   const p1 = useTransform(domProgress, [0, SEGMENT], [0, 1]);
   const p2 = useTransform(domProgress, [SEGMENT, SEGMENT * 2], [0, 1]);
   const p3 = useTransform(domProgress, [SEGMENT * 2, 1], [0, 1]);
 
   /* -----------------------
-     pointer move: clamp + center-origin transform (same as original)
+     pointer move: throttled rAF
      ----------------------- */
   useEffect(() => {
+    let frame = null;
+
     const handleMove = (e) => {
       const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
       const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
 
-      const clampedX = Math.max(80, Math.min(window.innerWidth - 80, clientX));
-      const clampedY = Math.max(80, Math.min(window.innerHeight - 80, clientY));
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
 
-      mouseX.set(clampedX - window.innerWidth / 2);
-      mouseY.set(clampedY - window.innerHeight / 2);
+        const clampedX = Math.max(80, Math.min(window.innerWidth - 80, clientX));
+        const clampedY = Math.max(80, Math.min(window.innerHeight - 80, clientY));
+
+        mouseX.set(clampedX - window.innerWidth / 2);
+        mouseY.set(clampedY - window.innerHeight / 2);
+      });
     };
 
     window.addEventListener("pointermove", handleMove, { passive: true });
@@ -338,19 +344,18 @@ export default function CarouselFullFixed() {
     return () => {
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("touchmove", handleMove);
+      if (frame) cancelAnimationFrame(frame);
     };
   }, [mouseX, mouseY]);
 
   /* -----------------------
-     sync scrollYProgress (ghost) -> domProgress single source of truth
+     sync scrollYProgress -> domProgress
      ----------------------- */
   useEffect(() => {
     const unsub = scrollYProgress.onChange((v) => {
       domProgress.set(v);
-      // compute which segment user is currently over
       const raw = v / SEGMENT;
       const seg = Math.max(0, Math.min(SLIDE_COUNT - 1, Math.floor(raw)));
-      // if user moved into a different segment and we're not animating -> trigger transition
       if (seg !== currentSegmentRef.current && !animatingRef.current) {
         triggerGlitchTransition(seg);
       }
@@ -359,7 +364,7 @@ export default function CarouselFullFixed() {
   }, [scrollYProgress, domProgress]);
 
   /* -----------------------
-     Shader code (unchanged)
+     Shader code
      ----------------------- */
   const vert = `
     varying vec2 vUv;
@@ -545,12 +550,9 @@ export default function CarouselFullFixed() {
       } catch (e) {}
     }
 
-    /* -----------------------
-       🔥 ZOOM TRANSITION PATCH (BEGIN)
-       ----------------------- */
     animatingRef.current = true;
 
-    // ⬅️ ZOOM-IN SEDIKIT SAAT MULAI TRANSISI
+    // ZOOM TRANSITION PATCH (tetep sama)
     zoomTransition.set(1.05);
 
     uProgressAnimRef.current = 0;
@@ -604,15 +606,16 @@ export default function CarouselFullFixed() {
             settleAnimRef.current = 0;
             uProgressAnimRef.current = 0;
 
-            // ⬅️ RESET ZOOM KE NORMAL SETELAH TRANSISI SELESAI
             zoomTransition.set(1);
 
             if (matRef.current && matRef.current.uniforms) {
               try {
                 matRef.current.uniforms.uSettleAnim.value = 0;
                 matRef.current.uniforms.uProgressAnim.value = 0;
-                matRef.current.uniforms.uFrom.value = texturesRef.current[to].texture;
-                matRef.current.uniforms.uTo.value = texturesRef.current[to].texture;
+                matRef.current.uniforms.uFrom.value =
+                  texturesRef.current[to].texture;
+                matRef.current.uniforms.uTo.value =
+                  texturesRef.current[to].texture;
               } catch (e) {}
             }
           }
@@ -689,6 +692,15 @@ export default function CarouselFullFixed() {
       const dt = (now - last) / 1000;
       last = now;
 
+      // 🔥 Idle optimization:
+      // Kalau section lagi nggak kelihatan (di luar viewport),
+      // kita skip update uniform & render.
+      // Begitu balik kelihatan lagi, langsung lanjut normal.
+      if (!visibleRef.current) {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+
       if (matRef.current && matRef.current.uniforms) {
         try {
           matRef.current.uniforms.uTime.value += dt;
@@ -707,6 +719,20 @@ export default function CarouselFullFixed() {
     };
 
     window.addEventListener("resize", onResize);
+
+    // 🔥 IntersectionObserver: track apakah overlay (section) kelihatan di viewport
+    if ("IntersectionObserver" in window && holder) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          visibleRef.current = entry.isIntersecting;
+        },
+        { threshold: 0.1 }
+      );
+      io.observe(holder);
+      intersectObserverRef.current = io;
+    }
+
     if ("ResizeObserver" in window) {
       resizeObserverRef.current = new ResizeObserver(onResize);
       resizeObserverRef.current.observe(holder);
@@ -722,25 +748,35 @@ export default function CarouselFullFixed() {
           resizeObserverRef.current.disconnect();
           resizeObserverRef.current = null;
         }
+        if (intersectObserverRef.current) {
+          intersectObserverRef.current.disconnect();
+          intersectObserverRef.current = null;
+        }
         window.removeEventListener("resize", onResize);
         if (rendererRef.current) {
           rendererRef.current.dispose();
           try {
             rendererRef.current.forceContextLoss();
           } catch (e) {}
-          if (rendererRef.current.domElement && rendererRef.current.domElement.parentNode) {
-            rendererRef.current.domElement.parentNode.removeChild(rendererRef.current.domElement);
+          if (
+            rendererRef.current.domElement &&
+            rendererRef.current.domElement.parentNode
+          ) {
+            rendererRef.current.domElement.parentNode.removeChild(
+              rendererRef.current.domElement
+            );
           }
         }
       } catch (e) {}
       try {
-        matRef.current?.dispose?.();
-        geometry.dispose?.();
+        matRef.current && matRef.current.dispose && matRef.current.dispose();
+        geometry.dispose && geometry.dispose();
       } catch (e) {}
       try {
-        texturesRef.current?.forEach((t) => {
-          t.texture?.dispose?.();
-        });
+        texturesRef.current &&
+          texturesRef.current.forEach((t) => {
+            t.texture && t.texture.dispose && t.texture.dispose();
+          });
       } catch (e) {}
     };
   };
@@ -760,18 +796,32 @@ export default function CarouselFullFixed() {
       try {
         if (rendererRef.current) {
           rendererRef.current.dispose();
-          rendererRef.current.forceContextLoss?.();
-          if (rendererRef.current.domElement && rendererRef.current.domElement.parentNode) {
-            rendererRef.current.domElement.parentNode.removeChild(rendererRef.current.domElement);
+          rendererRef.current.forceContextLoss &&
+            rendererRef.current.forceContextLoss();
+          if (
+            rendererRef.current.domElement &&
+            rendererRef.current.domElement.parentNode
+          ) {
+            rendererRef.current.domElement.parentNode.removeChild(
+              rendererRef.current.domElement
+            );
           }
         }
       } catch (e) {}
       try {
-        matRef.current?.dispose?.();
+        matRef.current && matRef.current.dispose && matRef.current.dispose();
       } catch (e) {}
       try {
-        texturesRef.current?.forEach((t) => t.texture?.dispose?.());
+        texturesRef.current &&
+          texturesRef.current.forEach(
+            (t) => t.texture && t.texture.dispose && t.texture.dispose()
+          );
       } catch (e) {}
+      if (intersectObserverRef.current) {
+        try {
+          intersectObserverRef.current.disconnect();
+        } catch (e) {}
+      }
     };
   }, []);
 
@@ -783,14 +833,13 @@ export default function CarouselFullFixed() {
       {/* MAIN: sticky 100vh viewport container (all visible UI sits here) */}
       <main
         ref={mainRef}
-        className="sticky top-0 h-screen w-full overflow-hidden bg-black"
+        className="sticky -top-px h-screen w-full overflow-hidden bg-black"
         aria-label="carousel main"
       >
-        {/* Pipeline 1 + DOM fallback slides (inside main so object-cover respects viewport) */}
+        {/* Pipeline 1: hidden canvas -> WebGL */}
         <CarouselPipeline1 ref={p1Ref} />
 
-        {/* DOM slides (we snap domProgress to segment after transition completes)
-            — NOTE: scale uses zoomCombined (DOM-only subtle zoom) */}
+        {/* DOM slides (sama kayak versi lo, scale pakai zoomCombined) */}
         <motion.div
           style={{ opacity: slide1, scale: zoomCombined }}
           className="absolute inset-0 -z-20"
@@ -854,10 +903,10 @@ export default function CarouselFullFixed() {
         </div>
       </main>
 
-      {/* GHOST SCROLL DRIVER: controls scroll progress but invisible — keeps main 100vh */}
+      {/* GHOST SCROLL DRIVER */}
       <div
         ref={scrollDriverRef}
-        className="h-[300vh] w-full pointer-events-none opacity-0"
+        className="h-[1000vh] w-full pointer-events-none opacity-0"
         aria-hidden="true"
       />
     </>

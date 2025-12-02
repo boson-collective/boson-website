@@ -674,7 +674,7 @@ this.background = {
   uNoise: 0.03,       // noise lebih halus
   uOffsetX: 0.05,
   uOffsetY: 0.0,
-  uLinesAmount: 3.8,
+  uLinesAmount: 1.36, // 1.36 3.8
 };
 
     
@@ -918,7 +918,7 @@ class ExperienceScene extends InteractiveScene {
 }
 
 // ===== webgl/index.js =====
-class WebGL extends THREE.EventDispatcher {
+export default class WebGL extends THREE.EventDispatcher {
   constructor({ rendererEl, setShouldReveal, setProgressValue }) {
     super();
     this.rafId = null;
@@ -926,6 +926,7 @@ class WebGL extends THREE.EventDispatcher {
     this.mouseMove = MouseMove.getInstance();
     this.preloader = new Preloader();
     this.gui = new GUI();
+    this.gui.hide(); // GUI hilang tanpa hapus kode
     this.pixelRatio = 1;
 
     this.rendererEl = rendererEl;
@@ -1763,21 +1764,3 @@ void main() {
 `;
 
  
-
-export default function Page() {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const webgl = new WebGL({ rendererEl: containerRef.current });
-    return () => webgl.destroy();
-  }, []);
-
-  return (
-    <div
-      ref={containerRef}
-      id="webgl"
-      className="absolute inset-0 -z-10"
-    />
-  );
-}

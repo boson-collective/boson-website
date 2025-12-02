@@ -10,8 +10,30 @@ gsap.registerPlugin(ScrollTrigger);
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 
 import Carousel from '../1/page';
+import GradientBg from '../../../components/organisms/GradientBg'
 
 
+
+function Webglbg() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const webgl = new GradientBg({ rendererEl: containerRef.current });
+    return () => webgl.destroy();
+  }, []);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      id="webgl"
+      className="absolute inset-0 -z-10"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 2, duration: 1.2, ease: "easeOut" }}
+    />
+  );
+}
 
 /* ==========================================
    HERO (unchanged markup, styling tightened)
@@ -21,8 +43,8 @@ function Hero() {
   const y = useTransform(scrollY, [0, 500], [0, 80])
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden flex justify-center items-center text-white/80">
-
+    <div className="relative w-full h-screen  overflow-hidden flex justify-center items-center text-white/80">
+      <Webglbg/>  
       {/* NAV */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -51,15 +73,16 @@ function Hero() {
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ delay: 2.1, duration: 0.8, ease: "easeOut" }}
-  className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center text-center select-none"
+  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center text-center select-none"
 >
   <img
     src="/png/boson-white.png"
     alt="Boson Collective"
-    className="w-[280px] object-contain"
+    className="w-[350px] object-contain"
     draggable="false"
   />
 </motion.div>
+
 
 
       {/* SIDE LEFT */}
@@ -96,30 +119,49 @@ function Hero() {
 
       {/* CHROME CSS (unchanged) */}
       <style jsx>{`
-        .boson-chrome-v4 {
-          position: absolute;
-          inset: 0;
-          margin: auto;
-          width: 1250px;
-          height: 1250px;
-          mask-image: url("/boson-white.png");
-          -webkit-mask-image: url("/boson-white.png");
-          mask-size: contain;
-          mask-position: center;
-          mask-repeat: no-repeat;
-          opacity: 0.9;
-          filter: blur(0.2px);
-          background:
-            linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 4%, rgba(255,255,255,0.25) 7%, rgba(255,255,255,0) 11%),
-            linear-gradient(140deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 3%, rgba(255,255,255,0) 8%),
-            radial-gradient(circle at 50% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%),
-            radial-gradient(circle at 50% 78%, rgba(0,0,0,0.4), rgba(0,0,0,0) 70%),
-            radial-gradient(circle at 50% 70%, rgba(0,0,0,0) 25%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,1) 100%),
-            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,1) 100%),
-            linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%),
-            linear-gradient(180deg, rgba(255,255,255,0.6), rgba(30,30,30,0.85) 45%, rgba(0,0,0,1) 95%);
-          background-blend-mode: screen, screen, screen, multiply, multiply, multiply, multiply, overlay;
-        }
+    
+    .boson-chrome-v4 {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 1250px;
+  height: 1250px;
+
+  /* MASK */
+  mask-image: url("/boson-white.png");
+  -webkit-mask-image: url("/boson-white.png");
+  mask-size: contain;
+  mask-position: center;
+  mask-repeat: no-repeat;
+
+  /* NEW SUBTLE PREMIUM CHROME */
+  background:
+    /* soft vertical gradient shading */
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.00) 40%,
+      rgba(0, 0, 0, 0.20) 90%,
+      rgba(0, 0, 0, 0.40) 100%
+    ),
+    /* inward radial lighting */
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(255,255,255,0.04) 0%,
+      rgba(255,255,255,0.0) 45%,
+      rgba(0,0,0,0.35) 80%,
+      rgba(0,0,0,0.55) 100%
+    ),
+    /* base color */
+    #09070b;
+
+  background-blend-mode: screen, multiply;
+
+  filter: blur(0.6px);
+  opacity: 0.5;
+}
+
+
       `}</style>
     </div>
   )
@@ -170,7 +212,7 @@ function BosonNarrative() {
       style={{
         width: "100%",
         minHeight: "100vh",
-        background: "#000",
+        background: "#09070b",
         padding: "140px 7vw",
         position: "relative",
         overflow: "hidden",
@@ -267,6 +309,18 @@ function Projects() {
   const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 720]);
   const rotate2 = useTransform(scrollYProgress, [0, 1], [0, -540]);
   const rotate3 = useTransform(scrollYProgress, [0, 1], [0, 900]);
+  
+  // ============================
+  // TEXT REVEAL with Framer Motion
+  // ============================
+  const textOpacity = useTransform(scrollYProgress, [0.05, 0.12], [0, 1]);
+  const textY = useTransform(scrollYProgress, [0, 0.12], [-50, 0]);
+  const textFilter = useTransform(
+    scrollYProgress,
+    [0, 0.12],
+    ["blur(20px)", "blur(0px)"]
+  );
+  
 
   // ORBIT CONFIGS
   const c1 = { cx: 425, cy: 350, r: 250 };
@@ -287,13 +341,13 @@ function Projects() {
     setTransform(g2Ref.current, c2.cx, c2.cy, rotate2.get());
     setTransform(g3Ref.current, c3.cx, c3.cy, rotate3.get());
 
-    const unsub1 = rotate1.onChange(v =>
+    const unsub1 = rotate1.onChange((v) =>
       setTransform(g1Ref.current, c1.cx, c1.cy, v)
     );
-    const unsub2 = rotate2.onChange(v =>
+    const unsub2 = rotate2.onChange((v) =>
       setTransform(g2Ref.current, c2.cx, c2.cy, v)
     );
-    const unsub3 = rotate3.onChange(v =>
+    const unsub3 = rotate3.onChange((v) =>
       setTransform(g3Ref.current, c3.cx, c3.cy, v)
     );
 
@@ -309,35 +363,34 @@ function Projects() {
   // ============================
   // original 4 + 5 extra (looping through the same assets as example)
   const images = [
-    "/clients/marrosh/mockup.png",              // 0
-    "/clients/dwm/mockup.png",                 // 1
-    "/clients/tender-touch/mockup.png",        // 2
-    "/clients/hidden-city-ubud/mockup.png",    // 3
-    "/clients/marrosh/mockup.png",             // 4 (extra)
-    "/clients/dwm/mockup.png",                 // 5
-    "/clients/tender-touch/mockup.png",        // 6
-    "/clients/hidden-city-ubud/mockup.png",    // 7
-    "/clients/marrosh/mockup.png",             // 8 (extra)
-    "/clients/tender-touch/mockup.png",        // 6
-    "/clients/hidden-city-ubud/mockup.png",    // 7
-    "/clients/marrosh/mockup.png",             // 8 (extra)
-    "/clients/hidden-city-ubud/mockup.png",    // 3
-    "/clients/marrosh/mockup.png",             // 4 (extra)
-    "/clients/dwm/mockup.png",                 // 5
-    "/clients/tender-touch/mockup.png",        // 6
-    "/clients/marrosh/mockup.png",              // 0
-    "/clients/dwm/mockup.png",                 // 1
-    "/clients/tender-touch/mockup.png",        // 2
-    "/clients/hidden-city-ubud/mockup.png",    // 3
-    "/clients/marrosh/mockup.png",             // 4 (extra)
-    "/clients/dwm/mockup.png",                 // 5
-    "/clients/marrosh/mockup.png",              // 0
-    "/clients/dwm/mockup.png",                 // 1
-    "/clients/tender-touch/mockup.png",        // 2
-    "/clients/hidden-city-ubud/mockup.png",    // 3
-    "/clients/marrosh/mockup.png",             // 4 (extra)
-    "/clients/dwm/mockup.png",                 // 5
-    
+    "/clients/marrosh/mockup.png", // 0
+    "/clients/dwm/mockup.png", // 1
+    "/clients/tender-touch/mockup.png", // 2
+    "/clients/hidden-city-ubud/mockup.png", // 3
+    "/clients/marrosh/mockup.png", // 4 (extra)
+    "/clients/dwm/mockup.png", // 5
+    "/clients/tender-touch/mockup.png", // 6
+    "/clients/hidden-city-ubud/mockup.png", // 7
+    "/clients/marrosh/mockup.png", // 8 (extra)
+    "/clients/tender-touch/mockup.png", // 6
+    "/clients/hidden-city-ubud/mockup.png", // 7
+    "/clients/marrosh/mockup.png", // 8 (extra)
+    "/clients/hidden-city-ubud/mockup.png", // 3
+    "/clients/marrosh/mockup.png", // 4 (extra)
+    "/clients/dwm/mockup.png", // 5
+    "/clients/tender-touch/mockup.png", // 6
+    "/clients/marrosh/mockup.png", // 0
+    "/clients/dwm/mockup.png", // 1
+    "/clients/tender-touch/mockup.png", // 2
+    "/clients/hidden-city-ubud/mockup.png", // 3
+    "/clients/marrosh/mockup.png", // 4 (extra)
+    "/clients/dwm/mockup.png", // 5
+    "/clients/marrosh/mockup.png", // 0
+    "/clients/dwm/mockup.png", // 1
+    "/clients/tender-touch/mockup.png", // 2
+    "/clients/hidden-city-ubud/mockup.png", // 3
+    "/clients/marrosh/mockup.png", // 4 (extra)
+    "/clients/dwm/mockup.png", // 5
   ];
 
   // ============================
@@ -345,7 +398,7 @@ function Projects() {
   // base start, step, window length
   // ============================
   const baseStart = 0.15;
-  const step = 0.03;     // small delay between starts
+  const step = 0.03; // small delay between starts
   const windowLen = 0.17; // each burst end = start + windowLen
 
   // For each image, compute burst transform from scrollYProgress
@@ -361,12 +414,12 @@ function Projects() {
   const randomSeedsRef = useRef(null);
   if (!randomSeedsRef.current) {
     randomSeedsRef.current = images.map(() => ({
-      xOffset: (Math.random() - 0.5) * 80,    // -40..40
-      yOffset: (Math.random() - 0.5) * 80,    // -40..40
-      zOffset: (Math.random() - 0.5) * 800,   // -400..400
-      rotStart: (Math.random() - 0.5) * 4,    // -2..2 deg
-      rotEnd: (Math.random() - 0.5) * 10,     // -5..5 deg
-      blurBoost: Math.random(),               // 0..1
+      xOffset: (Math.random() - 0.5) * 80, // -40..40
+      yOffset: (Math.random() - 0.5) * 80, // -40..40
+      zOffset: (Math.random() - 0.5) * 800, // -400..400
+      rotStart: (Math.random() - 0.5) * 4, // -2..2 deg
+      rotEnd: (Math.random() - 0.5) * 10, // -5..5 deg
+      blurBoost: Math.random(), // 0..1
     }));
   }
   const randomSeeds = randomSeedsRef.current;
@@ -380,18 +433,17 @@ function Projects() {
   // ============================
   function createMotionVector(b, pattern, seed) {
     // Z: piecewise — cepat ke kamera, halus keluar
-    const z = useTransform(
-      b,
-      [0, 0.4, 1],
-      [-3000, 0, 5000 + seed.zOffset]
-    );
+    const z = useTransform(b, [0, 0.4, 1], [-3000, 0, 5000 + seed.zOffset]);
 
     // base arah 4-kuadran
     const baseX =
-      pattern === 0 ? 220 : // right-top
-      pattern === 1 ? -220 : // left-top
-      pattern === 2 ? 220 :  // right-bottom
-                      -220;  // left-bottom;
+      pattern === 0
+        ? 220 // right-top
+        : pattern === 1
+        ? -220 // left-top
+        : pattern === 2
+        ? 220 // right-bottom
+        : -220; // left-bottom;
 
     const baseY = pattern <= 1 ? -200 : 200;
 
@@ -401,9 +453,6 @@ function Projects() {
 
     // scale natural berbasis depth (nggak meledak)
     const scale = useTransform(b, [0, 1], [0.3, 1.2]);
- 
-    
- 
 
     return { x, y, z, scale };
   }
@@ -415,11 +464,7 @@ function Projects() {
     const pattern = idx % 4;
     const seed = randomSeeds[idx % randomSeeds.length];
 
-    const { x, y, z, scale } = createMotionVector(
-      b,
-      pattern,
-      seed
-    );
+    const { x, y, z, scale } = createMotionVector(b, pattern, seed);
 
     return {
       burst: b,
@@ -431,8 +476,6 @@ function Projects() {
     };
   });
 
-
-
   // ---------------------------
   // Render
   // ---------------------------
@@ -442,7 +485,7 @@ function Projects() {
       style={{
         width: "100%",
         height: "1200vh",
-        background: "#000",
+        background: "#09070b",
         position: "relative",
       }}
     >
@@ -470,9 +513,33 @@ function Projects() {
           height="850"
           style={{ position: "absolute" }}
         >
-          <circle cx={c1.cx} cy={c1.cy} r={c1.r} stroke="white" strokeWidth="0.5" opacity="0.15" fill="none" />
-          <circle cx={c2.cx} cy={c2.cy} r={c2.r} stroke="white" strokeWidth="0.5" opacity="0.15" fill="none" />
-          <circle cx={c3.cx} cy={c3.cy} r={c3.r} stroke="white" strokeWidth="0.5" opacity="0.15" fill="none" />
+          <circle
+            cx={c1.cx}
+            cy={c1.cy}
+            r={c1.r}
+            stroke="white"
+            strokeWidth="0.5"
+            opacity="0.15"
+            fill="none"
+          />
+          <circle
+            cx={c2.cx}
+            cy={c2.cy}
+            r={c2.r}
+            stroke="white"
+            strokeWidth="0.5"
+            opacity="0.15"
+            fill="none"
+          />
+          <circle
+            cx={c3.cx}
+            cy={c3.cy}
+            r={c3.r}
+            stroke="white"
+            strokeWidth="0.5"
+            opacity="0.15"
+            fill="none"
+          />
 
           <g ref={g1Ref} transform={`translate(${c1.cx} ${c1.cy}) rotate(0)`}>
             <circle cx={c1.r} cy={0} r={3} fill="white" />
@@ -487,9 +554,12 @@ function Projects() {
           </g>
         </svg>
 
-{/* TEXT */}
-<div
+        {/* TEXT */}
+        <motion.div
   style={{
+    opacity: textOpacity,
+    y: textY,
+    filter: textFilter,
     position: "absolute",
     color: "white",
     fontSize: "32px",
@@ -497,18 +567,18 @@ function Projects() {
     fontWeight: 300,
     lineHeight: 1.3,
     zIndex: 10,
+    whiteSpace: "pre-line",
   }}
 >
-  Signals, motion, intent:
-  <br />
-  The Boson process takes shape
-</div>
+{`Signals, motion, intent:
+The Boson process takes shape`}
+</motion.div>
+
 
         {/* Render all image bursts (looped pattern) */}
         {images.map((src, i) => (
           <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
-
       </div>
     </div>
   );
@@ -535,7 +605,7 @@ function BigHeading() {
       style={{
         height: "150vh",
         position: "relative",
-        background: "#000",
+        background: "#09070b",
         overflow: "hidden",
       }}
     >
@@ -817,12 +887,33 @@ function MarqueeOverlay({ item, active }) {
   return (
     <div
       style={{
-        background: "#000",
+        background: "#09070b",
         width: "100%",
         padding: "6vh 0",
         position: "relative",
       }}
     >
+      
+      {/* BOSON SUBHEADER */}
+<div
+  style={{
+    width: "100%",
+    color: "white",
+    textAlign: "center",
+    fontSize: "1.1vw",
+    fontWeight: 300,
+    opacity: 0.7,
+    marginBottom: "6vh",
+    letterSpacing: "0.02em",
+    lineHeight: 1.4,
+    padding: "0 10vw",
+    textTransform: "none",
+  }}
+>
+Every decision, every detail is a lever — elevating the whole
+</div>
+
+      
       {items.map((item, i) => (
         <div
           key={i}
@@ -1087,6 +1178,7 @@ function Footer() {
             height: "100vh",
             overflow: "hidden",
             zIndex: 1,
+            background: 'black'
           }}
         >
           <Hero />
