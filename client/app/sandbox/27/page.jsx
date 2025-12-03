@@ -36,137 +36,299 @@ function Webglbg() {
 }
 
 /* ==========================================
-   HERO (unchanged markup, styling tightened)
+   HERO (PERSIS PUNYA LO)
    ========================================== */
-function Hero() {
-  const { scrollY } = useScroll()
-  const y = useTransform(scrollY, [0, 500], [0, 80])
+   function Hero() {
+    const { scrollY } = useScroll();
+    const y = useTransform(scrollY, [0, 500], [0, 80]);
+  
+    return (
+      <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
+        <Webglbg />
+        {/* NAV */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 0.75, y: 0 }}
+          transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
+          className="absolute top-10 w-full px-20 flex justify-between text-sm z-20 tracking-wide"
+        >
+          <div className="flex gap-8">
+            <span>About</span>
+            <span>Philosophy</span>
+          </div>
+          <div className="flex gap-8">
+            <span>Works</span>
+            <span>Contact</span>
+          </div>
+        </motion.div>
+  
+        {/* BOSON CHROME */}
+        <motion.div
+          initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
+          className="absolute inset-0 z-10 flex items-center justify-center"
+        >
+          <div className="boson-chrome-v4" />
+        </motion.div>
+   
+  
+        {/* SIDE LEFT */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.6, y: 0 }}
+          transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-[22%] left-20 text-sm leading-relaxed max-w-[240px] z-20"
+        >
+          A system-driven studio
+          <br />
+          for modern identity & engineering.
+        </motion.div>
+  
+        {/* SIDE RIGHT */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.6, y: 0 }}
+          transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-[22%] right-20 text-right text-sm leading-relaxed max-w-[240px] z-20"
+        >
+          Focused on how to shape
+          <br />
+          the future, not follow it.
+        </motion.div>
+  
+        {/* FOOTER */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.55, y: 0 }}
+          transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-10 w-full px-20 flex justify-between text-xs z-20"
+        >
+          <span>06°10&apos;00&quot;S</span>
+          <span>Bali, Indonesia</span>
+          <span>106°49&apos;00&quot;E</span>
+        </motion.div>
+  
+        {/* CHROME CSS (unchanged) */}
+        <style jsx>{`
+          .boson-chrome-v4 {
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            width: 1250px;
+            height: 1250px;
+  
+            /* MASK */
+            mask-image: url("/boson-white.png");
+            -webkit-mask-image: url("/boson-white.png");
+            mask-size: contain;
+            mask-position: center;
+            mask-repeat: no-repeat;
+  
+            /* NEW SUBTLE PREMIUM CHROME */
+            background:
+              /* soft vertical gradient shading */
+              linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.06) 0%,
+                rgba(255, 255, 255, 0) 40%,
+                rgba(0, 0, 0, 0.2) 90%,
+                rgba(0, 0, 0, 0.4) 100%
+              ),
+              /* inward radial lighting */
+              radial-gradient(
+                circle at 50% 45%,
+                rgba(255, 255, 255, 0.04) 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(0, 0, 0, 0.35) 80%,
+                rgba(0, 0, 0, 0.55) 100%
+              ),
+              /* base color */
+              #09070b;
+  
+            background-blend-mode: screen, multiply;
+  
+            filter: blur(0.6px);
+            opacity: 0.5;
+          }
+        `}</style>
+      </div>
+    );
+  }
+  
+  /* ==========================================
+   INTRO FRAME OVERLAY (SLIDES + PORTAL)
+   ========================================== */
+
+   function IntroOverlay() {
+    const IMAGES = [
+      "/clients/tender-touch/5.jpg",
+      "/clients/tender-touch/3.jpg",
+      "/clients/tender-touch/4.jpg",
+      "/clients/tender-touch/5.jpg",
+      "/clients/tender-touch/3.jpg",
+      "/clients/tender-touch/4.jpg",
+      "/clients/tender-touch/5.jpg",
+      "/clients/tender-touch/3.jpg",
+      "/clients/tender-touch/4.jpg",
+    ];
+    const [phase, setPhase] = useState("slides");
+    const [visible, setVisible] = useState(Array(IMAGES.length).fill("start"));
+    const [topIndex, setTopIndex] = useState(0);
+  
+    useEffect(() => {
+      const revealDuration = 250; 
+      const overlapStart = 150;
+      const delayPer = revealDuration;
+  
+      IMAGES.forEach((_, i) => {
+        const openTime = i * delayPer;
+        const overlapTime = openTime + overlapStart;
+        const closeTime = openTime + revealDuration;
+  
+        // OPEN slide i
+        setTimeout(() => {
+          setVisible((prev) => {
+            const arr = [...prev];
+            arr[i] = "open";
+            return arr;
+          });
+          setTopIndex(i);
+        }, openTime);
+  
+        // Bring next slide above before this closes
+        if (i < IMAGES.length - 1) {
+          setTimeout(() => {
+            setTopIndex(i + 1);
+          }, overlapTime);
+        }
+  
+        // CLOSE this slide
+        setTimeout(() => {
+          setVisible((prev) => {
+            const arr = [...prev];
+            arr[i] = "close";
+            return arr;
+          });
+        }, closeTime);
+      });
+  
+      const total = (IMAGES.length - 1) * delayPer + revealDuration;
+  
+      setTimeout(() => setPhase("hole"), total + 20);
+      setTimeout(() => setPhase("expand"), total + 700);
+      setTimeout(() => setPhase("done"), total + 2200);
+    }, []);
+  
+    if (phase === "done") return null;
+  
+    return (
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
+        animate={
+          phase === "expand"
+            ? { scaleX: 26, scaleY: 6 }
+            : { scaleX: 1, scaleY: 1 }
+        }
+        transition={{ duration: 1.6, ease: "easeInOut" }}
+        
+      >
+        <div className="relative" style={{ width: 260, height: 400 }}>
+          <div className="absolute inset-0">
+            {IMAGES.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                draggable="false"
+                className={`absolute w-full h-full object-cover transition-all duration-[250ms] ${
+                  visible[i] === "open"
+                    ? "reveal"
+                    : visible[i] === "close"
+                    ? "reveal-end"
+                    : "reveal-start"
+                }`}
+                style={{ zIndex: i === topIndex ? 1000 : i }}
+              />
+            ))}
+          </div>
+          <div className="absolute inset-0 spotlight pointer-events-none" />
+        </div>
+  
+        <style jsx>{`
+          .spotlight {
+            box-shadow: 0 0 0 9999px black;
+          }
+          .reveal-start {
+            clip-path: inset(100% 0% 0% 0%);
+          }
+          .reveal {
+            clip-path: inset(0% 0% 0% 0%);
+          }
+          .reveal-end {
+            clip-path: inset(0% 0% 100% 0%);
+          }
+        `}</style>
+      </motion.div>
+    );
+  }
+  
+  
+function HeroJoin() { 
+  const { scrollY } = useScroll();
+  const titleY = useTransform(scrollY, [0, 300], [0, -80]);
+ 
 
   return (
-    <div className="relative w-full h-screen  overflow-hidden flex justify-center items-center text-white/80">
-      <Webglbg/>  
-      {/* NAV */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 0.75, y: 0 }}
-        transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
-        className="absolute top-10 w-full px-20 flex justify-between text-sm z-20 tracking-wide"
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        background: "#000",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100vh",
+          overflow: "hidden",
+          zIndex: 1,
+          background: "black",
+        }}
       >
-        <div className="flex gap-8"><span>About</span><span>Philosophy</span></div>
-        <div className="flex gap-8"><span>Works</span><span>Contact</span></div>
-      </motion.div>
+        {/* HERO FULLSCREEN DI BELAKANG */}
+        <Hero />
 
-      {/* BOSON CHROME */}
-      <motion.div
-  initial={{ opacity: 0, scale: 1.07, filter: "blur(10px)" }}
-  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-  transition={{ delay: 2, duration: 1.2, ease: "easeOut" }}
-  className="absolute inset-0 z-10 flex items-center justify-center"
->
-  <div className="boson-chrome-v4" />
-</motion.div>
+        {/* TITLE PALING DEPAN + PARALLAX + SCALE ANIMATION */}
+        <motion.div
+          style={{ y: titleY }}
+          initial={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 3, duration: 1.2, ease: "easeOut" }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[65] flex flex-col items-center text-center select-none pointer-events-none"
+        >
+          <img
+            src="/png/boson-white.png"
+            alt="Boson Collective"
+            className="w-[250px] object-contain"
+            draggable="false"
+          />
+        </motion.div>
 
+        {/* INTRO OVERLAY DI DEPAN HERO TAPI DI BELAKANG TITLE */}
+        <IntroOverlay />
+      </div>
 
-{/* TITLE (Replaced with Image) */}
-<motion.div
-  style={{ y }}
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ delay: 2.1, duration: 0.8, ease: "easeOut" }}
-  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center text-center select-none"
->
-  <img
-    src="/png/boson-white.png"
-    alt="Boson Collective"
-    className="w-[350px] object-contain"
-    draggable="false"
-  />
-</motion.div>
-
-
-
-      {/* SIDE LEFT */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 0.6, y: 0 }}
-        transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
-        className="absolute bottom-[22%] left-20 text-sm leading-relaxed max-w-[240px] z-20"
-      >
-        A system-driven studio<br />for modern identity & engineering.
-      </motion.div>
-
-      {/* SIDE RIGHT */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 0.6, y: 0 }}
-        transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
-        className="absolute bottom-[22%] right-20 text-right text-sm leading-relaxed max-w-[240px] z-20"
-      >
-        Focused on how to shape<br />the future, not follow it.
-      </motion.div>
-
-      {/* FOOTER */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 0.55, y: 0 }}
-        transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
-        className="absolute bottom-10 w-full px-20 flex justify-between text-xs z-20"
-      >
-        <span>06°10'00"S</span>
-        <span>Bali, Indonesia</span>
-        <span>106°49'00"E</span>
-      </motion.div>
-
-      {/* CHROME CSS (unchanged) */}
-      <style jsx>{`
-    
-    .boson-chrome-v4 {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 1250px;
-  height: 1250px;
-
-  /* MASK */
-  mask-image: url("/boson-white.png");
-  -webkit-mask-image: url("/boson-white.png");
-  mask-size: contain;
-  mask-position: center;
-  mask-repeat: no-repeat;
-
-  /* NEW SUBTLE PREMIUM CHROME */
-  background:
-    /* soft vertical gradient shading */
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.00) 40%,
-      rgba(0, 0, 0, 0.20) 90%,
-      rgba(0, 0, 0, 0.40) 100%
-    ),
-    /* inward radial lighting */
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(255,255,255,0.04) 0%,
-      rgba(255,255,255,0.0) 45%,
-      rgba(0,0,0,0.35) 80%,
-      rgba(0,0,0,0.55) 100%
-    ),
-    /* base color */
-    #09070b;
-
-  background-blend-mode: screen, multiply;
-
-  filter: blur(0.6px);
-  opacity: 0.5;
-}
-
-
+      <style jsx global>{`
+        body {
+          background: #000;
+        }
       `}</style>
     </div>
-  )
+  );
 }
-  
+
 
 function BosonNarrative() {
   const wrap = useRef(null);
@@ -1170,19 +1332,9 @@ function Footer() {
           background: "#000",
           position: "relative",
         }}
-      >
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            height: "100vh",
-            overflow: "hidden",
-            zIndex: 1,
-            background: 'black'
-          }}
-        >
-          <Hero />
-        </div>
+      > 
+    
+        <HeroJoin/>
   
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
           <BosonNarrative />
@@ -1214,3 +1366,4 @@ function Footer() {
       </div>
     )
   }
+  
