@@ -322,20 +322,16 @@ function BosonNarrative() {
   const targetPos = useRef({ x: -9999, y: -9999 });
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile dynamically
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const handleChange = (e) => setIsMobile(e.matches);
-
-    handleChange(mq); // initial run
+    handleChange(mq);
     mq.addEventListener("change", handleChange);
     return () => mq.removeEventListener("change", handleChange);
   }, []);
 
-  // Spotlight animation for desktop only
   useEffect(() => {
     if (isMobile) {
-      // Reset for smooth return when resizing back to desktop
       setPos({ x: -9999, y: -9999 });
       targetPos.current = { x: -9999, y: -9999 };
       return;
@@ -371,7 +367,7 @@ function BosonNarrative() {
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
+      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
       style={{ padding: "120px 6vw" }}
     >
       <div
@@ -383,7 +379,7 @@ function BosonNarrative() {
           lineHeight: 1.25,
           fontWeight: 400,
           color: isMobile
-            ? "rgba(255,255,255,0.96)" // FULL glow on mobile
+            ? "rgba(255,255,255,0.96)"
             : "rgba(255,255,255,0.085)",
         }}
       >
@@ -420,9 +416,19 @@ function BosonNarrative() {
           </div>
         )}
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .boson-narrative-container {
+            min-height: auto !important;
+            height: auto !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
+
 
 
   
@@ -755,36 +761,21 @@ function BigHeading() {
   return (
     <div
       ref={ref}
-      style={{
-        height: "150vh",
-        position: "relative",
-        background: "#09070b",
-        overflow: "hidden",
-        width: "100%",
-      }}
+      className="relative bg-[#09070b] overflow-hidden w-full big-heading-container"
+      style={{ height: "150vh" }}
     >
       <div
-        style={{
-          position: "sticky",
-          top: 0,
-          height: "150vh",
-          width: "100%",
-          pointerEvents: "none",
-        }}
+        className="big-heading-sticky pointer-events-none"
+        style={{ position: "sticky", top: 0, width: "100%", height: "150vh" }}
       >
 
         {/* TOP */}
         <div
-          style={{
-            height: "75vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            overflow: "hidden",
-          }}
+          className="big-heading-top-wrapper flex justify-center items-end overflow-hidden"
+          style={{ height: "75vh" }}
         >
           <motion.div
-            className="big-heading-top"
+            className="big-heading-top flex whitespace-nowrap"
             style={{
               x: topX,
               transform: "translateY(10%)",
@@ -792,9 +783,7 @@ function BigHeading() {
               fontSize: "30vw",
               fontWeight: 300,
               lineHeight: 0.8,
-              whiteSpace: "nowrap",
               opacity: 0.9,
-              display: "flex",
               gap: "4vw",
             }}
           >
@@ -806,16 +795,11 @@ function BigHeading() {
 
         {/* BOTTOM */}
         <div
-          style={{
-            height: "75vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            overflow: "hidden",
-          }}
+          className="big-heading-bottom-wrapper flex justify-center items-start overflow-hidden"
+          style={{ height: "75vh" }}
         >
           <motion.div
-            className="big-heading-bottom"
+            className="big-heading-bottom flex whitespace-nowrap"
             style={{
               x: bottomX,
               transform: "translateY(-10%)",
@@ -823,9 +807,7 @@ function BigHeading() {
               fontSize: "30vw",
               fontWeight: 300,
               lineHeight: 0.8,
-              whiteSpace: "nowrap",
               opacity: 0.45,
-              display: "flex",
               gap: "4vw",
             }}
           >
@@ -836,26 +818,33 @@ function BigHeading() {
         </div>
       </div>
 
-      {/* RESPONSIVE FIX — hanya mobile & tablet */}
       <style>{`
         @media(max-width: 1023px) {
-          .big-heading-top,
-          .big-heading-bottom {
-            font-size: 20vw !important; /* lebih kecil di mobile */
-            gap: 6vw; /* biar lebih lega */
+          .big-heading-container {
+            height: auto !important;
+          }
+          .big-heading-sticky {
+            position: static !important;
+            height: auto !important;
+          }
+          .big-heading-top-wrapper,
+          .big-heading-bottom-wrapper {
+            height: auto !important;
+            padding: 2vh 0 !important; /* ← DIPERAPAT */
           }
         }
 
         @media(max-width: 600px) {
           .big-heading-top,
           .big-heading-bottom {
-            font-size: 22vw !important; /* mobile kecil */
+            font-size: 22vw !important;
           }
         }
       `}</style>
     </div>
   );
 }
+
 
 function MarqueeOverlay({ item, active }) {
   const trackRef = useRef(null);
