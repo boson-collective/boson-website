@@ -9,6 +9,8 @@ export const metadata = {
   description: "Transforming signals into stories. We turn chaos into meaning through creative digital experiences.",
 };
 
+
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

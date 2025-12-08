@@ -665,17 +665,17 @@ class Background extends InteractiveObject {
     this.mesh = null;
     this.geometry = null;
     this.material = null;
-this.background = {
-  color1: [0.92, 0.23, 0.15], // Soft bright red
-  color2: [0.55, 0.07, 0.04], // Darker warm red
-  color3: [0.01, 0.015, 0.03], // Rich dark navy-black
-  colorAccent: new THREE.Color(0.0, 0.0, 0.0),
-  uLinesBlur: 0.33,   // was 0.25 → lebih blur
-  uNoise: 0.03,       // noise lebih halus
-  uOffsetX: 0.05,
-  uOffsetY: 0.0,
-  uLinesAmount: 1.36, // 1.36 3.8
-};
+    this.background = {
+      color1: [0.92, 0.23, 0.15], // Soft bright red
+      color2: [0.55, 0.07, 0.04], // Darker warm red
+      color3: [0.01, 0.015, 0.03], // Rich dark navy-black
+      colorAccent: new THREE.Color(0.0, 0.0, 0.0),
+      uLinesBlur: 0.33,   // was 0.25 → lebih blur
+      uNoise: 0.03,       // noise lebih halus
+      uOffsetX: 0.05,
+      uOffsetY: 0.0,
+      uLinesAmount: 1.36, // 1.36 3.8
+    };
 
     
     // this.mouse2D = new Vector2(0.0, 0.0);

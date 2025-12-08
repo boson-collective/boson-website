@@ -8,7 +8,6 @@ import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
 
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
-
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
 
@@ -38,244 +37,230 @@ function Webglbg() {
 /* ==========================================
    HERO (PERSIS PUNYA LO)
    ========================================== */
-   function Hero() {
-    const { scrollY } = useScroll();
-    const y = useTransform(scrollY, [0, 500], [0, 80]);
-  
-    return (
-      <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
-        <Webglbg />
-        {/* NAV */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 0.75, y: 0 }}
-          transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
-          className="absolute top-10 w-full px-20 flex justify-between text-sm z-20 tracking-wide"
-        >
-          <div className="flex gap-8">
-            <span>About</span>
-            <span>Philosophy</span>
-          </div>
-          <div className="flex gap-8">
-            <span>Works</span>
-            <span>Contact</span>
-          </div>
-        </motion.div>
-  
-        {/* BOSON CHROME */}
-        <motion.div
-          initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
-          className="absolute inset-0 z-10 flex items-center justify-center"
-        >
-          <div className="boson-chrome-v4" />
-        </motion.div>
-   
-  
-        {/* SIDE LEFT */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.6, y: 0 }}
-          transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[22%] left-20 text-sm leading-relaxed max-w-[240px] z-20"
-        >
-          A system-driven studio
-          <br />
-          for modern identity & engineering.
-        </motion.div>
-  
-        {/* SIDE RIGHT */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.6, y: 0 }}
-          transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[22%] right-20 text-right text-sm leading-relaxed max-w-[240px] z-20"
-        >
-          Focused on how to shape
-          <br />
-          the future, not follow it.
-        </motion.div>
-  
-        {/* FOOTER */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.55, y: 0 }}
-          transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-10 w-full px-20 flex justify-between text-xs z-20"
-        >
-          <span>06°10&apos;00&quot;S</span>
-          <span>Bali, Indonesia</span>
-          <span>106°49&apos;00&quot;E</span>
-        </motion.div>
-  
-        {/* CHROME CSS (unchanged) */}
-        <style jsx>{`
-          .boson-chrome-v4 {
-            position: absolute;
-            inset: 0;
-            margin: auto;
-            width: 1250px;
-            height: 1250px;
-  
-            /* MASK */
-            mask-image: url("/boson-white.png");
-            -webkit-mask-image: url("/boson-white.png");
-            mask-size: contain;
-            mask-position: center;
-            mask-repeat: no-repeat;
-  
-            /* NEW SUBTLE PREMIUM CHROME */
-            background:
-              /* soft vertical gradient shading */
-              linear-gradient(
-                180deg,
-                rgba(255, 255, 255, 0.06) 0%,
-                rgba(255, 255, 255, 0) 40%,
-                rgba(0, 0, 0, 0.2) 90%,
-                rgba(0, 0, 0, 0.4) 100%
-              ),
-              /* inward radial lighting */
-              radial-gradient(
-                circle at 50% 45%,
-                rgba(255, 255, 255, 0.04) 0%,
-                rgba(255, 255, 255, 0) 45%,
-                rgba(0, 0, 0, 0.35) 80%,
-                rgba(0, 0, 0, 0.55) 100%
-              ),
-              /* base color */
-              #09070b;
-  
-            background-blend-mode: screen, multiply;
-  
-            filter: blur(0.6px);
-            opacity: 0.5;
-          }
-        `}</style>
+function Hero() {
+const { scrollY } = useScroll();
+const y = useTransform(scrollY, [0, 500], [0, 80]);
+
+return (
+  <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
+    <Webglbg />
+
+    {/* NAV */}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 0.75, y: 0 }}
+      transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
+      className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
+    >
+      <div className="flex gap-4 sm:gap-8">
+        <span>About</span>
+        <span>Philosophy</span>
       </div>
-    );
-  }
+      <div className="flex gap-4 sm:gap-8">
+        <span>Works</span>
+        <span>Contact</span>
+      </div>
+    </motion.div>
+
+    {/* BOSON CHROME */}
+    <motion.div
+      initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
+      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+      transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
+      className="absolute inset-0 z-10 flex items-center justify-center"
+    >
+      <div className="boson-chrome-v4" />
+    </motion.div>
+
+    {/* SIDE LEFT */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.6, y: 0 }}
+      transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
+      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-start z-20"
+    >
+      A system-driven studio
+      <br />
+      for modern identity & engineering.
+    </motion.div>
+
+    {/* SIDE RIGHT */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.6, y: 0 }}
+      transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-[20%] sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
+      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-right z-20"
+    >
+      Focused on how to shape
+      <br />
+      the future, not follow it.
+    </motion.div>
+
+    {/* FOOTER */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.55, y: 0 }}
+      transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
+      text-[10px] sm:text-xs tracking-wide z-20"
+    >
+      <span>06°10&apos;00&quot;S</span>
+      <span>Bali, Indonesia</span>
+      <span>106°49&apos;00&quot;E</span>
+    </motion.div>
+
+    {/* CHROME CSS */}
+    <style jsx>{`
+      .boson-chrome-v4 {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: min(90vw, 1250px);
+        height: min(90vw, 1250px);
+
+        mask-image: url("/boson-white.png");
+        -webkit-mask-image: url("/boson-white.png");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
+          radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%),
+          #09070b;
+
+        background-blend-mode: screen, multiply;
+
+        filter: blur(0.6px);
+        opacity: 0.5;
+      }
+    `}</style>
+  </div>
+);
+}
+  
   
   /* ==========================================
    INTRO FRAME OVERLAY (SLIDES + PORTAL)
-   ========================================== */
+   ========================================== */ 
+function IntroOverlay() {
+const IMAGES = [
+  "/clients/tender-touch/5.jpg",
+  "/clients/tender-touch/3.jpg",
+  "/clients/tender-touch/4.jpg",
+  "/clients/tender-touch/5.jpg",
+  "/clients/tender-touch/3.jpg",
+  "/clients/tender-touch/4.jpg",
+  "/clients/tender-touch/5.jpg",
+  "/clients/tender-touch/3.jpg",
+  "/clients/tender-touch/4.jpg",
+];
+const [phase, setPhase] = useState("slides");
+const [visible, setVisible] = useState(Array(IMAGES.length).fill("start"));
+const [topIndex, setTopIndex] = useState(0);
 
-   function IntroOverlay() {
-    const IMAGES = [
-      "/clients/tender-touch/5.jpg",
-      "/clients/tender-touch/3.jpg",
-      "/clients/tender-touch/4.jpg",
-      "/clients/tender-touch/5.jpg",
-      "/clients/tender-touch/3.jpg",
-      "/clients/tender-touch/4.jpg",
-      "/clients/tender-touch/5.jpg",
-      "/clients/tender-touch/3.jpg",
-      "/clients/tender-touch/4.jpg",
-    ];
-    const [phase, setPhase] = useState("slides");
-    const [visible, setVisible] = useState(Array(IMAGES.length).fill("start"));
-    const [topIndex, setTopIndex] = useState(0);
-  
-    useEffect(() => {
-      const revealDuration = 250; 
-      const overlapStart = 150;
-      const delayPer = revealDuration;
-  
-      IMAGES.forEach((_, i) => {
-        const openTime = i * delayPer;
-        const overlapTime = openTime + overlapStart;
-        const closeTime = openTime + revealDuration;
-  
-        // OPEN slide i
-        setTimeout(() => {
-          setVisible((prev) => {
-            const arr = [...prev];
-            arr[i] = "open";
-            return arr;
-          });
-          setTopIndex(i);
-        }, openTime);
-  
-        // Bring next slide above before this closes
-        if (i < IMAGES.length - 1) {
-          setTimeout(() => {
-            setTopIndex(i + 1);
-          }, overlapTime);
-        }
-  
-        // CLOSE this slide
-        setTimeout(() => {
-          setVisible((prev) => {
-            const arr = [...prev];
-            arr[i] = "close";
-            return arr;
-          });
-        }, closeTime);
+useEffect(() => {
+  const revealDuration = 250; 
+  const overlapStart = 150;
+  const delayPer = revealDuration;
+
+  IMAGES.forEach((_, i) => {
+    const openTime = i * delayPer;
+    const overlapTime = openTime + overlapStart;
+    const closeTime = openTime + revealDuration;
+
+    // OPEN slide i
+    setTimeout(() => {
+      setVisible((prev) => {
+        const arr = [...prev];
+        arr[i] = "open";
+        return arr;
       });
-  
-      const total = (IMAGES.length - 1) * delayPer + revealDuration;
-  
-      setTimeout(() => setPhase("hole"), total + 20);
-      setTimeout(() => setPhase("expand"), total + 700);
-      setTimeout(() => setPhase("done"), total + 2200);
-    }, []);
-  
-    if (phase === "done") return null;
-  
-    return (
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
-        animate={
-          phase === "expand"
-            ? { scaleX: 26, scaleY: 6 }
-            : { scaleX: 1, scaleY: 1 }
-        }
-        transition={{ duration: 1.6, ease: "easeInOut" }}
-        
-      >
-        <div className="relative" style={{ width: 260, height: 400 }}>
-          <div className="absolute inset-0">
-            {IMAGES.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                draggable="false"
-                className={`absolute w-full h-full object-cover transition-all duration-[250ms] ${
-                  visible[i] === "open"
-                    ? "reveal"
-                    : visible[i] === "close"
-                    ? "reveal-end"
-                    : "reveal-start"
-                }`}
-                style={{ zIndex: i === topIndex ? 1000 : i }}
-              />
-            ))}
-          </div>
-          <div className="absolute inset-0 spotlight pointer-events-none" />
-        </div>
-  
-        <style jsx>{`
-          .spotlight {
-            box-shadow: 0 0 0 9999px black;
-          }
-          .reveal-start {
-            clip-path: inset(100% 0% 0% 0%);
-          }
-          .reveal {
-            clip-path: inset(0% 0% 0% 0%);
-          }
-          .reveal-end {
-            clip-path: inset(0% 0% 100% 0%);
-          }
-        `}</style>
-      </motion.div>
-    );
-  }
+      setTopIndex(i);
+    }, openTime);
+
+    // Bring next slide above before this closes
+    if (i < IMAGES.length - 1) {
+      setTimeout(() => {
+        setTopIndex(i + 1);
+      }, overlapTime);
+    }
+
+    // CLOSE this slide
+    setTimeout(() => {
+      setVisible((prev) => {
+        const arr = [...prev];
+        arr[i] = "close";
+        return arr;
+      });
+    }, closeTime);
+  });
+
+  const total = (IMAGES.length - 1) * delayPer + revealDuration;
+
+  setTimeout(() => setPhase("hole"), total + 20);
+  setTimeout(() => setPhase("expand"), total + 700);
+  setTimeout(() => setPhase("done"), total + 2200);
+}, []);
+
+if (phase === "done") return null;
+
+return (
+  <motion.div
+    className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
+    animate={
+      phase === "expand"
+        ? { scaleX: 26, scaleY: 6 }
+        : { scaleX: 1, scaleY: 1 }
+    }
+    transition={{ duration: 1.6, ease: "easeInOut" }}
+    
+  >
+    <div className="relative" style={{ width: 260, height: 400 }}>
+      <div className="absolute inset-0">
+        {IMAGES.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            draggable="false"
+            className={`absolute w-full h-full object-cover transition-all duration-[250ms] ${
+              visible[i] === "open"
+                ? "reveal"
+                : visible[i] === "close"
+                ? "reveal-end"
+                : "reveal-start"
+            }`}
+            style={{ zIndex: i === topIndex ? 1000 : i }}
+          />
+        ))}
+      </div>
+      <div className="absolute inset-0 spotlight pointer-events-none" />
+    </div>
+
+    <style jsx>{`
+      .spotlight {
+        box-shadow: 0 0 0 9999px black;
+      }
+      .reveal-start {
+        clip-path: inset(100% 0% 0% 0%);
+      }
+      .reveal {
+        clip-path: inset(0% 0% 0% 0%);
+      }
+      .reveal-end {
+        clip-path: inset(0% 0% 100% 0%);
+      }
+    `}</style>
+  </motion.div>
+);
+}
   
   
 function HeroJoin() { 
   const { scrollY } = useScroll();
-  const titleY = useTransform(scrollY, [0, 300], [0, -80]);
+  const titleY = useTransform(scrollY, [0, 800], [0, -80]);
  
 
   return (
@@ -334,30 +319,40 @@ function BosonNarrative() {
   const wrap = useRef(null);
   const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    let frame;
+    const mq = window.matchMedia("(max-width: 768px)");
+    const handleChange = (e) => setIsMobile(e.matches);
+    handleChange(mq);
+    mq.addEventListener("change", handleChange);
+    return () => mq.removeEventListener("change", handleChange);
+  }, []);
 
+  useEffect(() => {
+    if (isMobile) {
+      setPos({ x: -9999, y: -9999 });
+      targetPos.current = { x: -9999, y: -9999 };
+      return;
+    }
+
+    let frame;
     const animate = () => {
       setPos((prev) => {
         const dx = targetPos.current.x - prev.x;
         const dy = targetPos.current.y - prev.y;
-
-        const speed = 0.06; // slow elegant
-        return {
-          x: prev.x + dx * speed,
-          y: prev.y + dy * speed,
-        };
+        const speed = 0.06;
+        return { x: prev.x + dx * speed, y: prev.y + dy * speed };
       });
-
       frame = requestAnimationFrame(animate);
     };
 
     animate();
     return () => cancelAnimationFrame(frame);
-  }, []);
+  }, [isMobile]);
 
   const handleMove = (e) => {
+    if (!wrap.current || isMobile) return;
     const rect = wrap.current.getBoundingClientRect();
     targetPos.current = {
       x: e.clientX - rect.left,
@@ -365,69 +360,77 @@ function BosonNarrative() {
     };
   };
 
-  const text = `We begin with possibility—mapping the forces, patterns, and subtle movements that shape how meaning emerges, transforming raw potential into stories, experiences, and identities that move with clarity and intention.`;
+  const text = `We Begin with possibility—mapping the forces, patterns, and subtle movements that shape how meaning emerges, transforming raw potential into stories, experiences, and identities that move with clarity and intention`;
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      style={{
-        width: "100%",
-        minHeight: "100vh",
-        background: "#09070b",
-        padding: "140px 7vw",
-        position: "relative",
-        overflow: "hidden",
-      }}
+      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
+      style={{ padding: "120px 6vw" }}
     >
       <div
         style={{
           position: "relative",
-          fontSize: "74px",
-          lineHeight: 1.28,
-          fontWeight: 400,
           width: "100%",
           whiteSpace: "pre-wrap",
-          color: "rgba(255,255,255,0.085)",
+          fontSize: "clamp(28px, 6vw, 74px)",
+          lineHeight: 1.25,
+          fontWeight: 400,
+          color: isMobile
+            ? "rgba(255,255,255,0.96)"
+            : "rgba(255,255,255,0.085)",
         }}
       >
         {text}
 
-        <div
-          style={{
-            pointerEvents: "none",
-            position: "absolute",
-            inset: 0,
-            color: "rgba(255,255,255,0.96)",
-
-            WebkitMaskImage: `
-              radial-gradient(
-                900px circle at ${pos.x}px ${pos.y}px,
-                rgba(255,255,255,1) 0%,
-                rgba(255,255,255,0.10) 30%,
-                rgba(255,255,255,0.02) 55%,
-                rgba(255,255,255,0) 100%
-              )
-            `,
-            maskImage: `
-              radial-gradient(
-                900px circle at ${pos.x}px ${pos.y}px,
-                rgba(255,255,255,1) 0%,
-                rgba(255,255,255,0.10) 30%,
-                rgba(255,255,255,0.02) 55%,
-                rgba(255,255,255,0) 100%
-              )
-            `,
-            transition: "color 0.2s linear",
-          }}
-        >
-          {text}
-        </div>
+        {!isMobile && (
+          <div
+            style={{
+              pointerEvents: "none",
+              position: "absolute",
+              inset: 0,
+              color: "rgba(255,255,255,0.96)",
+              WebkitMaskImage: `
+                radial-gradient(
+                  900px circle at ${pos.x}px ${pos.y}px,
+                  rgba(255,255,255,1) 0%,
+                  rgba(255,255,255,0.10) 30%,
+                  rgba(255,255,255,0.02) 55%,
+                  rgba(255,255,255,0) 100%
+                )
+              `,
+              maskImage: `
+                radial-gradient(
+                  900px circle at ${pos.x}px ${pos.y}px,
+                  rgba(255,255,255,1) 0%,
+                  rgba(255,255,255,0.10) 30%,
+                  rgba(255,255,255,0.02) 55%,
+                  rgba(255,255,255,0) 100%
+                )
+              `,
+            }}
+          >
+            {text}
+          </div>
+        )}
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .boson-narrative-container {
+            min-height: auto !important;
+            height: auto !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
- 
+
+
+
+  
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
     <motion.div
@@ -458,7 +461,6 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   );
 }
 
-
 function Projects() {
   const scrollRef = useRef(null);
 
@@ -471,7 +473,7 @@ function Projects() {
   const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 720]);
   const rotate2 = useTransform(scrollYProgress, [0, 1], [0, -540]);
   const rotate3 = useTransform(scrollYProgress, [0, 1], [0, 900]);
-  
+
   // ============================
   // TEXT REVEAL with Framer Motion
   // ============================
@@ -482,7 +484,6 @@ function Projects() {
     [0, 0.12],
     ["blur(20px)", "blur(0px)"]
   );
-  
 
   // ORBIT CONFIGS
   const c1 = { cx: 425, cy: 350, r: 250 };
@@ -655,7 +656,7 @@ function Projects() {
         style={{
           position: "sticky",
           top: 0,
-          width: "99vw",
+          width: "97vw",
           height: "100vh",
           display: "flex",
           justifyContent: "center",
@@ -718,24 +719,23 @@ function Projects() {
 
         {/* TEXT */}
         <motion.div
-  style={{
-    opacity: textOpacity,
-    y: textY,
-    filter: textFilter,
-    position: "absolute",
-    color: "white",
-    fontSize: "32px",
-    textAlign: "center",
-    fontWeight: 300,
-    lineHeight: 1.3,
-    zIndex: 10,
-    whiteSpace: "pre-line",
-  }}
->
-{`Signals, motion, intent:
+          style={{
+            opacity: textOpacity,
+            y: textY,
+            filter: textFilter,
+            position: "absolute",
+            color: "white",
+            fontSize: "32px",
+            textAlign: "center",
+            fontWeight: 300,
+            lineHeight: 1.3,
+            zIndex: 10,
+            whiteSpace: "pre-line",
+          }}
+        >
+          {`Signals, motion, intent:
 The Boson process takes shape`}
-</motion.div>
-
+        </motion.div>
 
         {/* Render all image bursts (looped pattern) */}
         {images.map((src, i) => (
@@ -746,53 +746,35 @@ The Boson process takes shape`}
   );
 }
 
-
 function BigHeading() {
   const ref = useRef(null);
 
   const { scrollYProgress } = useScroll({
     target: ref,
-
-    // ⬅️ MULAI ANIMASI begitu section mulai masuk viewport
     offset: ["start 80%", "end start"],
   });
 
-  // Scroll transforms — makin cepat respons
   const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
   const bottomX = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
 
   return (
     <div
       ref={ref}
-      style={{
-        height: "150vh",
-        position: "relative",
-        background: "#09070b",
-        overflow: "hidden",
-      }}
+      className="relative bg-[#09070b] overflow-hidden w-full big-heading-container"
+      style={{ height: "150vh" }}
     >
-      {/* Sticky container */}
       <div
-        style={{
-          position: "sticky",
-          top: 0,
-          height: "150vh",
-          width: "100vw",
-          pointerEvents: "none",
-        }}
+        className="big-heading-sticky pointer-events-none"
+        style={{ position: "sticky", top: 0, width: "100%", height: "150vh" }}
       >
 
-        {/* TOP 75vh */}
+        {/* TOP */}
         <div
-          style={{
-            height: "75vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            overflow: "hidden",
-          }}
+          className="big-heading-top-wrapper flex justify-center items-end overflow-hidden"
+          style={{ height: "75vh" }}
         >
           <motion.div
+            className="big-heading-top flex whitespace-nowrap"
             style={{
               x: topX,
               transform: "translateY(10%)",
@@ -800,9 +782,7 @@ function BigHeading() {
               fontSize: "30vw",
               fontWeight: 300,
               lineHeight: 0.8,
-              whiteSpace: "nowrap",
               opacity: 0.9,
-              display: "flex",
               gap: "4vw",
             }}
           >
@@ -812,17 +792,13 @@ function BigHeading() {
           </motion.div>
         </div>
 
-        {/* BOTTOM 75vh */}
+        {/* BOTTOM */}
         <div
-          style={{
-            height: "75vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            overflow: "hidden",
-          }}
+          className="big-heading-bottom-wrapper flex justify-center items-start overflow-hidden"
+          style={{ height: "75vh" }}
         >
           <motion.div
+            className="big-heading-bottom flex whitespace-nowrap"
             style={{
               x: bottomX,
               transform: "translateY(-10%)",
@@ -830,9 +806,7 @@ function BigHeading() {
               fontSize: "30vw",
               fontWeight: 300,
               lineHeight: 0.8,
-              whiteSpace: "nowrap",
               opacity: 0.45,
-              display: "flex",
               gap: "4vw",
             }}
           >
@@ -841,8 +815,31 @@ function BigHeading() {
             <span>Experiences</span>
           </motion.div>
         </div>
-
       </div>
+
+      <style>{`
+        @media(max-width: 1023px) {
+          .big-heading-container {
+            height: auto !important;
+          }
+          .big-heading-sticky {
+            position: static !important;
+            height: auto !important;
+          }
+          .big-heading-top-wrapper,
+          .big-heading-bottom-wrapper {
+            height: auto !important;
+            padding: 2vh 0 !important; /* ← DIPERAPAT */
+          }
+        }
+
+        @media(max-width: 600px) {
+          .big-heading-top,
+          .big-heading-bottom {
+            font-size: 22vw !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -1004,8 +1001,7 @@ function MarqueeOverlay({ item, active }) {
   );
 }
 
-
- function WorksList() {
+function WorksList() {
   const items = [
     {
       industry: "Fitness",
@@ -1164,129 +1160,63 @@ Every decision, every detail is a lever — elevating the whole
     </div>
   );
 }
-
-
+  
 
 function Footer() {
   return (
-    <div className="footer-section">
-      {/* LEFT — Rotated Chrome Logo (UNCHANGED CSS) */}
-      <div className="footer-chrome" />
+    <div className="relative w-full bg-black text-white px-[80px] py-[180px] overflow-hidden flex items-center justify-center max-[900px]:px-6 max-[900px]:py-[140px]">
 
-      {/* RIGHT — BOSON CREATIVE FOOTER */}
-      <div className="ml-auto w-[62%] z-[10] grid grid-cols-2 gap-28 items-start">
+      {/* BOSON LOGO BACKDROP */}
+      <div className="footer-chrome absolute right-0 top-1/2 -translate-y-1/2 w-[900px] h-[1100px] opacity-[0.20] pointer-events-none select-none max-[900px]:right-[-20%] max-[900px]:w-[600px] max-[900px]:h-[750px]" />
 
-{/* COL 1 — BOSON CTA */}
-<div className="flex flex-col gap-6">
-  <h1 className="text-[42px] font-light leading-tight tracking-tight max-w-md">
-    LET’S WORK TOGETHER
-  </h1>
+      {/* GRID */}
+      <div className="relative z-[2] grid grid-cols-[1fr_0.6fr] gap-20 w-full max-w-[1400px] max-[900px]:grid-cols-1 max-[900px]:gap-12">
 
-  <p className="text-sm opacity-60 leading-relaxed max-w-xs">
-    If your work requires intention, clarity, or engineered precision,  
-    this is where the conversation begins.
-  </p>
+        {/* LEFT CONTENT */}
+        <div className="flex flex-col gap-10">
 
-  <a
-    href="mailto:boson.studio@gmail.com"
-    className="text-lg font-light mt-4 inline-flex items-center gap-2 hover:opacity-100 opacity-90"
-  >
-    boson.studio@gmail.com →
-  </a>
-</div>
+          <h2 className="text-[64px] font-light leading-[1.05] tracking-tight max-[900px]:text-[42px]">
+            Let’s work<br/>together
+          </h2>
 
+          <div className="w-[70%] border-t border-white/10 max-[900px]:w-full" />
 
-        {/* COL 2 — NORDIC META + CHANNELS + MAP */}
-        <div className="flex flex-col gap-14 text-sm">
+          <a href="mailto:boson.studio@gmail.com"
+            className="inline-flex items-center justify-center bg-[#822222] px-12 py-5 rounded-full text-base font-medium whitespace-nowrap opacity-95 hover:opacity-100 transition-all duration-200 tracking-wide w-fit">
+            Get in touch →
+          </a>
 
-          {/* NORDIC INFO */}
-          <div className="flex flex-col gap-6 opacity-75">
-            <div>
-              <div className="flex flex-col gap-1 mt-3">
-                <span>Based in Bali</span>
-                <span>Working across the World</span>
-                <span>Since 2021</span>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="uppercase tracking-wider text-xs opacity-60">FOCUS</h4>
-              <div className="flex flex-col gap-1 mt-3">
-                <span>Design</span>
-                <span>Architecture</span>
-                <span>Engineering</span>
-              </div>
-            </div>
+          <div className="text-sm opacity-75 font-light">
+            boson.studio@gmail.com
           </div>
 
-          {/* CHANNELS */}
-          <div>
-            <h4 className="uppercase tracking-wider text-xs opacity-60">CHANNELS</h4>
-            <div className="flex gap-6 opacity-75 mt-4">
-              {["Behance", "Dribbble", "LinkedIn", "Medium"].map((txt) => (
-                <span key={txt} className="cursor-pointer hover:opacity-100">
-                  {txt}
-                </span>
-              ))}
-            </div>
+          <div className="text-xs opacity-70 flex gap-3 flex-wrap">
+            <span>Based in Bali</span>•<span>Working Worldwide</span>•<span>Since 2021</span>
           </div>
 
-          {/* MAP */}
-          <div>
-            <h4 className="uppercase tracking-wider text-xs opacity-60">MAP</h4>
-            <div className="flex flex-col gap-2 opacity-75 mt-4">
-              {["Home", "Work", "Systems", "Approach", "Contact"].map((item) => (
-                <span key={item} className="cursor-pointer hover:opacity-100">
-                  {item}
-                </span>
-              ))}
-            </div>
+          <div className="flex gap-6 text-xs opacity-70 mt-1 flex-wrap">
+            {["Behance", "LinkedIn", "Contact"].map((txt) => (
+              <a key={txt} className="cursor-pointer hover:opacity-100 transition-opacity">
+                {txt}
+              </a>
+            ))}
           </div>
 
         </div>
+
+        {/* RIGHT EMPTY COLUMN FOR BALANCE */}
+        <div />
+
       </div>
- 
 
-      {/* LEFT CSS — DO NOT TOUCH */}
       <style jsx>{`
-        .footer-section {
-          position: sticky;
-          bottom: 0;
-          width: 100%;
-          height: 100vh;
-          background: #000;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          padding: 0 80px;
-          color: white;
-        }
-
         .footer-chrome {
-          position: absolute;
-          left: -10%;
-          top: 50%;
-          transform: translateY(-50%) rotate(90deg);
-
-          width: 1200px;
-          height: 2000px;
-
           mask-image: url("/boson-white.png");
           -webkit-mask-image: url("/boson-white.png");
           mask-size: contain;
           mask-repeat: no-repeat;
           mask-position: center;
-
-          opacity: 0.9;
-
-          background:
-            linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 4%, rgba(255,255,255,0.25) 7%, rgba(255,255,255,0) 11%),
-            linear-gradient(140deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 3%, rgba(255,255,255,0) 8%),
-            radial-gradient(circle at 50% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%),
-            radial-gradient(circle at 50% 78%, rgba(0,0,0,0.4), rgba(0,0,0,0) 70%),
-            radial-gradient(circle at 50% 70%, rgba(0,0,0,0) 25%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,1) 100%),
-            linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,1) 100%),
-            linear-gradient(180deg, rgba(255,255,255,0.6), rgba(30,30,30,0.85) 45%, rgba(0,0,0,1) 95%);
+          background: linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 4%, rgba(255,255,255,0.25) 7%, rgba(255,255,255,0) 11%), linear-gradient(140deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 3%, rgba(255,255,255,0) 8%), radial-gradient(circle at 50% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%), radial-gradient(circle at 50% 78%, rgba(0,0,0,0.4), rgba(0,0,0,0) 70%), radial-gradient(circle at 50% 70%, rgba(0,0,0,0) 25%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,1) 100%), linear-gradient(180deg, rgba(255,255,255,0.6), rgba(30,30,30,0.85) 45%, rgba(0,0,0,1) 95%);
           background-blend-mode: screen, screen, screen, multiply, multiply, multiply, multiply, overlay;
         }
       `}</style>
@@ -1294,15 +1224,10 @@ function Footer() {
   );
 }
 
-
-
-
  
 
  
-
-
-
+ 
 
 
 /* ==========================================
@@ -1315,7 +1240,14 @@ function Footer() {
     useEffect(() => {
       window.scrollTo(0, 0)
     }, [])
-  
+    
+    const { scrollYProgress } = useScroll();
+    const narrativeY = useTransform(
+      scrollYProgress,
+      [0, 0.2, 0.5],
+      ["100vh", "40vh", "0vh"]
+    );
+        
     // =============================
     // 1️⃣ — Kalau belum ready → return null
     // =============================
@@ -1324,46 +1256,47 @@ function Footer() {
     // =============================
     // 2️⃣ — Kalau ready → return full page
     // =============================
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "100vh",
-          background: "#000",
-          position: "relative",
-        }}
-      > 
+   
     
-        <HeroJoin/>
-  
+    return (
+      <div style={{ width: "100%", background: "#000", position: "relative" }}>
+        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
+          <HeroJoin />
+        </div>
+    
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
           <BosonNarrative />
         </div>
-  
+    
         <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
         </div>
-  
+    
         <div style={{ position: "relative", zIndex: 2 }}>
           <BigHeading />
         </div>
-  
+    
         <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
         </div>
-        
+    
         <div style={{ position: "relative", zIndex: 2 }}>
           <Carousel />
         </div>
-  
-        <Footer />
-  
+    
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Footer />
+        </div>
+    
         <style jsx global>{`
           body {
             background: #000;
           }
         `}</style>
       </div>
-    )
+    );
+    
+    
+    
   }
   

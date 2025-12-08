@@ -45,7 +45,6 @@ const detectLowTier = () => {
   return isLowEndGPU ? 0 : 1; // 0 = Low Quality, 1 = High Quality
 };
 
-
 /* -----------------------
    CanvasMirror
    ----------------------- */
@@ -206,45 +205,44 @@ const CanvasMirror = ({ index, src, onTextureReady }) => {
 /* -----------------------
    Pipeline 1 (optimized)
    ----------------------- */
-   const CarouselPipeline1 = forwardRef(({ onAllTexturesReady }, ref) => {
-    const texturesRef = useRef([]);
-    const allReadyRef = useRef(false);
-  
-    useImperativeHandle(ref, () => ({
-      getTextures: () => texturesRef.current,
-    }));
-  
-    const handleTextureReady = (index, data) => {
-      texturesRef.current[index] = data;
-  
-      // Cek kalau semua texture sudah ready
-      if (
-        !allReadyRef.current &&
-        texturesRef.current.length === SLIDE_COUNT &&
-        texturesRef.current.every(Boolean)
-      ) {
-        allReadyRef.current = true;
-        if (typeof onAllTexturesReady === "function") {
-          // kirim shallow copy ke parent biar aman
-          onAllTexturesReady([...texturesRef.current]);
-        }
+const CarouselPipeline1 = forwardRef(({ onAllTexturesReady }, ref) => {
+  const texturesRef = useRef([]);
+  const allReadyRef = useRef(false);
+
+  useImperativeHandle(ref, () => ({
+    getTextures: () => texturesRef.current,
+  }));
+
+  const handleTextureReady = (index, data) => {
+    texturesRef.current[index] = data;
+
+    // Cek kalau semua texture sudah ready
+    if (
+      !allReadyRef.current &&
+      texturesRef.current.length === SLIDE_COUNT &&
+      texturesRef.current.every(Boolean)
+    ) {
+      allReadyRef.current = true;
+      if (typeof onAllTexturesReady === "function") {
+        // kirim shallow copy ke parent biar aman
+        onAllTexturesReady([...texturesRef.current]);
       }
-    };
-  
-    return (
-      <div className="absolute inset-0 -z-10">
-        {SLIDES.map((s, i) => (
-          <CanvasMirror
-            key={s.id}
-            index={i}
-            src={s.src}
-            onTextureReady={handleTextureReady}
-          />
-        ))}
-      </div>
-    );
-  });
-  
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 -z-10">
+      {SLIDES.map((s, i) => (
+        <CanvasMirror
+          key={s.id}
+          index={i}
+          src={s.src}
+          onTextureReady={handleTextureReady}
+        />
+      ))}
+    </div>
+  );
+});
 
 /* -----------------------
    MAIN COMPONENT
@@ -268,11 +266,9 @@ export default function CarouselFullFixed() {
   const glContextLostRef = useRef(false);
   const contextListenerRef = useRef(null);
 
-
   const texturesRef = useRef([]);
   const [ready, setReady] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
-
 
   // section visibility (buat idle optimization)
   const visibleRef = useRef(true);
@@ -315,7 +311,6 @@ export default function CarouselFullFixed() {
   const TRANSITION_DURATION = 0.75;
   const SETTLE_DURATION = 0.25;
   const TRANSITION_EASE = (t) => t * t * (3 - 2 * t);
- 
 
   // progress bar segments
   const p1 = useTransform(domProgress, [0, SEGMENT], [0, 1]);
@@ -336,8 +331,14 @@ export default function CarouselFullFixed() {
       frame = requestAnimationFrame(() => {
         frame = null;
 
-        const clampedX = Math.max(80, Math.min(window.innerWidth - 80, clientX));
-        const clampedY = Math.max(80, Math.min(window.innerHeight - 80, clientY));
+        const clampedX = Math.max(
+          80,
+          Math.min(window.innerWidth - 80, clientX)
+        );
+        const clampedY = Math.max(
+          80,
+          Math.min(window.innerHeight - 80, clientY)
+        );
 
         mouseX.set(clampedX - window.innerWidth / 2);
         mouseY.set(clampedY - window.innerHeight / 2);
@@ -377,7 +378,7 @@ export default function CarouselFullFixed() {
     void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }
   `;
 
-const frag = `
+  const frag = `
   precision highp float;
   varying vec2 vUv;
   uniform sampler2D uFrom;
@@ -533,17 +534,15 @@ const frag = `
   }
 `;
 
-   /* -----------------------
+  /* -----------------------
      Wait textures ready -> start three (event-based)
      ----------------------- */
-     const handleAllTexturesReady = (allTextures) => {
-      // simpan ke ref global Three
-      texturesRef.current = allTextures;
-      startThree();
-      updateAspectUniform(); // << PATCH
-
-    };
-  
+  const handleAllTexturesReady = (allTextures) => {
+    // simpan ke ref global Three
+    texturesRef.current = allTextures;
+    startThree();
+    updateAspectUniform(); // << PATCH
+  };
 
   /* -----------------------
      triggerGlitchTransition(nextSegment)
@@ -594,7 +593,8 @@ const frag = `
 
       if (matRef.current && matRef.current.uniforms) {
         try {
-          matRef.current.uniforms.uProgressAnim.value = uProgressAnimRef.current;
+          matRef.current.uniforms.uProgressAnim.value =
+            uProgressAnimRef.current;
         } catch (e) {}
       }
 
@@ -656,348 +656,340 @@ const frag = `
   /* -----------------------
      snapToSegment
      ----------------------- */
-     const snapToSegment = (seg) => {
-      currentSegmentRef.current = seg;
-      setCurrentSegmentUI(seg);
-      setActiveSlide(seg); // DOM background ikut pindah
-      const snapped = seg * SEGMENT;
-      domProgress.set(snapped);
-    
-      updateAspectUniform(); // << PATCH: sesuaikan aspect tiap ganti slide
-      // Per-slide focal point (0–1 range)
-const FOCUS_POINTS = [
-  { x: 0.45, y: 0.50 }, // Slide 0: TenderTouch - mid slightly left
-  { x: 0.60, y: 0.45 }, // Slide 1: Marroosh - shift right + down
-  { x: 0.55, y: 0.50 }, // Slide 2: DWM Real Estate - mid-right
-];
+  const snapToSegment = (seg) => {
+    currentSegmentRef.current = seg;
+    setCurrentSegmentUI(seg);
+    setActiveSlide(seg); // DOM background ikut pindah
+    const snapped = seg * SEGMENT;
+    domProgress.set(snapped);
 
-const fp = FOCUS_POINTS[seg];
-if (fp && matRef.current?.uniforms?.uFocus) {
-  matRef.current.uniforms.uFocus.value.set(fp.x, fp.y);
-}
+    updateAspectUniform(); // << PATCH: sesuaikan aspect tiap ganti slide
+    // Per-slide focal point (0–1 range)
+    const FOCUS_POINTS = [
+      { x: 0.45, y: 0.5 }, // Slide 0: TenderTouch - mid slightly left
+      { x: 0.6, y: 0.45 }, // Slide 1: Marroosh - shift right + down
+      { x: 0.55, y: 0.5 }, // Slide 2: DWM Real Estate - mid-right
+    ];
 
-    };
-    
-  
+    const fp = FOCUS_POINTS[seg];
+    if (fp && matRef.current?.uniforms?.uFocus) {
+      matRef.current.uniforms.uFocus.value.set(fp.x, fp.y);
+    }
+  };
 
-    const updateAspectUniform = () => {
-      const holder = overlayRef.current;
-      const seg = currentSegmentRef.current;
-      const tex = texturesRef.current[seg];
-      if (!holder || !tex || !matRef.current) return;
-    
-      const viewportAspect = holder.clientWidth / holder.clientHeight;
-      const textureAspect = tex.width / tex.height;
-    
-      let scaleX = 1;
-      let scaleY = 1;
-    
-      // COVER mode (zoom out / crop if needed)
-      if (viewportAspect > textureAspect) {
-        // layar lebih lebar → crop horizontal
-        scaleY = viewportAspect / textureAspect;
-      } else {
-        // layar lebih tinggi → crop vertikal
-        scaleX = textureAspect / viewportAspect;
-      }
-    
-      try {
-        matRef.current.uniforms.uAspect.value.set(scaleX, scaleY);
-      } catch (e) {}
-    };
-    
-    
-    
+  const updateAspectUniform = () => {
+    const holder = overlayRef.current;
+    const seg = currentSegmentRef.current;
+    const tex = texturesRef.current[seg];
+    if (!holder || !tex || !matRef.current) return;
+
+    const viewportAspect = holder.clientWidth / holder.clientHeight;
+    const textureAspect = tex.width / tex.height;
+
+    let scaleX = 1;
+    let scaleY = 1;
+
+    // COVER mode (zoom out / crop if needed)
+    if (viewportAspect > textureAspect) {
+      // layar lebih lebar → crop horizontal
+      scaleY = viewportAspect / textureAspect;
+    } else {
+      // layar lebih tinggi → crop vertikal
+      scaleX = textureAspect / viewportAspect;
+    }
+
+    try {
+      matRef.current.uniforms.uAspect.value.set(scaleX, scaleY);
+    } catch (e) {}
+  };
+
   /* -----------------------
      startThree (setup WebGL)
      ----------------------- */
-     const startThree = async () => {
-      // small delay supaya layout settle dulu
-      await new Promise((r) => setTimeout(r, 50));
-  
-      const holder = overlayRef.current;
-      if (!holder) return;
-  
-      // kalau sebelumnya sudah ada renderer, jangan bikin dobel
-      if (rendererRef.current) return;
-  
-      glContextLostRef.current = false;
-  
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(holder.clientWidth, holder.clientHeight);
-      renderer.domElement.style.display = "block";
-      holder.appendChild(renderer.domElement);
-      rendererRef.current = renderer;
-  
-      const scene = new THREE.Scene();
-      sceneRef.current = scene;
-  
-      const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
-      cam.position.z = 1;
-      camRef.current = cam;
-  
-      const geometry = new THREE.PlaneGeometry(2, 2);
-  
-      const uniforms = {
-        uFrom: { value: texturesRef.current[0]?.texture || new THREE.Texture() },
-        uTo: { value: texturesRef.current[0]?.texture || new THREE.Texture() },
-        uProgressAnim: { value: 0 },
-        uSettleAnim: { value: 0 },
-        uTime: { value: 0 },
-        uQuality: { value: detectLowTier() }, // 0 = low tier, 1 = high tier
-        uAspect: { value: new THREE.Vector2(1, 1) }, // << ADD THIS
-        uFocus: { value: new THREE.Vector2(0.5, 0.5) }, // << ADD THIS
+  const startThree = async () => {
+    // small delay supaya layout settle dulu
+    await new Promise((r) => setTimeout(r, 50));
 
-      };
-    
-  
-      const material = new THREE.ShaderMaterial({
-        vertexShader: vert,
-        fragmentShader: frag,
-        uniforms,
-        transparent: true,
-        depthTest: false,
-        depthWrite: false,
-      });
-  
-      matRef.current = material;
-  
-      const mesh = new THREE.Mesh(geometry, material);
-      quadRef.current = mesh;
-      scene.add(mesh);
-  
-      let last = performance.now();
-  
-      const tick = (now) => {
-        const dt = (now - last) / 1000;
-        last = now;
-  
-        // kalau context WebGL sudah hilang, jangan render apa-apa
-        if (glContextLostRef.current) {
-          rafRef.current = null;
-          return;
-        }
-  
-        // kalau section nggak kelihatan, stop loop
-        if (!visibleRef.current) {
-          rafRef.current = null;
-          return;
-        }
-  
-        if (matRef.current && matRef.current.uniforms) {
-          try {
-            matRef.current.uniforms.uTime.value += dt;
-            matRef.current.uniforms.uProgressAnim.value =
-              uProgressAnimRef.current;
-            matRef.current.uniforms.uSettleAnim.value = settleAnimRef.current;
-          } catch (e) {}
-        }
-  
-        try {
-          renderer.render(scene, cam);
-        } catch (e) {
-          // kalau render lempar error karena context lost, matikan loop
-          glContextLostRef.current = true;
-          rafRef.current = null;
-          return;
-        }
-  
-        rafRef.current = requestAnimationFrame(tick);
-      };
-  
-      // ---- WebGL context lost / restored handlers ----
-      const handleContextLost = (event) => {
-        event.preventDefault();
-        glContextLostRef.current = true;
-  
-        // stop render loop
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current);
-          rafRef.current = null;
-        }
-      };
-  
-      const handleContextRestored = () => {
-        glContextLostRef.current = false;
-  
-        // kalau masih kelihatan di viewport, hidupkan lagi loop
-        if (!rafRef.current && visibleRef.current) {
-          last = performance.now();
-          rafRef.current = requestAnimationFrame(tick);
-        }
-      };
-  
-      renderer.domElement.addEventListener(
-        "webglcontextlost",
-        handleContextLost,
-        false
-      );
-      renderer.domElement.addEventListener(
-        "webglcontextrestored",
-        handleContextRestored,
-        false
-      );
-  
-      contextListenerRef.current = {
-        handleContextLost,
-        handleContextRestored,
-      };
-  
-      // ---- Resize handling: debounced ----
-      const applyResize = () => {
-        if (!holder || !rendererRef.current) return;
-        rendererRef.current.setSize(holder.clientWidth, holder.clientHeight);
-      };
-  
-      const scheduleResize = () => {
-        if (resizeTimeoutRef.current) return;
-  
-        resizeTimeoutRef.current = setTimeout(() => {
-          resizeTimeoutRef.current = null;
-          applyResize();
-        }, 150);
-      };
-  
-      window.addEventListener("resize", scheduleResize);
-  
-      // IntersectionObserver: track apakah overlay (section) kelihatan di viewport
-      if ("IntersectionObserver" in window && holder) {
-        const io = new IntersectionObserver(
-          (entries) => {
-            const entry = entries[0];
-            const isVisible = entry.isIntersecting;
-  
-            visibleRef.current = isVisible;
-  
-            if (isVisible) {
-              // kalau baru masuk viewport dan loop lagi mati → hidupkan lagi
-              if (!rafRef.current && !glContextLostRef.current) {
-                last = performance.now();
-                rafRef.current = requestAnimationFrame(tick);
-              }
-  
-              // saat baru kelihatan lagi, pastikan ukuran up to date
-              scheduleResize();
-            } else {
-              // keluar viewport → loop akan berhenti di tick berikutnya
-            }
-          },
-          { threshold: 0.1 }
-        );
-        io.observe(holder);
-        intersectObserverRef.current = io;
-      }
-  
-      // ResizeObserver: juga pakai scheduler, bukan direct apply
-      if ("ResizeObserver" in window) {
-        resizeObserverRef.current = new ResizeObserver(() => {
-          scheduleResize();
-        });
-        resizeObserverRef.current.observe(holder);
-      }
-  
-      setReady(true);
-      updateAspectUniform(); // << ADD THIS
-      rafRef.current = requestAnimationFrame(tick);
-  
-      // ---- CLEANUP ----
-      startThree._cleanup = () => {
-        // Stop all RAF loops
-        cancelAnimationFrame(rafRef.current || 0);
-        cancelAnimationFrame(animRafRef.current || 0);
-        rafRef.current = null;
-  
-        // Clear pending resize timer kalau masih ada
-        if (resizeTimeoutRef.current) {
-          clearTimeout(resizeTimeoutRef.current);
-          resizeTimeoutRef.current = null;
-        }
-  
-        // Disconnect ResizeObserver
-        if (resizeObserverRef.current) {
-          try {
-            resizeObserverRef.current.disconnect();
-          } catch (e) {}
-          resizeObserverRef.current = null;
-        }
-  
-        // Disconnect IntersectionObserver
-        if (intersectObserverRef.current) {
-          try {
-            intersectObserverRef.current.disconnect();
-          } catch (e) {}
-          intersectObserverRef.current = null;
-        }
-  
-        // Hapus window resize listener
-        window.removeEventListener("resize", scheduleResize);
-  
-        // Lepas listener context lost/restored
-        if (
-          contextListenerRef.current &&
-          rendererRef.current &&
-          rendererRef.current.domElement
-        ) {
-          const { handleContextLost, handleContextRestored } =
-            contextListenerRef.current;
-          try {
-            rendererRef.current.domElement.removeEventListener(
-              "webglcontextlost",
-              handleContextLost
-            );
-            rendererRef.current.domElement.removeEventListener(
-              "webglcontextrestored",
-              handleContextRestored
-            );
-          } catch (e) {}
-        }
-        contextListenerRef.current = null;
-  
-        // Dispose renderer
-        try {
-          if (rendererRef.current) {
-            rendererRef.current.dispose();
-            if (rendererRef.current.forceContextLoss) {
-              rendererRef.current.forceContextLoss();
-            }
-            if (
-              rendererRef.current.domElement &&
-              rendererRef.current.domElement.parentNode
-            ) {
-              rendererRef.current.domElement.parentNode.removeChild(
-                rendererRef.current.domElement
-              );
-            }
-          }
-        } catch (e) {}
-        rendererRef.current = null;
-  
-        // Dispose material & geometry safely
-        try {
-          if (matRef.current) {
-            matRef.current.dispose();
-            matRef.current = null;
-          }
-          if (quadRef.current?.geometry) {
-            quadRef.current.geometry.dispose();
-          }
-        } catch (e) {}
-  
-        // Dispose textures in cache
-        try {
-          if (texturesRef.current) {
-            texturesRef.current.forEach((t) => {
-              if (t?.texture?.dispose) t.texture.dispose();
-            });
-          }
-        } catch (e) {}
-  
-        texturesRef.current = [];
-        glContextLostRef.current = false;
-      };
+    const holder = overlayRef.current;
+    if (!holder) return;
+
+    // kalau sebelumnya sudah ada renderer, jangan bikin dobel
+    if (rendererRef.current) return;
+
+    glContextLostRef.current = false;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(holder.clientWidth, holder.clientHeight);
+    renderer.domElement.style.display = "block";
+    holder.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+
+    const scene = new THREE.Scene();
+    sceneRef.current = scene;
+
+    const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+    cam.position.z = 1;
+    camRef.current = cam;
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+
+    const uniforms = {
+      uFrom: { value: texturesRef.current[0]?.texture || new THREE.Texture() },
+      uTo: { value: texturesRef.current[0]?.texture || new THREE.Texture() },
+      uProgressAnim: { value: 0 },
+      uSettleAnim: { value: 0 },
+      uTime: { value: 0 },
+      uQuality: { value: detectLowTier() }, // 0 = low tier, 1 = high tier
+      uAspect: { value: new THREE.Vector2(1, 1) }, // << ADD THIS
+      uFocus: { value: new THREE.Vector2(0.5, 0.5) }, // << ADD THIS
     };
-  
+
+    const material = new THREE.ShaderMaterial({
+      vertexShader: vert,
+      fragmentShader: frag,
+      uniforms,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    });
+
+    matRef.current = material;
+
+    const mesh = new THREE.Mesh(geometry, material);
+    quadRef.current = mesh;
+    scene.add(mesh);
+
+    let last = performance.now();
+
+    const tick = (now) => {
+      const dt = (now - last) / 1000;
+      last = now;
+
+      // kalau context WebGL sudah hilang, jangan render apa-apa
+      if (glContextLostRef.current) {
+        rafRef.current = null;
+        return;
+      }
+
+      // kalau section nggak kelihatan, stop loop
+      if (!visibleRef.current) {
+        rafRef.current = null;
+        return;
+      }
+
+      if (matRef.current && matRef.current.uniforms) {
+        try {
+          matRef.current.uniforms.uTime.value += dt;
+          matRef.current.uniforms.uProgressAnim.value =
+            uProgressAnimRef.current;
+          matRef.current.uniforms.uSettleAnim.value = settleAnimRef.current;
+        } catch (e) {}
+      }
+
+      try {
+        renderer.render(scene, cam);
+      } catch (e) {
+        // kalau render lempar error karena context lost, matikan loop
+        glContextLostRef.current = true;
+        rafRef.current = null;
+        return;
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    // ---- WebGL context lost / restored handlers ----
+    const handleContextLost = (event) => {
+      event.preventDefault();
+      glContextLostRef.current = true;
+
+      // stop render loop
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    const handleContextRestored = () => {
+      glContextLostRef.current = false;
+
+      // kalau masih kelihatan di viewport, hidupkan lagi loop
+      if (!rafRef.current && visibleRef.current) {
+        last = performance.now();
+        rafRef.current = requestAnimationFrame(tick);
+      }
+    };
+
+    renderer.domElement.addEventListener(
+      "webglcontextlost",
+      handleContextLost,
+      false
+    );
+    renderer.domElement.addEventListener(
+      "webglcontextrestored",
+      handleContextRestored,
+      false
+    );
+
+    contextListenerRef.current = {
+      handleContextLost,
+      handleContextRestored,
+    };
+
+    // ---- Resize handling: debounced ----
+    const applyResize = () => {
+      if (!holder || !rendererRef.current) return;
+      rendererRef.current.setSize(holder.clientWidth, holder.clientHeight);
+    };
+
+    const scheduleResize = () => {
+      if (resizeTimeoutRef.current) return;
+
+      resizeTimeoutRef.current = setTimeout(() => {
+        resizeTimeoutRef.current = null;
+        applyResize();
+      }, 150);
+    };
+
+    window.addEventListener("resize", scheduleResize);
+
+    // IntersectionObserver: track apakah overlay (section) kelihatan di viewport
+    if ("IntersectionObserver" in window && holder) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+          const isVisible = entry.isIntersecting;
+
+          visibleRef.current = isVisible;
+
+          if (isVisible) {
+            // kalau baru masuk viewport dan loop lagi mati → hidupkan lagi
+            if (!rafRef.current && !glContextLostRef.current) {
+              last = performance.now();
+              rafRef.current = requestAnimationFrame(tick);
+            }
+
+            // saat baru kelihatan lagi, pastikan ukuran up to date
+            scheduleResize();
+          } else {
+            // keluar viewport → loop akan berhenti di tick berikutnya
+          }
+        },
+        { threshold: 0.1 }
+      );
+      io.observe(holder);
+      intersectObserverRef.current = io;
+    }
+
+    // ResizeObserver: juga pakai scheduler, bukan direct apply
+    if ("ResizeObserver" in window) {
+      resizeObserverRef.current = new ResizeObserver(() => {
+        scheduleResize();
+      });
+      resizeObserverRef.current.observe(holder);
+    }
+
+    setReady(true);
+    updateAspectUniform(); // << ADD THIS
+    rafRef.current = requestAnimationFrame(tick);
+
+    // ---- CLEANUP ----
+    startThree._cleanup = () => {
+      // Stop all RAF loops
+      cancelAnimationFrame(rafRef.current || 0);
+      cancelAnimationFrame(animRafRef.current || 0);
+      rafRef.current = null;
+
+      // Clear pending resize timer kalau masih ada
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+        resizeTimeoutRef.current = null;
+      }
+
+      // Disconnect ResizeObserver
+      if (resizeObserverRef.current) {
+        try {
+          resizeObserverRef.current.disconnect();
+        } catch (e) {}
+        resizeObserverRef.current = null;
+      }
+
+      // Disconnect IntersectionObserver
+      if (intersectObserverRef.current) {
+        try {
+          intersectObserverRef.current.disconnect();
+        } catch (e) {}
+        intersectObserverRef.current = null;
+      }
+
+      // Hapus window resize listener
+      window.removeEventListener("resize", scheduleResize);
+
+      // Lepas listener context lost/restored
+      if (
+        contextListenerRef.current &&
+        rendererRef.current &&
+        rendererRef.current.domElement
+      ) {
+        const { handleContextLost, handleContextRestored } =
+          contextListenerRef.current;
+        try {
+          rendererRef.current.domElement.removeEventListener(
+            "webglcontextlost",
+            handleContextLost
+          );
+          rendererRef.current.domElement.removeEventListener(
+            "webglcontextrestored",
+            handleContextRestored
+          );
+        } catch (e) {}
+      }
+      contextListenerRef.current = null;
+
+      // Dispose renderer
+      try {
+        if (rendererRef.current) {
+          rendererRef.current.dispose();
+          if (rendererRef.current.forceContextLoss) {
+            rendererRef.current.forceContextLoss();
+          }
+          if (
+            rendererRef.current.domElement &&
+            rendererRef.current.domElement.parentNode
+          ) {
+            rendererRef.current.domElement.parentNode.removeChild(
+              rendererRef.current.domElement
+            );
+          }
+        }
+      } catch (e) {}
+      rendererRef.current = null;
+
+      // Dispose material & geometry safely
+      try {
+        if (matRef.current) {
+          matRef.current.dispose();
+          matRef.current = null;
+        }
+        if (quadRef.current?.geometry) {
+          quadRef.current.geometry.dispose();
+        }
+      } catch (e) {}
+
+      // Dispose textures in cache
+      try {
+        if (texturesRef.current) {
+          texturesRef.current.forEach((t) => {
+            if (t?.texture?.dispose) t.texture.dispose();
+          });
+        }
+      } catch (e) {}
+
+      texturesRef.current = [];
+      glContextLostRef.current = false;
+    };
+  };
 
   /* -----------------------
      cleanup on unmount
@@ -1055,19 +1047,18 @@ if (fp && matRef.current?.uniforms?.uFocus) {
         aria-label="carousel main"
       >
         {/* Pipeline 1: hidden canvas -> WebGL */}
-        <CarouselPipeline1 ref={p1Ref} onAllTexturesReady={handleAllTexturesReady} />
-
- 
-
+        <CarouselPipeline1
+          ref={p1Ref}
+          onAllTexturesReady={handleAllTexturesReady}
+        />
 
         {/* WebGL overlay (shader) */}
         <motion.div
-  ref={overlayRef}
-  style={{ scale: zoomCombined }}
-  className="absolute inset-0 z-30 pointer-events-none"
-  aria-hidden="true"
-/>
-
+          ref={overlayRef}
+          style={{ scale: zoomCombined }}
+          className="absolute inset-0 z-30 pointer-events-none"
+          aria-hidden="true"
+        />
 
         {/* Pointer-follow bubble */}
         <motion.div
@@ -1088,19 +1079,29 @@ if (fp && matRef.current?.uniforms?.uFocus) {
         {/* Progress Bar */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] h-[2px] flex gap-2 z-40">
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div style={{ scaleX: p1 }} className="origin-left h-full bg-white" />
+            <motion.div
+              style={{ scaleX: p1 }}
+              className="origin-left h-full bg-white"
+            />
           </div>
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div style={{ scaleX: p2 }} className="origin-left h-full bg-white" />
+            <motion.div
+              style={{ scaleX: p2 }}
+              className="origin-left h-full bg-white"
+            />
           </div>
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div style={{ scaleX: p3 }} className="origin-left h-full bg-white" />
+            <motion.div
+              style={{ scaleX: p3 }}
+              className="origin-left h-full bg-white"
+            />
           </div>
         </div>
 
         {/* status (debug) */}
         <div className="absolute top-4 right-4 text-white text-xs z-40">
-          Pipeline 4 {ready ? "• READY" : "• INIT"} {animatingRef.current ? "• ANIM" : ""}
+          Pipeline 4 {ready ? "• READY" : "• INIT"}{" "}
+          {animatingRef.current ? "• ANIM" : ""}
         </div>
       </main>
 

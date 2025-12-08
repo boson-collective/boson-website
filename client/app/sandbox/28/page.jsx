@@ -37,115 +37,114 @@ function Webglbg() {
 /* ==========================================
    HERO (PERSIS PUNYA LO)
    ========================================== */
-   function Hero() {
-    const { scrollY } = useScroll();
-    const y = useTransform(scrollY, [0, 500], [0, 80]);
-  
-    return (
-      <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
-        <Webglbg />
-  
-        {/* NAV */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 0.75, y: 0 }}
-          transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
-          className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
-        >
-          <div className="flex gap-4 sm:gap-8">
-            <span>About</span>
-            <span>Philosophy</span>
-          </div>
-          <div className="flex gap-4 sm:gap-8">
-            <span>Works</span>
-            <span>Contact</span>
-          </div>
-        </motion.div>
-  
-        {/* BOSON CHROME */}
-        <motion.div
-          initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
-          className="absolute inset-0 z-10 flex items-center justify-center"
-        >
-          <div className="boson-chrome-v4" />
-        </motion.div>
-  
-        {/* SIDE LEFT */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.6, y: 0 }}
-          transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
-          text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-start z-20"
-        >
-          A system-driven studio
-          <br />
-          for modern identity & engineering.
-        </motion.div>
-  
-        {/* SIDE RIGHT */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.6, y: 0 }}
-          transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[20%] sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
-          text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-right z-20"
-        >
-          Focused on how to shape
-          <br />
-          the future, not follow it.
-        </motion.div>
-  
-        {/* FOOTER */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.55, y: 0 }}
-          transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
-          text-[10px] sm:text-xs tracking-wide z-20"
-        >
-          <span>06°10&apos;00&quot;S</span>
-          <span>Bali, Indonesia</span>
-          <span>106°49&apos;00&quot;E</span>
-        </motion.div>
-  
-        {/* CHROME CSS */}
-        <style jsx>{`
-          .boson-chrome-v4 {
-            position: absolute;
-            inset: 0;
-            margin: auto;
-            width: min(90vw, 1250px);
-            height: min(90vw, 1250px);
-  
-            mask-image: url("/boson-white.png");
-            -webkit-mask-image: url("/boson-white.png");
-            mask-size: contain;
-            mask-position: center;
-            mask-repeat: no-repeat;
-  
-            background:
-              linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
-              radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%),
-              #09070b;
-  
-            background-blend-mode: screen, multiply;
-  
-            filter: blur(0.6px);
-            opacity: 0.5;
-          }
-        `}</style>
+function Hero() {
+const { scrollY } = useScroll();
+const y = useTransform(scrollY, [0, 500], [0, 80]);
+
+return (
+  <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
+    <Webglbg />
+
+    {/* NAV */}
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 0.75, y: 0 }}
+      transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
+      className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
+    >
+      <div className="flex gap-4 sm:gap-8">
+        <span>About</span>
+        <span>Philosophy</span>
       </div>
-    );
-  }
+      <div className="flex gap-4 sm:gap-8">
+        <span>Works</span>
+        <span>Contact</span>
+      </div>
+    </motion.div>
+
+    {/* BOSON CHROME */}
+    <motion.div
+      initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
+      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+      transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
+      className="absolute inset-0 z-10 flex items-center justify-center"
+    >
+      <div className="boson-chrome-v4" />
+    </motion.div>
+
+    {/* SIDE LEFT */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.6, y: 0 }}
+      transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
+      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-start z-20"
+    >
+      A system-driven studio
+      <br />
+      for modern identity & engineering.
+    </motion.div>
+
+    {/* SIDE RIGHT */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.6, y: 0 }}
+      transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-[20%] sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
+      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-right z-20"
+    >
+      Focused on how to shape
+      <br />
+      the future, not follow it.
+    </motion.div>
+
+    {/* FOOTER */}
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 0.55, y: 0 }}
+      transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
+      className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
+      text-[10px] sm:text-xs tracking-wide z-20"
+    >
+      <span>06°10&apos;00&quot;S</span>
+      <span>Bali, Indonesia</span>
+      <span>106°49&apos;00&quot;E</span>
+    </motion.div>
+
+    {/* CHROME CSS */}
+    <style jsx>{`
+      .boson-chrome-v4 {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: min(90vw, 1250px);
+        height: min(90vw, 1250px);
+
+        mask-image: url("/boson-white.png");
+        -webkit-mask-image: url("/boson-white.png");
+        mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
+          radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%),
+          #09070b;
+
+        background-blend-mode: screen, multiply;
+
+        filter: blur(0.6px);
+        opacity: 0.5;
+      }
+    `}</style>
+  </div>
+);
+}
   
   
   /* ==========================================
    INTRO FRAME OVERLAY (SLIDES + PORTAL)
-   ========================================== */
-
+   ========================================== */ 
 function IntroOverlay() {
 const IMAGES = [
   "/clients/tender-touch/5.jpg",
@@ -361,26 +360,32 @@ function BosonNarrative() {
     };
   };
 
-  const text = `We Begin with possibility—mapping the forces, patterns, and subtle movements that shape how meaning emerges, transforming raw potential into stories, experiences, and identities that move with clarity and intention`;
+
+  const text = `In the beginning
+there is only possibility.
+A world where uncertainty
+becomes clarity.`;
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
-      style={{ padding: "120px 6vw" }}
+      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center justify-center"
+      style={{ padding: "200px 8vw" }}
     >
       <div
         style={{
           position: "relative",
           width: "100%",
+          maxWidth: "1200px",
+          textAlign: "center",
           whiteSpace: "pre-wrap",
-          fontSize: "clamp(28px, 6vw, 74px)",
-          lineHeight: 1.25,
+          fontSize: "clamp(32px, 6vw, 78px)",
+          lineHeight: 1.28,
           fontWeight: 400,
           color: isMobile
             ? "rgba(255,255,255,0.96)"
-            : "rgba(255,255,255,0.085)",
+            : "rgba(255,255,255,0.10)",
         }}
       >
         {text}
@@ -391,7 +396,9 @@ function BosonNarrative() {
               pointerEvents: "none",
               position: "absolute",
               inset: 0,
+              textAlign: "center",
               color: "rgba(255,255,255,0.96)",
+              fontWeight: 400,
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
@@ -430,7 +437,402 @@ function BosonNarrative() {
 }
 
 
+function IndustryItem({ title, logos }) {
+  const [hovered, setHovered] = React.useState(false);
 
+  const trackRef = React.useRef(null);
+  const x = useMotionValue(0);
+  const segmentWidthRef = React.useRef(0);
+
+  const itemHeight = "clamp(36px, 6vw, 84px)";
+  const expandedHeight = "150px";
+
+  // ====== BUILD SEGMENTS ======
+  const baseImages = React.useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 2; i++) out.push(...logos);
+    return out;
+  }, [logos]);
+
+  const segmentImages = React.useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 3; i++) out.push(...baseImages);
+    return out;
+  }, [baseImages]);
+
+  // ====== MEASURE WIDTH ======
+  React.useLayoutEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const total = el.scrollWidth;
+      if (!total) return;
+      segmentWidthRef.current = total / 2;
+    };
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  // ====== INFINITE MARQUEE ENGINE ======
+  useAnimationFrame((t, delta) => {
+    const segmentWidth = segmentWidthRef.current;
+    if (!segmentWidth) return;
+
+    const speed = hovered ? 80 : 15;
+    const move = (speed * delta) / 1000;
+
+    let next = x.get() - move;
+
+    if (next <= -segmentWidth) {
+      next = next + segmentWidth;
+    }
+
+    x.set(next);
+  });
+
+  // ====== LOGO CARD ======
+  const renderLogoCard = (src, key) => (
+    <div
+      key={key}
+      style={{
+        background: "rgba(255,255,255,0.15)",
+        padding: "35px 40px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+      }}
+    >
+      <img
+        src={src}
+        draggable={false}
+        style={{
+          height: "80px",
+          objectFit: "contain",
+        }}
+      />
+    </div>
+  );
+
+  // ====== SEGMENT BUILDER ======
+  const renderSegment = (key) => (
+    <div
+      key={key}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "30px",
+        paddingRight: "40px",
+      }}
+    >
+      {segmentImages.map((src, idx) =>
+        renderLogoCard(src, `${key}-${idx}`)
+      )}
+    </div>
+  );
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        height: hovered ? expandedHeight : itemHeight,
+        transition: "height 0.35s ease",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "visible",
+        padding: "45px 0",
+        fontFamily: 'Bricolage Grotesque'
+
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* TEXT TITLE */}
+      <h2
+        style={{
+          color: hovered ? "transparent" : "#FDEBD3",
+          fontWeight: 600,
+          fontSize: itemHeight,
+          margin: 0,
+          lineHeight: 1.1,
+          transition: "color 0.25s ease",
+          zIndex: 1, 
+        }}
+      >
+        {title}
+      </h2>
+
+      {/* HEIGHT-ANIMATED WRAPPER */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: hovered ? expandedHeight : 0,
+          overflow: "hidden",
+          transition: "height 0.35s ease",
+          pointerEvents: "none",
+        }}
+      >
+        {/* CONTENT INSIDE THE SLIDE-DOWN PANEL */}
+        <motion.div
+          style={{
+            height: expandedHeight,
+            opacity: hovered ? 1 : 0,
+            transform: hovered ? "translateY(0)" : "translateY(8px)",
+            transition: "opacity 0.25s ease, transform 0.25s ease",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <motion.div
+            ref={trackRef}
+            style={{
+              display: "flex",
+              flexShrink: 0,
+              x,
+              willChange: "transform",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {renderSegment("seg-1")}
+            {renderSegment("seg-2")}
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+ function IndustriesPage() {
+  const industries = [
+    {
+      title: "Real Estate & Property",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "Lifestyle & Hospitality",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "Personal Brand",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "Food & Beverage",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "E-Commerce & Retail",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "Fashion & Beauty",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+    {
+      title: "Drone & Aerial Media",
+      logos: [
+        "/clients/dwm/logo.png",
+        "/clients/marrosh/logo.png",
+        "/clients/novo-ampang/logo.png",
+        "/clients/sdg/logo.png",
+        "/clients/sunny-village/logo.png",
+        "/clients/solace/logo.png",
+      ],
+    },
+  ];
+
+  return (
+    <div style={{ padding: "150px 20px", background: "#e85848", color: "#FDEBD3", fontFamily: 'Bricolage Grotesque'}}>
+      <h1
+        style={{
+          fontSize: "clamp(80px, 22vw, 300px)",
+          fontWeight: "800",
+          lineHeight: 0.9,
+          margin: 0,
+          textAlign: "center",
+        }}
+      >
+        INDUSTRIES
+      </h1>
+
+      <p style={{ textAlign: "center", marginBottom: "60px" }}>
+        Backed by decades of experience
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+        }}
+      >
+        {industries.map((item, i) => (
+          <IndustryItem key={i} title={item.title} logos={item.logos} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MeetBoson() {
+  const container = useRef(null);
+  const maskGroup = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!container.current || !maskGroup.current) return;
+    
+    const ctx = gsap.context(() => {
+      const box = maskGroup.current.getBBox();
+      const viewportWidth = window.innerWidth;
+
+      // Geser sampai huruf terakhir sedikit lewat center
+      const scrollDistance = Math.max(
+        box.x + box.width - viewportWidth * 0.7,
+        0
+      );
+
+      gsap.to(maskGroup.current, {
+        x: -scrollDistance,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container.current,
+          start: "top top",
+          end: `+=${scrollDistance}`,
+          scrub: true,
+          pin: true,
+        },
+      });
+
+      gsap.to(maskGroup.current, {
+        scale: 6,
+        transformBox: "fill-box",
+        transformOrigin: "center center",
+        ease: "none",
+        scrollTrigger: {
+          trigger: container.current,
+          start: `top+=${scrollDistance} top`,
+          end: "+=900",
+          scrub: true,
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      ref={container}
+      style={{
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        position: "relative",
+        background: "#000",
+      }}
+    >
+      <video
+        src="https://video.wixstatic.com/video/f0fad4_c5e73af6159647568391799b6d161626/1080p/mp4/file.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+
+      <svg
+        width="100%"
+        height="100%"
+        style={{ position: "absolute", inset: 0, zIndex: 10 }}
+      >
+        <mask id="text-mask">
+          <rect width="100%" height="100%" fill="white" />
+          <g ref={maskGroup} fill="black">
+            <text
+              x="0"
+              y="60%"
+              fontSize="55vw"
+              fontWeight="900"
+              letterSpacing="-0.05em"
+              dominantBaseline="middle"
+            >
+              COLLECTIVE
+            </text>
+          </g>
+        </mask>
+
+        <rect width="100%" height="100%" fill="#09070b" mask="url(#text-mask)" />
+      </svg>
+    </section>
+  );
+}
+
+ 
   
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
@@ -1236,32 +1638,18 @@ function Footer() {
    ========================================== */
 
    export default function Page() {
-    const ready = useContext(LoaderContext)
+    const ready = useContext(LoaderContext);
   
     useEffect(() => {
-      window.scrollTo(0, 0)
-    }, [])
-    
-    const { scrollYProgress } = useScroll();
-    const narrativeY = useTransform(
-      scrollYProgress,
-      [0, 0.2, 0.5],
-      ["100vh", "40vh", "0vh"]
-    );
-        
-    // =============================
-    // 1️⃣ — Kalau belum ready → return null
-    // =============================
-    if (!ready) return null
+      window.scrollTo(0, 0);
+    }, []);
   
-    // =============================
-    // 2️⃣ — Kalau ready → return full page
-    // =============================
-   
+    if (!ready) return null;
+  
     
     return (
       <div style={{ width: "100%", background: "#000", position: "relative" }}>
-        <div className="sticky top-0 h-screen z-[1]" style={{ position: "sticky", top: 0, zIndex: 1 }}>
+        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
           <HeroJoin />
         </div>
     
@@ -1281,9 +1669,14 @@ function Footer() {
           <WorksList />
         </div>
     
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <Carousel />
-        </div>
+        </div> */}
+        
+         <MeetBoson />
+         
+         <IndustriesPage/>
+         
     
         <div style={{ position: "relative", zIndex: 2 }}>
           <Footer />
@@ -1292,12 +1685,49 @@ function Footer() {
         <style jsx global>{`
           body {
             background: #000;
+            overflow-x: hidden;
           }
         `}</style>
       </div>
     );
     
     
-    
+    // return (
+    //   <div style={{ width: "100%", background: "#000", position: "relative" }}>
+
+    //     {/* HERO */}
+    //     <HeroJoin />
+  
+    //     {/* BOSON NARRATIVE */}
+    //     <BosonNarrative />
+  
+    //     <div style={{ position: "relative", zIndex: 2 }}>
+    //       <Projects />
+    //     </div>
+        
+    //     {/* MEET BOSON (GSAP pin — TIDAK BOLEH ADA WRAPPER) */}
+    //     <MeetBoson />
+        
+    //     {/* <IndustriesPage /> */}
+        
+    //     <Footer />
+  
+    //     {/* OTHER SECTIONS */}
+    //     {/*
+        
+    //     <BigHeading />
+    //     <WorksList />
+    //     <Carousel />
+    //     */}
+  
+    //     <style jsx global>{`
+    //       html,
+    //       body {
+    //         background: #000; 
+    //         overflow-x: hidden;
+    //       }
+    //     `}</style>
+    //   </div>
+    // );
   }
   
