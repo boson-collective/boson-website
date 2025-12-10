@@ -361,31 +361,27 @@ function BosonNarrative() {
   };
 
 
-  const text = `In the beginning
-there is only possibility.
-A world where uncertainty
-becomes clarity.`;
+  const text = `     In the beginning, there is only possibility, a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
+
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center justify-center"
-      style={{ padding: "200px 8vw" }}
+      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
+      style={{ padding: "120px 6vw" }}
     >
       <div
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: "1200px",
-          textAlign: "center",
           whiteSpace: "pre-wrap",
-          fontSize: "clamp(32px, 6vw, 78px)",
-          lineHeight: 1.28,
+          fontSize: "clamp(28px, 6vw, 74px)",
+          lineHeight: 1.25,
           fontWeight: 400,
           color: isMobile
             ? "rgba(255,255,255,0.96)"
-            : "rgba(255,255,255,0.10)",
+            : "rgba(255,255,255,0.15)",
         }}
       >
         {text}
@@ -396,9 +392,7 @@ becomes clarity.`;
               pointerEvents: "none",
               position: "absolute",
               inset: 0,
-              textAlign: "center",
               color: "rgba(255,255,255,0.96)",
-              fontWeight: 400,
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
@@ -553,7 +547,7 @@ function IndustryItem({ title, logos }) {
         alignItems: "center",
         overflow: "visible",
         padding: "45px 0",
-        fontFamily: 'Bricolage Grotesque'
+        // fontFamily: 'Bricolage Grotesque'
 
       }}
       onMouseEnter={() => setHovered(true)}
@@ -699,7 +693,7 @@ function IndustryItem({ title, logos }) {
   ];
 
   return (
-    <div style={{ padding: "150px 20px", background: "#e85848", color: "#FDEBD3", fontFamily: 'Bricolage Grotesque'}}>
+    <div style={{ padding: "150px 20px", background: "#e85848", color: "#FDEBD3"}}>
       <h1
         style={{
           fontSize: "clamp(80px, 22vw, 300px)",
@@ -732,47 +726,113 @@ function IndustryItem({ title, logos }) {
   );
 }
 
+
 function MeetBoson() {
   const container = useRef(null);
   const maskGroup = useRef(null);
 
   useLayoutEffect(() => {
     if (!container.current || !maskGroup.current) return;
-    
-    const ctx = gsap.context(() => {
-      const box = maskGroup.current.getBBox();
-      const viewportWidth = window.innerWidth;
 
-      // Geser sampai huruf terakhir sedikit lewat center
-      const scrollDistance = Math.max(
-        box.x + box.width - viewportWidth * 0.7,
-        0
+    const ctx = gsap.context(() => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const faceX = vw * 0.48;
+      const faceY = vh * 0.42;
+
+      const textNode = maskGroup.current.querySelector("text");
+
+      const textX = parseFloat(textNode.getAttribute("x")) || 0;
+      const totalLength = textNode.getComputedTextLength();
+      const totalChars = textNode.getNumberOfChars();
+      const lastIndex = totalChars - 1;
+      const lastWidth = textNode.getSubStringLength(lastIndex, 1);
+
+      const rightEdge = textX + totalLength;
+      const lastLetterCenterX = rightEdge - lastWidth / 2;
+
+      const centerTargetX = vw / 2;
+      const shiftToCenter = centerTargetX - lastLetterCenterX;
+
+      /** ---------------------------------------------------------
+       *  GET SAFE SCALE — iterative solver
+       *  memastikan SEMUA corner huruf keluar viewport
+       * --------------------------------------------------------- */
+
+      const box = maskGroup.current.getBBox();
+
+      const boxCorners = [
+        { x: box.x, y: box.y },
+        { x: box.x + box.width, y: box.y },
+        { x: box.x, y: box.y + box.height },
+        { x: box.x + box.width, y: box.y + box.height },
+      ];
+
+      const viewportCorners = [
+        { x: 0, y: 0 },
+        { x: vw, y: 0 },
+        { x: 0, y: vh },
+        { x: vw, y: vh },
+      ];
+
+      const dist = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
+
+      const farViewport = Math.max(
+        ...viewportCorners.map((v) => dist(faceX, faceY, v.x, v.y))
       );
 
-      gsap.to(maskGroup.current, {
-        x: -scrollDistance,
-        ease: "none",
+      // 🔥 ITERATIVE SCALE COMPUTATION
+      let scaleFinal = 1;
+      for (let i = 1; i < 6000; i++) {
+        const scaledDistances = boxCorners.map((c) => {
+          const dx = c.x - faceX;
+          const dy = c.y - faceY;
+          return Math.hypot(dx * i, dy * i);
+        });
+
+        const farScaled = Math.max(...scaledDistances);
+        if (farScaled >= farViewport * 1) {
+          scaleFinal = i * 5.1;
+          break;
+        }
+      }
+
+      /** ---------------------------------------------------------
+       *  BUILD SCROLL TIMELINE
+       * --------------------------------------------------------- */
+
+      const scrollLength = Math.round(vh * 1.6);
+
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container.current,
           start: "top top",
-          end: `+=${scrollDistance}`,
+          end: `+=${scrollLength}`,
           scrub: true,
           pin: true,
         },
       });
 
-      gsap.to(maskGroup.current, {
-        scale: 6,
-        transformBox: "fill-box",
-        transformOrigin: "center center",
+      // Phase 1: shift horizontally
+      tl.to(maskGroup.current, {
+        x: shiftToCenter,
         ease: "none",
-        scrollTrigger: {
-          trigger: container.current,
-          start: `top+=${scrollDistance} top`,
-          end: "+=900",
-          scrub: true,
-        },
+        duration: 0.5,
       });
+
+      // Phase 2: scale zoom-out
+      tl.to(
+        maskGroup.current,
+        {
+          scale: scaleFinal,
+          transformBox: "fill-box",
+          svgOrigin: `${faceX} ${faceY}`,
+          ease: "none",
+          duration: 0.5,
+        },
+        0.5
+      );
     });
 
     return () => ctx.revert();
@@ -790,7 +850,7 @@ function MeetBoson() {
       }}
     >
       <video
-        src="https://video.wixstatic.com/video/f0fad4_c5e73af6159647568391799b6d161626/1080p/mp4/file.mp4"
+        src="https://cdn.pixabay.com/video/2022/07/08/123523-728292591_large.mp4"
         autoPlay
         muted
         loop
@@ -805,23 +865,23 @@ function MeetBoson() {
         }}
       />
 
-      <svg
-        width="100%"
-        height="100%"
-        style={{ position: "absolute", inset: 0, zIndex: 10 }}
-      >
-        <mask id="text-mask">
+      <svg width="100%" height="100%" style={{ position: "absolute", inset: 0, zIndex: 10 }}>
+        <mask
+          id="text-mask"
+          maskUnits="userSpaceOnUse"
+          maskContentUnits="userSpaceOnUse"
+        >
           <rect width="100%" height="100%" fill="white" />
-          <g ref={maskGroup} fill="black">
-            <text
-              x="0"
-              y="60%"
-              fontSize="55vw"
-              fontWeight="900"
-              letterSpacing="-0.05em"
-              dominantBaseline="middle"
-            >
-              COLLECTIVE
+
+          <g
+            ref={maskGroup}
+            fill="black"
+            fontWeight="900"
+            fontSize="110vh"
+            letterSpacing="-0.05em"
+          >
+            <text x="0" y="60%" dominantBaseline="middle">
+              TRANSFORMATION
             </text>
           </g>
         </mask>
@@ -832,8 +892,9 @@ function MeetBoson() {
   );
 }
 
- 
-  
+
+
+
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
     <motion.div
@@ -867,26 +928,43 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 function Projects() {
   const scrollRef = useRef(null);
 
+  // PROGRESS UTAMA — untuk burst (TETAP seperti semula)
   const { scrollYProgress } = useScroll({
     target: scrollRef,
     offset: ["start start", "end end"],
   });
 
-  // ROTATION VALUES (for orbits)
-  const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 720]);
-  const rotate2 = useTransform(scrollYProgress, [0, 1], [0, -540]);
-  const rotate3 = useTransform(scrollYProgress, [0, 1], [0, 900]);
+  
+  const { scrollYProgress: dotProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "end end"],
+  });
+  
+  const slowDotProgress = useTransform(dotProgress, v => v * 0.15);
 
+  
+  
+  // ROTATION VALUES (for orbits) — pakai introProgress
+  const rotate1 = useTransform(slowDotProgress, [0, 1], [0, 7200]);
+  const rotate2 = useTransform(slowDotProgress, [0, 1], [0, -5400]);
+  const rotate3 = useTransform(slowDotProgress, [0, 1], [0, 9000]);
+    
+  
+  // PROGRESS INTRO — dari pertama kelihatan sampai titik sticky
+  const { scrollYProgress: introProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "start start"],
+  });
   // ============================
   // TEXT REVEAL with Framer Motion
   // ============================
-  const textOpacity = useTransform(scrollYProgress, [0.05, 0.12], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0, 0.12], [-50, 0]);
-  const textFilter = useTransform(
-    scrollYProgress,
-    [0, 0.12],
-    ["blur(20px)", "blur(0px)"]
-  );
+  // mulai reveal begitu komponen kelihatan, selesai pas sticky
+  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+  const textFilter = useTransform(introProgress, [0, 1], [
+    "blur(20px)",
+    "blur(0px)",
+  ]);
 
   // ORBIT CONFIGS
   const c1 = { cx: 425, cy: 350, r: 250 };
@@ -952,11 +1030,6 @@ function Projects() {
     "/clients/marrosh/mockup.png", // 4 (extra)
     "/clients/dwm/mockup.png", // 5
     "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
-    "/clients/tender-touch/mockup.png", // 2
-    "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
   ];
 
   // ============================
@@ -1128,12 +1201,13 @@ function Projects() {
             filter: textFilter,
             position: "absolute",
             color: "white",
-            fontSize: "32px",
+            fontSize: "23px",
             textAlign: "center",
             fontWeight: 300,
             lineHeight: 1.3,
             zIndex: 10,
             whiteSpace: "pre-line",
+            textTransform: "uppercase"
           }}
         >
           {`Signals, motion, intent:
@@ -1148,6 +1222,8 @@ The Boson process takes shape`}
     </div>
   );
 }
+
+
 
 function BigHeading() {
   const ref = useRef(null);
@@ -1183,9 +1259,10 @@ function BigHeading() {
               transform: "translateY(10%)",
               color: "white",
               fontSize: "30vw",
-              fontWeight: 300,
+              fontWeight: 600,
               lineHeight: 0.8,
               opacity: 0.9,
+              textTransform: "uppercase",
               gap: "4vw",
             }}
           >
@@ -1207,9 +1284,10 @@ function BigHeading() {
               transform: "translateY(-10%)",
               color: "#3a3a3a",
               fontSize: "30vw",
-              fontWeight: 300,
+              fontWeight: 600,
               lineHeight: 0.8,
               opacity: 0.45,
+              textTransform: "uppercase",
               gap: "4vw",
             }}
           >
@@ -1404,6 +1482,7 @@ function MarqueeOverlay({ item, active }) {
   );
 }
 
+
 function WorksList() {
   const items = [
     {
@@ -1564,6 +1643,219 @@ Every decision, every detail is a lever — elevating the whole
   );
 }
   
+function BosonScrollText() {
+  const outerRef = useRef(null);
+  const wrapRef = useRef(null);
+
+  const TEXT = `
+We are a multicultural collective of creatives, strategists, and designers, blending global perspectives with local insight to craft brands, stories, and digital experiences that move people and create lasting clarity.
+  `;
+
+  // =============================
+  // SPLIT → WORD → CHAR
+  // =============================
+  const words = TEXT.trim().split(/(\s+)/);
+  const chars = [];
+  words.forEach((word) => {
+    if (word.trim().length === 0) {
+      chars.push({ type: "space", char: " " });
+      return;
+    }
+    const charArray = word.split("").map((c) => ({ type: "char", char: c }));
+    chars.push({ type: "word", chars: charArray });
+  });
+
+  useEffect(() => {
+    const outer = outerRef.current;
+    const wrap = wrapRef.current;
+    if (!outer || !wrap) return;
+
+    const characters = Array.from(wrap.querySelectorAll(".bf-char"));
+    const total = characters.length;
+
+    // ======================================================
+    // TARGET: KATA TERAKHIR (BUKAN HURUF)
+    // ======================================================
+    const words = wrap.querySelectorAll(".bf-word");
+    const lastWord = words[words.length - 1];
+    lastWord.classList.add("bf-target");
+
+    // ======================================
+    // MASTER TIMELINE
+    // ======================================
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: outer,
+        start: "top top",
+        end: "+=600%",
+        scrub: 0.3,
+        pin: true,
+      },
+    });
+
+    // --------------------------------------
+    // PHASE 1 — CHAR FILL (0 → 45%)
+    // --------------------------------------
+    tl.to({}, {
+      duration: 0.45,
+      onUpdate: function () {
+        const p = this.progress();
+        const filled = p * total;
+        const full = Math.floor(filled);
+        const frac = filled - full;
+
+        for (let i = 0; i < total; i++) {
+          characters[i].classList.remove("filled", "partial");
+          characters[i].style.setProperty("--partial", "0%");
+        }
+
+        for (let i = 0; i < full; i++) {
+          characters[i].classList.add("filled");
+        }
+
+        if (characters[full]) {
+          characters[full].classList.add("partial");
+          characters[full].style.setProperty(
+            "--partial",
+            `${Math.round(frac * 100)}%`
+          );
+        }
+      }
+    });
+
+    // --------------------------------------
+    // PHASE 2 — POSISIKAN KATA TERAKHIR KE TENGAH
+    // --------------------------------------
+    tl.to({}, {
+      duration: 0.0001,
+      onStart: () => {
+        const rectOuter = outer.getBoundingClientRect();
+        const rectWrap = wrap.getBoundingClientRect();
+        const rectWord = lastWord.getBoundingClientRect();
+
+        // 1. Hitung transform-origin berdasarkan center kata terakhir
+        const originX = rectWord.left - rectWrap.left + rectWord.width / 2;
+        const originY = rectWord.top - rectWrap.top + rectWord.height / 2;
+
+        gsap.set(wrap, {
+          transformOrigin: `${originX}px ${originY}px`
+        });
+
+        // 2. Hitung translasi agar kata terakhir tepat di center viewport
+        const screenCenterX = rectOuter.width / 2;
+        const screenCenterY = rectOuter.height / 2;
+
+        const currentWordCenterX = rectWord.left + rectWord.width / 2;
+        const currentWordCenterY = rectWord.top + rectWord.height / 2;
+
+        const dx = screenCenterX - currentWordCenterX;
+        const dy = screenCenterY - currentWordCenterY;
+
+        // >>>>>>>>>> FIX SNAP <<<<<<<<<<
+        // Gunakan timeline to supaya ikut scrub dan tidak ada perpindahan mendadak
+        tl.to(wrap, {
+          x: dx,
+          y: dy,
+          duration: 0.001,
+          ease: "none"
+        }, 0);
+      }
+    });
+
+    // --------------------------------------
+    // PHASE 3 — SCALE OUT
+    // --------------------------------------
+    tl.to(wrap, {
+      scale: 50,
+      opacity: 0,
+      ease: "none",
+      duration: 0.55,
+    });
+
+    return () => {
+      tl.scrollTrigger.kill();
+      tl.kill();
+    };
+  }, []);
+
+  return (
+    <div className="bf-outer" ref={outerRef}>
+      <style jsx>{`
+        .bf-outer {
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: lightgray;
+          overflow: hidden;
+        }
+
+        .bf-wrap {
+          width: min(1100px, 92%);
+          line-height: 1.05;
+          text-align: center;
+        }
+
+        .bf-word {
+          display: inline-block;
+          white-space: nowrap;
+          margin-right: 0.4rem;
+        }
+
+        .bf-char {
+          display: inline-block;
+          color: rgba(234, 70, 50, 0.27);
+          font-weight: 800;
+          line-height: 0.98;
+          font-size: clamp(28px, 8vw, 84px);
+        }
+
+        .bf-char.filled {
+          color: rgb(234, 70, 50);
+        }
+
+        .bf-char.partial {
+          color: transparent;
+          background-image: linear-gradient(
+            90deg,
+            rgb(234, 70, 50) var(--partial),
+            rgba(234, 70, 50, 0.24) var(--partial)
+          );
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+
+        .bf-target {
+          outline: 2px solid rgba(234, 70, 50, 0.3);
+          outline-offset: 4px;
+        }
+      `}</style>
+
+      <div className="bf-wrap" ref={wrapRef}>
+        {chars.map((item, i) => {
+          if (item.type === "space") return <span key={i}>&nbsp;</span>;
+          return (
+            <span className="bf-word" key={i}>
+              {item.chars.map((c, j) => (
+                <span
+                  key={j}
+                  className="bf-char"
+                  dangerouslySetInnerHTML={{
+                    __html: c.char === "<" ? "&lt;" : c.char,
+                  }}
+                />
+              ))}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
+
 
 function Footer() {
   return (
@@ -1656,24 +1948,33 @@ function Footer() {
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
           <BosonNarrative />
         </div>
+        
     
-        <div style={{ position: "relative", zIndex: 2 }}>
+   
+    
+      
+        
+        
+             <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
         </div>
-    
-        <div style={{ position: "relative", zIndex: 2 }}>
+        
+          <div style={{ position: "relative", zIndex: 2 }}>
           <BigHeading />
         </div>
+
+        <MeetBoson />
+                <BosonScrollText/>  
+
     
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
-        </div>
+        </div> */}
     
         {/* <div style={{ position: "relative", zIndex: 2 }}>
           <Carousel />
         </div> */}
         
-         <MeetBoson />
          
          <IndustriesPage/>
          
@@ -1689,45 +1990,6 @@ function Footer() {
           }
         `}</style>
       </div>
-    );
-    
-    
-    // return (
-    //   <div style={{ width: "100%", background: "#000", position: "relative" }}>
-
-    //     {/* HERO */}
-    //     <HeroJoin />
-  
-    //     {/* BOSON NARRATIVE */}
-    //     <BosonNarrative />
-  
-    //     <div style={{ position: "relative", zIndex: 2 }}>
-    //       <Projects />
-    //     </div>
-        
-    //     {/* MEET BOSON (GSAP pin — TIDAK BOLEH ADA WRAPPER) */}
-    //     <MeetBoson />
-        
-    //     {/* <IndustriesPage /> */}
-        
-    //     <Footer />
-  
-    //     {/* OTHER SECTIONS */}
-    //     {/*
-        
-    //     <BigHeading />
-    //     <WorksList />
-    //     <Carousel />
-    //     */}
-  
-    //     <style jsx global>{`
-    //       html,
-    //       body {
-    //         background: #000; 
-    //         overflow-x: hidden;
-    //       }
-    //     `}</style>
-    //   </div>
-    // );
+    ); 
   }
   
