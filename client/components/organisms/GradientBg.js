@@ -666,9 +666,11 @@ class Background extends InteractiveObject {
     this.geometry = null;
     this.material = null;
     this.background = {
-      color1: [0.92, 0.23, 0.15], // Soft bright red
-      color2: [0.55, 0.07, 0.04], // Darker warm red
-      color3: [0.01, 0.015, 0.03], // Rich dark navy-black
+      color1: [0.914, 0.412, 0.349], // Soft bright (#E96959)
+      color2: [0.796, 0.294, 0.243], // Base (#CB4B3E)
+      
+      color3: [0.87, 0.85, 0.81]
+, // Rich dark navy-black
       colorAccent: new THREE.Color(0.0, 0.0, 0.0),
       uLinesBlur: 0.33,   // was 0.25 → lebih blur
       uNoise: 0.03,       // noise lebih halus
@@ -926,7 +928,7 @@ export default class WebGL extends THREE.EventDispatcher {
     this.mouseMove = MouseMove.getInstance();
     this.preloader = new Preloader();
     this.gui = new GUI();
-    this.gui.hide(); // GUI hilang tanpa hapus kode
+    this.gui.hide(); // GUI hilang tanpa hapus kode 
     this.pixelRatio = 1;
 
     this.rendererEl = rendererEl;

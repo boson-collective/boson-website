@@ -4,6 +4,7 @@ import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffe
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
 import ScrollTrigger from "gsap/ScrollTrigger";
+import SplitType from "split-type";
 import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
 
@@ -42,7 +43,7 @@ const { scrollY } = useScroll();
 const y = useTransform(scrollY, [0, 500], [0, 80]);
 
 return (
-  <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-white/80">
+  <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
     <Webglbg />
 
     {/* NAV */}
@@ -54,7 +55,7 @@ return (
     >
       <div className="flex gap-4 sm:gap-8">
         <span>About</span>
-        <span>Philosophy</span>
+        <span>Services</span>
       </div>
       <div className="flex gap-4 sm:gap-8">
         <span>Works</span>
@@ -64,9 +65,9 @@ return (
 
     {/* BOSON CHROME */}
     <motion.div
-      initial={{ opacity: 0, scale: 1.5, filter: "blur(100px)" }}
+      initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
       animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ delay: 2.4, duration: 1.8, ease: "easeOut" }}
+      transition={{ delay: 2.8, duration: 2.3, ease: "easeOut" }}
       className="absolute inset-0 z-10 flex items-center justify-center"
     >
       <div className="boson-chrome-v4" />
@@ -82,7 +83,7 @@ return (
     >
       A system-driven studio
       <br />
-      for modern identity & engineering.
+      for modern identity & engineering
     </motion.div>
 
     {/* SIDE RIGHT */}
@@ -95,7 +96,7 @@ return (
     >
       Focused on how to shape
       <br />
-      the future, not follow it.
+      the future, driving it forward
     </motion.div>
 
     {/* FOOTER */}
@@ -129,7 +130,7 @@ return (
         background:
           linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
           radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%),
-          #09070b;
+          #ebe8e0;
 
         background-blend-mode: screen, multiply;
 
@@ -148,14 +149,14 @@ return (
 function IntroOverlay() {
 const IMAGES = [
   "/clients/tender-touch/5.jpg",
-  "/clients/tender-touch/3.jpg",
+  "/clients/dwm/3.jpg",
   "/clients/tender-touch/4.jpg",
-  "/clients/tender-touch/5.jpg",
+  "/clients/dwm/5.jpg",
   "/clients/tender-touch/3.jpg",
-  "/clients/tender-touch/4.jpg",
-  "/clients/tender-touch/5.jpg",
-  "/clients/tender-touch/3.jpg",
-  "/clients/tender-touch/4.jpg",
+  "/clients/dwm/4.jpg",
+  "/clients/tender-touch/7.jpg",
+  "/clients/marrosh/9.jpg",
+  "/clients/dwm/2.jpg",
 ];
 const [phase, setPhase] = useState("slides");
 const [visible, setVisible] = useState(Array(IMAGES.length).fill("start"));
@@ -268,7 +269,7 @@ function HeroJoin() {
       style={{
         width: "100%",
         height: "100vh",
-        background: "#000",
+        background: "black",
         position: "relative",
       }}
     >
@@ -307,7 +308,7 @@ function HeroJoin() {
 
       <style jsx global>{`
         body {
-          background: #000;
+          background: black;
         }
       `}</style>
     </div>
@@ -317,18 +318,27 @@ function HeroJoin() {
 
 function BosonNarrative() {
   const wrap = useRef(null);
+  const baseTextRef = useRef(null); // stagger applied here
+
   const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
   const [isMobile, setIsMobile] = useState(false);
 
+  // ====================================
+  // MOBILE CHECK
+  // ====================================
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const handleChange = (e) => setIsMobile(e.matches);
+
     handleChange(mq);
     mq.addEventListener("change", handleChange);
     return () => mq.removeEventListener("change", handleChange);
   }, []);
 
+  // ====================================
+  // SPOTLIGHT FOLLOW
+  // ====================================
   useEffect(() => {
     if (isMobile) {
       setPos({ x: -9999, y: -9999 });
@@ -344,6 +354,7 @@ function BosonNarrative() {
         const speed = 0.06;
         return { x: prev.x + dx * speed, y: prev.y + dy * speed };
       });
+
       frame = requestAnimationFrame(animate);
     };
 
@@ -353,6 +364,7 @@ function BosonNarrative() {
 
   const handleMove = (e) => {
     if (!wrap.current || isMobile) return;
+
     const rect = wrap.current.getBoundingClientRect();
     targetPos.current = {
       x: e.clientX - rect.left,
@@ -360,15 +372,44 @@ function BosonNarrative() {
     };
   };
 
+  // ====================================
+  // STAGGER ON BASE TEXT (WITH SCROLLTRIGGER)
+  // ====================================
+  useEffect(() => {
+    if (!baseTextRef.current || isMobile) return;
 
-  const text = `     In the beginning, there is only possibility, a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
+    gsap.registerPlugin(ScrollTrigger);
 
+    const split = new SplitType(baseTextRef.current, { types: "words" });
+
+    gsap.from(split.words, {
+      opacity: 0,
+      y: 20,
+      duration: 2.9,
+      ease: "power3.out",
+      stagger: 0.03,
+      scrollTrigger: {
+        trigger: baseTextRef.current,
+        start: "top 80%", // <<== INI YANG LO MINTA
+        toggleActions: "play none none none",
+      },
+    });
+
+    return () => {
+      split.revert();
+    };
+  }, [isMobile]);
+
+  // ====================================
+  // TEXT
+  // ====================================
+  const text = `In the beginning, there is only possibility, a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen bg-[#09070b] relative overflow-hidden flex items-center"
+      className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
       style={{ padding: "120px 6vw" }}
     >
       <div
@@ -379,13 +420,26 @@ function BosonNarrative() {
           fontSize: "clamp(28px, 6vw, 74px)",
           lineHeight: 1.25,
           fontWeight: 400,
-          color: isMobile
-            ? "rgba(255,255,255,0.96)"
-            : "rgba(255,255,255,0.15)",
         }}
       >
-        {text}
 
+        {/* ====================================
+            LAYER 1 — BASE DIM TEXT (ANIMATED)
+        ==================================== */}
+        <div
+          ref={baseTextRef}
+          style={{
+            color: isMobile
+              ? "rgba(255,255,255,0.96)"
+              : "rgba(255,255,255,0.15)",
+          }}
+        >
+          {text}
+        </div>
+
+        {/* ====================================
+            LAYER 2 — HIGHLIGHT W/ SPOTLIGHT MASK
+        ==================================== */}
         {!isMobile && (
           <div
             style={{
@@ -393,12 +447,13 @@ function BosonNarrative() {
               position: "absolute",
               inset: 0,
               color: "rgba(255,255,255,0.96)",
+
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
+                  rgba(255,255,255,0.12) 30%,
+                  rgba(255,255,255,0.03) 55%,
                   rgba(255,255,255,0) 100%
                 )
               `,
@@ -406,8 +461,8 @@ function BosonNarrative() {
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
+                  rgba(255,255,255,0.12) 30%,
+                  rgba(255,255,255,0.03) 55%,
                   rgba(255,255,255,0) 100%
                 )
               `,
@@ -611,7 +666,7 @@ function IndustryItem({ title, logos }) {
   );
 }
 
- function IndustriesPage() {
+function IndustriesPage() {
   const industries = [
     {
       title: "Real Estate & Property",
@@ -693,7 +748,7 @@ function IndustryItem({ title, logos }) {
   ];
 
   return (
-    <div style={{ padding: "150px 20px", background: "#e85848", color: "#FDEBD3"}}>
+    <div style={{ padding: "150px 20px", color: "#FDEBD3"}}>
       <h1
         style={{
           fontSize: "clamp(80px, 22vw, 300px)",
@@ -701,6 +756,7 @@ function IndustryItem({ title, logos }) {
           lineHeight: 0.9,
           margin: 0,
           textAlign: "center",
+          fontFamily: 'Bricolage Grotesque'
         }}
       >
         INDUSTRIES
@@ -892,7 +948,56 @@ function MeetBoson() {
   );
 }
 
+function VideoSection() {
+  const holeWidth = 800;
+  const holeHeight = 450;
 
+  return (
+    <section
+      style={{
+        position: "relative",
+        height: "100vh",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
+      {/* FULLSCREEN VIDEO */}
+      <video
+        src="https://cdn.pixabay.com/video/2022/07/08/123523-728292591_large.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
+      />
+
+      {/* LUBANG KOTAK + BOX-SHADOW HITAM BESAR */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: `${holeWidth}px`,
+          height: `${holeHeight}px`,
+          transform: "translate(-50%, -50%)",
+          borderRadius: "4px",
+
+          // INILAH OVERLAY UTAMA
+          boxShadow: "0 0 0 9999px rgba(0,0,0,1)",
+
+          // lubang middle tetap transparent
+          background: "transparent",
+        }}
+      />
+    </section>
+  );
+}
 
 
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
@@ -1389,7 +1494,7 @@ function MarqueeOverlay({ item, active }) {
           src={src}
           draggable={false}
           style={{
-            height: "18vh",
+            height: "13vh",
             width: "auto",
             objectFit: "contain",
             filter: "invert(1) brightness(0)", // jadi hitam
@@ -1405,9 +1510,9 @@ function MarqueeOverlay({ item, active }) {
         src={src}
         draggable={false}
         style={{
-          height: "18vh",
+          height: "13vh",
           width: "32vh",
-          borderRadius: "2vh",
+          borderRadius: "6vh",
           objectFit: "cover",
           boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
           flexShrink: 0,
@@ -1614,7 +1719,7 @@ Every decision, every detail is a lever — elevating the whole
 
             <div
               style={{
-                fontSize: "6.8vw",
+                fontSize: "3.8vw",
                 fontWeight: 300,
                 textAlign: "center",
                 lineHeight: 0.95,
@@ -1644,202 +1749,130 @@ Every decision, every detail is a lever — elevating the whole
 }
   
 function BosonScrollText() {
-  const outerRef = useRef(null);
   const wrapRef = useRef(null);
 
   const TEXT = `
 We are a multicultural collective of creatives, strategists, and designers, blending global perspectives with local insight to craft brands, stories, and digital experiences that move people and create lasting clarity.
-  `;
+`;
 
   // =============================
   // SPLIT → WORD → CHAR
   // =============================
-  const words = TEXT.trim().split(/(\s+)/);
+  const words = TEXT.trim().split(/(\s+)/); // keep spaces as tokens
+
   const chars = [];
-  words.forEach((word) => {
+  words.forEach((word, wi) => {
     if (word.trim().length === 0) {
       chars.push({ type: "space", char: " " });
       return;
     }
+
     const charArray = word.split("").map((c) => ({ type: "char", char: c }));
     chars.push({ type: "word", chars: charArray });
   });
 
+  // =============================
+  // GSAP CHAR ANIMATION
+  // =============================
   useEffect(() => {
-    const outer = outerRef.current;
     const wrap = wrapRef.current;
-    if (!outer || !wrap) return;
+    if (!wrap) return;
 
     const characters = Array.from(wrap.querySelectorAll(".bf-char"));
     const total = characters.length;
 
-    // ======================================================
-    // TARGET: KATA TERAKHIR (BUKAN HURUF)
-    // ======================================================
-    const words = wrap.querySelectorAll(".bf-word");
-    const lastWord = words[words.length - 1];
-    lastWord.classList.add("bf-target");
-
-    // ======================================
-    // MASTER TIMELINE
-    // ======================================
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: outer,
-        start: "top top",
-        end: "+=600%",
-        scrub: 0.3,
-        pin: true,
-      },
-    });
-
-    // --------------------------------------
-    // PHASE 1 — CHAR FILL (0 → 45%)
-    // --------------------------------------
-    tl.to({}, {
-      duration: 0.45,
-      onUpdate: function () {
-        const p = this.progress();
-        const filled = p * total;
+    const st = ScrollTrigger.create({
+      trigger: wrap,
+      start: "top 70%",     // mulai saat wrap baru nyentuh bottom viewport
+      end: "+=145%",       // selesai saat wrap keluar atas      
+      scrub: 0.2,
+      onUpdate: (self) => {
+        const progress = self.progress;
+        const filled = progress * total;
         const full = Math.floor(filled);
         const frac = filled - full;
 
         for (let i = 0; i < total; i++) {
-          characters[i].classList.remove("filled", "partial");
-          characters[i].style.setProperty("--partial", "0%");
+          const el = characters[i];
+          el.classList.remove("filled", "partial");
+          el.style.setProperty("--partial", "0%");
         }
 
-        for (let i = 0; i < full; i++) {
-          characters[i].classList.add("filled");
-        }
+        for (let i = 0; i < full; i++) characters[i].classList.add("filled");
 
         if (characters[full]) {
           characters[full].classList.add("partial");
-          characters[full].style.setProperty(
-            "--partial",
-            `${Math.round(frac * 100)}%`
-          );
+          characters[full].style.setProperty("--partial", `${Math.round(frac * 100)}%`);
         }
-      }
+      },
     });
 
-    // --------------------------------------
-    // PHASE 2 — POSISIKAN KATA TERAKHIR KE TENGAH
-    // --------------------------------------
-    tl.to({}, {
-      duration: 0.0001,
-      onStart: () => {
-        const rectOuter = outer.getBoundingClientRect();
-        const rectWrap = wrap.getBoundingClientRect();
-        const rectWord = lastWord.getBoundingClientRect();
-
-        // 1. Hitung transform-origin berdasarkan center kata terakhir
-        const originX = rectWord.left - rectWrap.left + rectWord.width / 2;
-        const originY = rectWord.top - rectWrap.top + rectWord.height / 2;
-
-        gsap.set(wrap, {
-          transformOrigin: `${originX}px ${originY}px`
-        });
-
-        // 2. Hitung translasi agar kata terakhir tepat di center viewport
-        const screenCenterX = rectOuter.width / 2;
-        const screenCenterY = rectOuter.height / 2;
-
-        const currentWordCenterX = rectWord.left + rectWord.width / 2;
-        const currentWordCenterY = rectWord.top + rectWord.height / 2;
-
-        const dx = screenCenterX - currentWordCenterX;
-        const dy = screenCenterY - currentWordCenterY;
-
-        // >>>>>>>>>> FIX SNAP <<<<<<<<<<
-        // Gunakan timeline to supaya ikut scrub dan tidak ada perpindahan mendadak
-        tl.to(wrap, {
-          x: dx,
-          y: dy,
-          duration: 0.001,
-          ease: "none"
-        }, 0);
-      }
-    });
-
-    // --------------------------------------
-    // PHASE 3 — SCALE OUT
-    // --------------------------------------
-    tl.to(wrap, {
-      scale: 50,
-      opacity: 0,
-      ease: "none",
-      duration: 0.55,
-    });
-
-    return () => {
-      tl.scrollTrigger.kill();
-      tl.kill();
-    };
+    return () => st.kill();
   }, []);
 
   return (
-    <div className="bf-outer" ref={outerRef}>
-      <style jsx>{`
-        .bf-outer {
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background: lightgray;
-          overflow: hidden;
-        }
+    <div className="bf-outer">
+<style jsx>{`
+  .bf-outer {
+    width: 100vw;
+    min-height: 150vh;
+    padding: 10vh 3vw;
+    display: flex;
+    justify-content: center;   /* center horizontal kontainer */
+    align-items: center;       /* center vertical */
+    box-sizing: border-box; 
+  }
 
-        .bf-wrap {
-          width: min(1100px, 92%);
-          line-height: 1.05;
-          text-align: center;
-        }
+  .bf-wrap {
+    width: min(1300px, 92%);
+    line-height: 1.05;
+    border:1px solid none;
+    text-align: center;        /* teks center */
+    margin: 0 auto;            /* jaga agar wrap tetap center */
+  }
 
-        .bf-word {
-          display: inline-block;
-          white-space: nowrap;
-          margin-right: 0.4rem;
-        }
+  .bf-word {
+    display: inline-block;     /* inline-block → bisa center sempurna */
+    white-space: nowrap;       /* biar kata tetap utuh */
+    margin-right: 0.4rem;
+  }
 
-        .bf-char {
-          display: inline-block;
-          color: rgba(234, 70, 50, 0.27);
-          font-weight: 800;
-          line-height: 0.98;
-          font-size: clamp(28px, 8vw, 84px);
-        }
+  .bf-char {
+    display: inline-block;
+    color: rgba(234, 70, 50, 0.27);
+    font-weight: 600;
+    line-height: 0.98;
+    font-size: clamp(48px, 18vw, 104px);
+    background-clip: text;
+    -webkit-background-clip: text;
+  }
 
-        .bf-char.filled {
-          color: rgb(234, 70, 50);
-        }
+  .bf-char.filled {
+    color: rgb(234, 70, 50);
+  }
 
-        .bf-char.partial {
-          color: transparent;
-          background-image: linear-gradient(
-            90deg,
-            rgb(234, 70, 50) var(--partial),
-            rgba(234, 70, 50, 0.24) var(--partial)
-          );
-          -webkit-background-clip: text;
-          background-clip: text;
-        }
+  .bf-char.partial {
+    color: transparent;
+    background-image: linear-gradient(
+      90deg,
+      rgb(234, 70, 50) var(--partial),
+      rgba(234, 70, 50, 0.24) var(--partial)
+    );
+  }
+`}</style>
 
-        .bf-target {
-          outline: 2px solid rgba(234, 70, 50, 0.3);
-          outline-offset: 4px;
-        }
-      `}</style>
 
       <div className="bf-wrap" ref={wrapRef}>
         {chars.map((item, i) => {
-          if (item.type === "space") return <span key={i}>&nbsp;</span>;
+          if (item.type === "space") {
+            return <span key={`s-${i}`}>&nbsp;</span>;
+          }
+
           return (
-            <span className="bf-word" key={i}>
+            <span className="bf-word" key={`w-${i}`}>
               {item.chars.map((c, j) => (
                 <span
-                  key={j}
+                  key={`c-${i}-${j}`}
                   className="bf-char"
                   dangerouslySetInnerHTML={{
                     __html: c.char === "<" ? "&lt;" : c.char,
@@ -1857,9 +1890,10 @@ We are a multicultural collective of creatives, strategists, and designers, blen
 
 
 
+
 function Footer() {
   return (
-    <div className="relative w-full bg-black text-white px-[80px] py-[180px] overflow-hidden flex items-center justify-center max-[900px]:px-6 max-[900px]:py-[140px]">
+    <div className="relative w-full bg-[#F3F4F5]   text-black px-[80px] py-[180px] overflow-hidden flex items-center justify-center max-[900px]:px-6 max-[900px]:py-[140px]">
 
       {/* BOSON LOGO BACKDROP */}
       <div className="footer-chrome absolute right-0 top-1/2 -translate-y-1/2 w-[900px] h-[1100px] opacity-[0.20] pointer-events-none select-none max-[900px]:right-[-20%] max-[900px]:w-[600px] max-[900px]:h-[750px]" />
@@ -1877,7 +1911,7 @@ function Footer() {
           <div className="w-[70%] border-t border-white/10 max-[900px]:w-full" />
 
           <a href="mailto:boson.studio@gmail.com"
-            className="inline-flex items-center justify-center bg-[#822222] px-12 py-5 rounded-full text-base font-medium whitespace-nowrap opacity-95 hover:opacity-100 transition-all duration-200 tracking-wide w-fit">
+            className="inline-flex items-center justify-center bg-[#822222] px-12 py-5 text-white rounded-full text-base font-medium whitespace-nowrap opacity-95 hover:opacity-100 transition-all duration-200 tracking-wide w-fit">
             Get in touch →
           </a>
 
@@ -1931,58 +1965,113 @@ function Footer() {
 
    export default function Page() {
     const ready = useContext(LoaderContext);
+    const bgRef = useRef(null);
   
     useEffect(() => {
       window.scrollTo(0, 0);
     }, []);
   
+    useEffect(() => {
+      if (!ready) return;
+  
+      const el = bgRef.current;
+  
+      // ===== BACKGROUND SCROLL TRANSITION ===== 
+      // (versi NON-SCRUB → scroll cuma memicu animasi)
+      ScrollTrigger.create({
+        trigger: ".industries-page",
+        start: "top 30%",
+        end: "bottom top",
+      
+        onEnter: () => {
+          gsap.to(el, {
+            backgroundColor: "#09070b",
+            duration: 1.2,
+            ease: "power2.out",
+          });
+        },
+      
+        onEnterBack: () => {
+          gsap.to(el, {
+            backgroundColor: "#09070b",
+            duration: 1.2,
+            ease: "power2.out",
+          });
+        },
+      
+        onLeave: () => {
+          gsap.to(el, {
+            backgroundColor: "#09070b",
+            duration: 1.2,
+            ease: "power2.out",
+          });
+        },
+      
+        onLeaveBack: () => {
+          gsap.to(el, {
+            backgroundColor: "#09070b",
+            duration: 1.2,
+            ease: "power2.out",
+          });
+        },
+      });
+      
+  
+      return () => ScrollTrigger.getAll().forEach((st) => st.kill());
+    }, [ready]);
+  
     if (!ready) return null;
   
-    
     return (
-      <div style={{ width: "100%", background: "#000", position: "relative" }}>
+      <div
+        ref={bgRef}
+        style={{ width: "100%", background: "#09070b", position: "relative" }}
+      >
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
-          <HeroJoin />
-        </div>
-    
-        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
+            <HeroJoin />
+          </div>
+  
+  {/* <div className="h-screen w-screen bg-white"/> */}
+  
+        <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
           <BosonNarrative />
         </div>
         
-    
-   
-    
-      
+        <VideoSection/>
+  
         
-        
-             <div style={{ position: "relative", zIndex: 2 }}>
-          <Projects />
-        </div>
-        
-          <div style={{ position: "relative", zIndex: 2 }}>
-          <BigHeading />
-        </div>
-
-        <MeetBoson />
-                <BosonScrollText/>  
-
-    
+  
         {/* <div style={{ position: "relative", zIndex: 2 }}>
-          <WorksList />
-        </div> */}
-    
+            <Projects />
+          </div> */}
+  
+        {/* <MeetBoson /> */}
+  
+       
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+            <WorksList />
+          </div>
+  
         {/* <div style={{ position: "relative", zIndex: 2 }}>
-          <Carousel />
+            <Carousel />
+          </div> */}
+        
+        {/* <div className="industries-page" style={{ position: "relative", zIndex: 2 }}>
+          <IndustriesPage />
         </div> */}
         
-         
-         <IndustriesPage/>
-         
-    
+        {/* <BosonScrollText/>   */}
+        
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
+            <BigHeading />
+          </div> */}
+
+  
         <div style={{ position: "relative", zIndex: 2 }}>
           <Footer />
         </div>
-    
+  
         <style jsx global>{`
           body {
             background: #000;
@@ -1990,6 +2079,7 @@ function Footer() {
           }
         `}</style>
       </div>
-    ); 
+    );
   }
+  
   
