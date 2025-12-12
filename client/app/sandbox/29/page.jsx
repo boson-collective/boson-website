@@ -7,7 +7,7 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
-
+import Galery from '../22/page.jsx'
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
@@ -45,13 +45,13 @@ const y = useTransform(scrollY, [0, 500], [0, 80]);
 return (
   <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
     <Webglbg />
-
+    
     {/* NAV */}
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 0.75, y: 0 }}
       transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
-      className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
+      className="absolute top-6 text-white sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
     >
       <div className="flex gap-4 sm:gap-8">
         <span>About</span>
@@ -62,23 +62,13 @@ return (
         <span>Contact</span>
       </div>
     </motion.div>
-
-    {/* BOSON CHROME */}
-    <motion.div
-      initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ delay: 2.8, duration: 2.3, ease: "easeOut" }}
-      className="absolute inset-0 z-10 flex items-center justify-center"
-    >
-      <div className="boson-chrome-v4" />
-    </motion.div>
-
+    
     {/* SIDE LEFT */}
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 0.6, y: 0 }}
       transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
+      className="absolute bottom-[28%] text-white sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
       text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-start z-20"
     >
       A system-driven studio
@@ -91,26 +81,38 @@ return (
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 0.6, y: 0 }}
       transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-[20%] sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
+      className="absolute bottom-[20%] text-white sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
       text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-right z-20"
     >
       Focused on how to shape
       <br />
       the future, driving it forward
     </motion.div>
-
+    
     {/* FOOTER */}
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 0.55, y: 0 }}
       transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
+      className="absolute bottom-6 text-white sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
       text-[10px] sm:text-xs tracking-wide z-20"
     >
       <span>06°10&apos;00&quot;S</span>
       <span>Bali, Indonesia</span>
       <span>106°49&apos;00&quot;E</span>
     </motion.div>
+ 
+
+    {/* BOSON CHROME */}
+    <motion.div
+      initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
+      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+      transition={{ delay: 2.8, duration: 2.3, ease: "easeOut" }}
+      className="absolute inset-0 z-10 flex items-center justify-center"
+    >
+      {/* <div className="boson-chrome-v4" /> */}
+    </motion.div>
+ 
 
     {/* CHROME CSS */}
     <style jsx>{`
@@ -155,7 +157,7 @@ const IMAGES = [
   "/clients/tender-touch/3.jpg",
   "/clients/dwm/4.jpg",
   "/clients/tender-touch/7.jpg",
-  "/clients/marrosh/9.jpg",
+  "/clients/dwm/6.jpg",
   "/clients/dwm/2.jpg",
 ];
 const [phase, setPhase] = useState("slides");
@@ -377,49 +379,29 @@ function BosonNarrative() {
   // ====================================
   useEffect(() => {
     if (!baseTextRef.current || isMobile) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const split = new SplitType(baseTextRef.current, { types: "words" });
-
-    gsap.from(split.words, {
-      opacity: 0,
-      y: 20,
-      duration: 2.9,
-      ease: "power3.out",
-      stagger: 0.03,
-      scrollTrigger: {
-        trigger: baseTextRef.current,
-        start: "top 80%", // <<== INI YANG LO MINTA
-        toggleActions: "play none none none",
-      },
-    });
-
-    return () => {
-      split.revert();
-    };
+ 
   }, [isMobile]);
 
   // ====================================
   // TEXT
   // ====================================
-  const text = `In the beginning, there is only possibility, a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
+  const text = `              We are a social media agency that helps brands stay consistent online. We keep everything on track so you can stay focused on what matters`;
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
-      style={{ padding: "120px 6vw" }}
+      className="boson-narrative-container bg-[#F3F4F5] w-full  relative overflow-hidden flex items-start"
+      style={{ padding: "120px 2vw" }}
     >
       <div
         style={{
           position: "relative",
           width: "100%",
           whiteSpace: "pre-wrap",
-          fontSize: "clamp(18px, 6vw, 64px)",
-          lineHeight: 1.25,
-          fontWeight: 400,
+          fontSize: "clamp(18px, 6vw, 72px)",
+          lineHeight: 1.05,
+          fontWeight: 400, 
         }}
       >
        
@@ -430,8 +412,8 @@ function BosonNarrative() {
           ref={baseTextRef}
           style={{
             color: isMobile
-              ? "rgba(255,255,255,0.96)"
-              : "rgba(255,255,255,0.1)",
+              ? "rgba(0,0,0,0.96)"
+              : "rgba(0,0,0,0.9)",
           }}
         >
            <span className="mr-32"></span>{text}
@@ -955,9 +937,9 @@ function VideoSection() {
   const videoRef = useRef(null);
   const textRef = useRef(null);
 
-  const holeBaseW = 800;
+  const holeBaseW = 300;
   const holeBaseH = 450;
-  const holeMaxScale = 4;
+  const holeMaxScale = 7;
 
   useLayoutEffect(() => {
     const outer = outerRef.current;
@@ -1049,9 +1031,10 @@ function VideoSection() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%) scale(1)",
-            borderRadius: "4px",
+            borderTopLeftRadius: "100rem",
+            borderTopRightRadius: "100rem",
             background: "transparent",
-            boxShadow: `0 0 0 9999px #09070b`,
+            boxShadow: `0 0 0 9999px #F3F4F5`,
             pointerEvents: "none",
           }}
         />
@@ -1447,7 +1430,7 @@ function BigHeading() {
   return (
     <div
       ref={ref}
-      className="relative bg-[#09070b] overflow-hidden w-full big-heading-container"
+      className="relative bg-[#f1f2f3] overflow-hidden w-full big-heading-container"
       style={{ height: "150vh" }}
     >
       <div
@@ -1465,7 +1448,7 @@ function BigHeading() {
             style={{
               x: topX,
               transform: "translateY(10%)",
-              color: "white",
+              color: "black",
               fontSize: "30vw",
               fontWeight: 600,
               lineHeight: 0.8,
@@ -1474,9 +1457,9 @@ function BigHeading() {
               gap: "4vw",
             }}
           >
-            <span>Work -</span>
-            <span>Work -</span>
-            <span>Work</span>
+            <span>What We Do -</span>
+            <span>What We Do -</span>
+            <span>What We Do</span>
           </motion.div>
         </div>
 
@@ -1490,13 +1473,14 @@ function BigHeading() {
             style={{
               x: bottomX,
               transform: "translateY(-10%)",
-              color: "#3a3a3a",
+              color: "black",
               fontSize: "30vw",
               fontWeight: 600,
               lineHeight: 0.8,
               opacity: 0.45,
               textTransform: "uppercase",
               gap: "4vw",
+              
             }}
           >
             <span>Experiences -</span>
@@ -1991,7 +1975,116 @@ We are a multicultural collective of creatives, strategists, and designers, blen
   );
 }
 
+function ServicesHero() {
+  return (
+    <section className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden">
+      <div className="max-w-screen mx-auto h-full px-8 lg:px-16 py-12 flex flex-col">
+        {/* TOP BAR */}
+        <div className="w-full flex items-start justify-between pt-6">
+          {/* left tiny label */}
+          <div className="text-sm text-gray-600 flex items-center gap-3">
+            <span className="w-2 h-2 rounded-full bg-black/80 inline-block" />
+            <span className="opacity-80">Our Expertise</span>
+          </div>
 
+          {/* center headline */}
+          <h2 className="hidden md:block text-center text-black font-medium leading-tight max-w-[700px] text-[clamp(20px,3vw,40px)]">
+            How we take your <br /> business to the next level
+          </h2>
+
+          {/* right panel */}
+          <div className="hidden lg:flex flex-col items-end text-right max-w-xs">
+            <p className="text-gray-600 text-sm mb-4">
+              We are a digital marketing agency with expertise, and we're on a mission to
+              help you take the next step in your business.
+            </p>
+          </div>
+        </div>
+
+        {/* MAIN ROW */}
+        <div className="relative flex-1 mt-32 grid grid-cols-12 gap-6 items-start">
+          {/* left gutter */}
+          <div className="col-span-4" />
+
+          {/* center big list */}
+          <div className="col-span-8 flex flex-col gap-10 justify-start">
+            {["Social Media Marketing", "Content Production", "Branding", "Website Development"].map((label) => (
+              <div key={label} className="relative">
+                <h3
+                  className="font-sans font-semibold text-black leading-[0.9] tracking-tight"
+                  style={{
+                    fontSize: "clamp(48px, 12vw, 120px)",
+                    lineHeight: 0.95,
+                  }}
+                >
+                  {label}
+                </h3>
+
+                <div className="mt-6 border-t border-black/10 w-full" />
+              </div>
+            ))}
+          </div>
+
+          {/* right gutter */}
+          <div className="col-span-1" />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Description() {
+  return (
+    <section className="w-full bg-[#F3F4F5] text-black py-32">
+      <div className="max-w-screen mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+        {/* LEFT SIDE — rhetorical headline */}
+        <div className="lg:col-span-7 flex flex-col">
+          <div className="flex items-center gap-3 text-gray-600 text-sm mb-6">
+            <span className="w-2 h-2 rounded-full bg-black inline-block" />
+            <span>Built for Growing Needs</span>
+          </div>
+
+          <h1
+            className="font-sans font-medium leading-[1.05] tracking-tight text-black"
+            style={{ fontSize: "clamp(32px, 4vw, 54px)" }}
+          >
+            We build brands that move with clarity, communicate with intention,
+            and scale smoothly in a world that never stops shifting.
+          </h1>
+        </div>
+
+        {/* RIGHT SIDE — descriptive content */}
+        <div className="lg:col-span-5 flex flex-col text-gray-700 text-[17px] leading-relaxed">
+
+          <p className="mb-5">
+            Boson is a digital agency founded in 2021 and based in Bali, working with
+            clients across Qatar, Malaysia, and other regions. We focus on creating
+            structured, reliable systems for brands that want to scale with confidence.
+          </p>
+
+          <p className="mb-5">
+            Our work combines design, development, and brand operations, giving teams
+            a toolkit that keeps everything consistent — from visuals to messaging to
+            digital experience. No clutter, no unnecessary layers.
+          </p>
+
+          <p className="mb-8">
+            Whether you're refining a brand or building a new digital foundation,
+            Boson brings clarity, process, and long-term stability to the table.
+          </p>
+
+          {/* button */}
+          <button className="bg-[#d7ff5f] text-black px-6 py-3 rounded-full font-medium w-fit flex items-center gap-2 hover:opacity-90 transition">
+            Learn More
+            <span className="text-xl">↗</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+  );
+}
 
 
 
@@ -2131,9 +2224,9 @@ function Footer() {
         ref={bgRef}
         style={{ width: "100%", background: "#09070b", position: "relative" }}
       >
-        {/* <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
-            <HeroJoin />
-          </div> */}
+        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
+            <HeroJoin/>
+          </div>
   
   {/* <div className="h-screen w-screen bg-white"/> */}
   
@@ -2141,9 +2234,23 @@ function Footer() {
           <BosonNarrative />
         </div>
         
-        {/* <VideoSection/> */}
-  
+        <Galery/>
         
+        <Description/>
+        
+           
+          <VideoSection/>
+        
+        <ServicesHero/>
+        
+        <div style={{ position: "relative", zIndex: 2 }}>
+            <BigHeading />
+          </div>
+        
+  
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
+            <WorksList />
+          </div> */}
   
         {/* <div style={{ position: "relative", zIndex: 2 }}>
             <Projects />
@@ -2163,13 +2270,9 @@ function Footer() {
           <IndustriesPage />
         </div> */}
         
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <BigHeading />
-          </div> */}
+     
         
-          {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <WorksList />
-          </div> */}
+          
         
         {/* <BosonScrollText/>   */}
         

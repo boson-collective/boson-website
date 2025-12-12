@@ -21,7 +21,7 @@ import {
    ----------------------- */
 const MAX_TEXTURE_SIZE = 2048;
 const SLIDES = [
-  { id: "b", src: "/clients/dwm/mockup.png" },
+  { id: "b", src: "https://cdn.dribbble.com/userupload/42930855/file/still-8aa6db1c445b429535ca5c98332a23b5.png" },
   { id: "a", src: "/clients/marrosh/mockup.png" },
   { id: "c", src: "/clients/tender-touch/mockup.png" },
 ];
@@ -29,21 +29,6 @@ const SLIDES = [
 const SLIDE_COUNT = SLIDES.length;
 const SEGMENT = 1 / SLIDE_COUNT;
 const ease = (t) => t * t * (3 - 2 * t);
-
-// Simple heuristic: detect device tier (0 = low, 1 = high)
-const detectLowTier = () => {
-  if (typeof navigator === "undefined") return 1; // default aman di server
-
-  const ua = navigator.userAgent || "";
-  const isIOS = /iPhone|iPad|iPod/.test(ua);
-
-  const cores = navigator.hardwareConcurrency || 4; // hint CPU
-  const memory = navigator.deviceMemory || 4; // hint RAM (GB, di browser yang support)
-
-  // Rule kasar: kalau iOS lama / core <=4 / RAM <=4 → anggap low tier
-  const isLowEndGPU = isIOS || cores <= 4 || memory <= 4;
-  return isLowEndGPU ? 0 : 1; // 0 = Low Quality, 1 = High Quality
-};
 
 /* -----------------------
    CanvasMirror
@@ -203,11 +188,10 @@ const CanvasMirror = ({ index, src, onTextureReady }) => {
 };
 
 /* -----------------------
-   Pipeline 1 (optimized)
+   Pipeline 1
    ----------------------- */
-const CarouselPipeline1 = forwardRef(({ onAllTexturesReady }, ref) => {
+const CarouselPipeline1 = forwardRef((_, ref) => {
   const texturesRef = useRef([]);
-  const allReadyRef = useRef(false);
 
   useImperativeHandle(ref, () => ({
     getTextures: () => texturesRef.current,
@@ -215,30 +199,23 @@ const CarouselPipeline1 = forwardRef(({ onAllTexturesReady }, ref) => {
 
   const handleTextureReady = (index, data) => {
     texturesRef.current[index] = data;
-
-    // Cek kalau semua texture sudah ready
-    if (
-      !allReadyRef.current &&
-      texturesRef.current.length === SLIDE_COUNT &&
-      texturesRef.current.every(Boolean)
-    ) {
-      allReadyRef.current = true;
-      if (typeof onAllTexturesReady === "function") {
-        // kirim shallow copy ke parent biar aman
-        onAllTexturesReady([...texturesRef.current]);
-      }
-    }
   };
 
   return (
     <div className="absolute inset-0 -z-10">
       {SLIDES.map((s, i) => (
-        <CanvasMirror
+        <img
           key={s.id}
-          index={i}
           src={s.src}
-          onTextureReady={handleTextureReady}
+          alt=""
+          fill="true"
+          className="object-cover absolute inset-0 -z-20"
+          priority="true"
         />
+      ))}
+
+      {SLIDES.map((s, i) => (
+        <CanvasMirror key={s.id} index={i} src={s.src} onTextureReady={handleTextureReady} />
       ))}
     </div>
   );
@@ -261,17 +238,9 @@ export default function CarouselFullFixed() {
   const quadRef = useRef(null);
   const rafRef = useRef(null);
   const resizeObserverRef = useRef(null);
-  const intersectObserverRef = useRef(null);
-  const resizeTimeoutRef = useRef(null);
-  const glContextLostRef = useRef(false);
-  const contextListenerRef = useRef(null);
 
   const texturesRef = useRef([]);
   const [ready, setReady] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  // section visibility (buat idle optimization)
-  const visibleRef = useRef(true);
 
   // pointer bubble
   const mouseX = useMotionValue(0);
@@ -283,7 +252,7 @@ export default function CarouselFullFixed() {
   const domProgress = useMotionValue(0);
 
   /* -----------------------
-     ZOOM PATCH
+     🔥 ZOOM PATCH INSERTED HERE
      ----------------------- */
   const { scrollYProgress } = useScroll({
     target: scrollDriverRef,
@@ -292,57 +261,75 @@ export default function CarouselFullFixed() {
 
   const zoomTransition = useMotionValue(1);
   const zoomScroll = useTransform(scrollYProgress, [0, 1], [1.05, 1]);
-  const zoomCombined = useTransform(
-    [zoomScroll, zoomTransition],
-    ([a, b]) => a * b
-  );
+  const zoomCombined = useTransform([zoomScroll, zoomTransition], ([a, b]) => a * b);
 
-  // current visible segment
-  const currentSegmentRef = useRef(0);
-  const [currentSegmentUI, setCurrentSegmentUI] = useState(0);
+  /* -----------------------
+     Continue… (scroll handlers, shader, etc)
+     ----------------------- */
 
-  // anim state for shader
-  const uProgressAnimRef = useRef(0);
+  // current visible segment (integer) maintained by our internal state
+  const currentSegmentRef = useRef(0); // starts at 0
+  const [currentSegmentUI, setCurrentSegmentUI] = useState(0); // used for DOM opacity snapping after transition
+
+  // anim state for shader: uProgressAnim (0..1), controlled by internal animation timeline
+  const uProgressAnimRef = useRef(0); // what we feed to shader during animation
   const animatingRef = useRef(false);
   const animRafRef = useRef(null);
+
+  // settle anim state
   const settleAnimRef = useRef(0);
 
   // transition config
-  const TRANSITION_DURATION = 0.75;
-  const SETTLE_DURATION = 0.25;
-  const TRANSITION_EASE = (t) => t * t * (3 - 2 * t);
+  const TRANSITION_DURATION = 0.75; // seconds (phase1)
+  const SETTLE_DURATION = 0.25; // seconds (phase2)
+  const TRANSITION_EASE = (t) => t * t * (3 - 2 * t); // smoothstep-like
 
-  // progress bar segments
+  // slide opacity transforms (driven by internal currentSegmentUI)
+  const slide1 = useTransform(domProgress, (v) => {
+    const raw = v / SEGMENT;
+    const seg = Math.floor(raw);
+    const local = ease(raw - seg);
+    if (v < 0.0001) return 1;
+    if (seg === 0) return 1 - local;
+    return 0;
+  });
+  const slide2 = useTransform(domProgress, (v) => {
+    const raw = v / SEGMENT;
+    const seg = Math.floor(raw);
+    const local = ease(raw - seg);
+    if (v < 0.0001) return 0;
+    if (seg === 0) return local;
+    if (seg === 1) return 1 - local;
+    return 0;
+  });
+  const slide3 = useTransform(domProgress, (v) => {
+    const raw = v / SEGMENT;
+    const seg = Math.floor(raw);
+    const local = ease(raw - seg);
+    if (v < 0.0001) return 0;
+    if (seg === 1) return local;
+    if (seg === 2) return 1;
+    return 0;
+  });
+
+  // progress bar segments (we'll snap domProgress when transition completes)
   const p1 = useTransform(domProgress, [0, SEGMENT], [0, 1]);
   const p2 = useTransform(domProgress, [SEGMENT, SEGMENT * 2], [0, 1]);
   const p3 = useTransform(domProgress, [SEGMENT * 2, 1], [0, 1]);
 
   /* -----------------------
-     pointer move: throttled rAF
+     pointer move: clamp + center-origin transform (same as original)
      ----------------------- */
   useEffect(() => {
-    let frame = null;
-
     const handleMove = (e) => {
       const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? 0;
       const clientY = e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? 0;
 
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = null;
+      const clampedX = Math.max(80, Math.min(window.innerWidth - 80, clientX));
+      const clampedY = Math.max(80, Math.min(window.innerHeight - 80, clientY));
 
-        const clampedX = Math.max(
-          80,
-          Math.min(window.innerWidth - 80, clientX)
-        );
-        const clampedY = Math.max(
-          80,
-          Math.min(window.innerHeight - 80, clientY)
-        );
-
-        mouseX.set(clampedX - window.innerWidth / 2);
-        mouseY.set(clampedY - window.innerHeight / 2);
-      });
+      mouseX.set(clampedX - window.innerWidth / 2);
+      mouseY.set(clampedY - window.innerHeight / 2);
     };
 
     window.addEventListener("pointermove", handleMove, { passive: true });
@@ -351,18 +338,19 @@ export default function CarouselFullFixed() {
     return () => {
       window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("touchmove", handleMove);
-      if (frame) cancelAnimationFrame(frame);
     };
   }, [mouseX, mouseY]);
 
   /* -----------------------
-     sync scrollYProgress -> domProgress
+     sync scrollYProgress (ghost) -> domProgress single source of truth
      ----------------------- */
   useEffect(() => {
     const unsub = scrollYProgress.onChange((v) => {
       domProgress.set(v);
+      // compute which segment user is currently over
       const raw = v / SEGMENT;
       const seg = Math.max(0, Math.min(SLIDE_COUNT - 1, Math.floor(raw)));
+      // if user moved into a different segment and we're not animating -> trigger transition
       if (seg !== currentSegmentRef.current && !animatingRef.current) {
         triggerGlitchTransition(seg);
       }
@@ -371,7 +359,7 @@ export default function CarouselFullFixed() {
   }, [scrollYProgress, domProgress]);
 
   /* -----------------------
-     Shader code
+     Shader code (unchanged)
      ----------------------- */
   const vert = `
     varying vec2 vUv;
@@ -386,9 +374,6 @@ export default function CarouselFullFixed() {
   uniform float uProgressAnim;
   uniform float uSettleAnim;
   uniform float uTime;
-  uniform float uQuality;
-  uniform vec2 uFocus; // << ADD THIS
-  uniform vec2 uAspect; // << PATCH: aspect uniform
 
   float easeF(float t){ return t*t*(3.0 - 2.0*t); }
   vec2 clampUV(vec2 uv){ return clamp(uv, 0.0, 1.0); }
@@ -438,12 +423,8 @@ export default function CarouselFullFixed() {
     band *= (1.0 - topFade);
     float mask = 1.0 - step(wavePos, vUv.y);
 
-    // PATCH: aspect-corrected UV untuk sampling texture
-    vec2 baseUv = ((vUv - uFocus) * uAspect) + uFocus; // << UPDATED
-
-
-    vec3 baseFrom = texture2D(uFrom, baseUv).rgb;
-    vec3 baseTo   = texture2D(uTo,   baseUv).rgb;
+    vec3 baseFrom = texture2D(uFrom, vUv).rgb;
+    vec3 baseTo   = texture2D(uTo,   vUv).rgb;
     vec3 cleanComposite = mix(baseFrom, baseTo, mask);
 
     if (band < 0.0005) {
@@ -452,32 +433,19 @@ export default function CarouselFullFixed() {
     }
 
     float t = uTime * 0.9;
-
-    float organic;
-    float pull;
-    float shard;
-
-    if (uQuality > 0.5) {
-      // HIGH quality: full fbm detail
-      float n1 = fbm(vec2(vUv.x * 2.0, vUv.y * 4.0 + t * 0.35));
-      float n2 = fbm(vec2(vUv.x * 6.0, vUv.y * 8.0 + t * 1.1));
-      float n3 = fbm(vec2(vUv.x * 18.0, vUv.y * 22.0 + t * 2.6));
-      organic = mix(n1, n2, 0.5) * 0.55 + n3 * 0.15;
-
-      pull = pow(1.0 - vUv.y, 2.6) * 0.65 * band;
-      shard = smoothstep(0.25, 0.75, fract(n2 * 10.0)) * 0.06 * band;
-    } else {
-      // LOW quality: lebih ringan, 1x noise saja
-      organic = noise(vUv * 4.0 + t * 0.3) * 0.4;
-      pull = 0.0;
-      shard = 0.0;
-    }
+    float n1 = fbm(vec2(vUv.x * 2.0, vUv.y * 4.0 + t * 0.35));
+    float n2 = fbm(vec2(vUv.x * 6.0, vUv.y * 8.0 + t * 1.1));
+    float n3 = fbm(vec2(vUv.x * 18.0, vUv.y * 22.0 + t * 2.6));
+    float organic = mix(n1, n2, 0.5) * 0.55 + n3 * 0.15;
 
     float curvature = pow(vUv.y * 1.05, 1.6) * 0.48 * band;
     float waveA = sin((vUv.x * 8.5)  - t * 1.6) * 0.12;
     float waveB = sin((vUv.x * 22.0) + t * 2.2) * 0.045;
     float waveC = sin((vUv.x * 44.0) - t * 3.8) * 0.018;
     float combinedWave = (waveA + waveB + waveC) * (0.9 + organic * 0.8) * band;
+
+    float pull = pow(1.0 - vUv.y, 2.6) * 0.65 * band;
+    float shard = smoothstep(0.25, 0.75, fract(n2 * 10.0)) * 0.06 * band;
 
     vec2 disp = vec2(
       combinedWave * 0.9 + shard,
@@ -487,14 +455,10 @@ export default function CarouselFullFixed() {
     float waveFollow = smoothstep(lowEdge - 0.12, midEdge + 0.12, vUv.y);
     disp += vec2(sin(t * 1.2 + vUv.x * 6.0) * 0.03 * band * waveFollow, 0.0);
 
-    float CHROMA = (uQuality > 0.5)
-      ? 0.09 * (0.6 + organic * 0.8) * band
-      : 0.0;
-
-    // PATCH: semua sampling berbasis baseUv, bukan vUv langsung
-    vec2 rUV = clampUV(baseUv + disp + vec2(CHROMA, 0.0));
-    vec2 gUV = clampUV(baseUv + disp);
-    vec2 bUV = clampUV(baseUv + disp - vec2(CHROMA, 0.0));
+    float CHROMA = 0.09 * (0.6 + organic * 0.8) * band;
+    vec2 rUV = clampUV(vUv + disp + vec2(CHROMA, 0.0));
+    vec2 gUV = clampUV(vUv + disp);
+    vec2 bUV = clampUV(vUv + disp - vec2(CHROMA, 0.0));
 
     vec3 fromR = texture2D(uFrom, rUV).rgb;
     vec3 fromG = texture2D(uFrom, gUV).rgb;
@@ -510,17 +474,13 @@ export default function CarouselFullFixed() {
     float compMix = clamp(trans + localWipe * 0.35 * trans, 0.0, 1.0);
     vec3 glitchMain = mix(colFrom, colTo, compMix);
 
-    vec2 smearUV = clampUV(
-      baseUv + normalize(vec2(disp.x, max(-disp.y, 0.001))) * (0.06 + organic * 0.08)
-    );
+    vec2 smearUV = clampUV(vUv + normalize(vec2(disp.x, max(-disp.y, 0.001))) * (0.06 + organic * 0.08));
     vec3 smear = texture2D(uFrom, smearUV).rgb;
     float smearStrength = (0.4 + organic * 0.6) * band * smoothstep(0.0, 0.6, 1.0 - vUv.y);
 
     glitchMain += smear * smearStrength;
 
-    vec2 causticUV = clampUV(
-      baseUv + disp * 0.33 + vec2(sin(t * 2.2 + vUv.x*10.0) * 0.005, 0.0)
-    );
+    vec2 causticUV = clampUV(vUv + disp * 0.33 + vec2(sin(t * 2.2 + vUv.x*10.0) * 0.005, 0.0));
     vec3 caustic = texture2D(uFrom, causticUV).rgb * (0.12 * band * (0.7 + organic * 0.8));
     glitchMain = mix(glitchMain, glitchMain + caustic, 0.25);
 
@@ -532,17 +492,28 @@ export default function CarouselFullFixed() {
     finalColor = clamp(finalColor, 0.0, 1.0);
     gl_FragColor = vec4(finalColor, 1.0);
   }
-`;
+  `;
 
   /* -----------------------
-     Wait textures ready -> start three (event-based)
+     Wait textures ready -> start three
      ----------------------- */
-  const handleAllTexturesReady = (allTextures) => {
-    // simpan ke ref global Three
-    texturesRef.current = allTextures;
-    startThree();
-    updateAspectUniform(); // << PATCH
-  };
+  useEffect(() => {
+    let alive = true;
+    const poll = setInterval(() => {
+      const t = p1Ref.current?.getTextures?.() || [];
+      if (t.length === SLIDE_COUNT && t.every(Boolean)) {
+        texturesRef.current = t;
+        clearInterval(poll);
+        if (alive) startThree();
+      }
+    }, 40);
+
+    return () => {
+      alive = false;
+      clearInterval(poll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* -----------------------
      triggerGlitchTransition(nextSegment)
@@ -574,9 +545,12 @@ export default function CarouselFullFixed() {
       } catch (e) {}
     }
 
+    /* -----------------------
+       🔥 ZOOM TRANSITION PATCH (BEGIN)
+       ----------------------- */
     animatingRef.current = true;
 
-    // ZOOM TRANSITION PATCH (tetep sama)
+    // ⬅️ ZOOM-IN SEDIKIT SAAT MULAI TRANSISI
     zoomTransition.set(1.05);
 
     uProgressAnimRef.current = 0;
@@ -593,8 +567,7 @@ export default function CarouselFullFixed() {
 
       if (matRef.current && matRef.current.uniforms) {
         try {
-          matRef.current.uniforms.uProgressAnim.value =
-            uProgressAnimRef.current;
+          matRef.current.uniforms.uProgressAnim.value = uProgressAnimRef.current;
         } catch (e) {}
       }
 
@@ -631,16 +604,15 @@ export default function CarouselFullFixed() {
             settleAnimRef.current = 0;
             uProgressAnimRef.current = 0;
 
+            // ⬅️ RESET ZOOM KE NORMAL SETELAH TRANSISI SELESAI
             zoomTransition.set(1);
 
             if (matRef.current && matRef.current.uniforms) {
               try {
                 matRef.current.uniforms.uSettleAnim.value = 0;
                 matRef.current.uniforms.uProgressAnim.value = 0;
-                matRef.current.uniforms.uFrom.value =
-                  texturesRef.current[to].texture;
-                matRef.current.uniforms.uTo.value =
-                  texturesRef.current[to].texture;
+                matRef.current.uniforms.uFrom.value = texturesRef.current[to].texture;
+                matRef.current.uniforms.uTo.value = texturesRef.current[to].texture;
               } catch (e) {}
             }
           }
@@ -659,64 +631,18 @@ export default function CarouselFullFixed() {
   const snapToSegment = (seg) => {
     currentSegmentRef.current = seg;
     setCurrentSegmentUI(seg);
-    setActiveSlide(seg); // DOM background ikut pindah
     const snapped = seg * SEGMENT;
     domProgress.set(snapped);
-
-    updateAspectUniform(); // << PATCH: sesuaikan aspect tiap ganti slide
-    // Per-slide focal point (0–1 range)
-    const FOCUS_POINTS = [
-      { x: 0.45, y: 0.5 }, // Slide 0: TenderTouch - mid slightly left
-      { x: 0.6, y: 0.45 }, // Slide 1: Marroosh - shift right + down
-      { x: 0.55, y: 0.5 }, // Slide 2: DWM Real Estate - mid-right
-    ];
-
-    const fp = FOCUS_POINTS[seg];
-    if (fp && matRef.current?.uniforms?.uFocus) {
-      matRef.current.uniforms.uFocus.value.set(fp.x, fp.y);
-    }
-  };
-
-  const updateAspectUniform = () => {
-    const holder = overlayRef.current;
-    const seg = currentSegmentRef.current;
-    const tex = texturesRef.current[seg];
-    if (!holder || !tex || !matRef.current) return;
-
-    const viewportAspect = holder.clientWidth / holder.clientHeight;
-    const textureAspect = tex.width / tex.height;
-
-    let scaleX = 1;
-    let scaleY = 1;
-
-    // COVER mode (zoom out / crop if needed)
-    if (viewportAspect > textureAspect) {
-      // layar lebih lebar → crop horizontal
-      scaleY = viewportAspect / textureAspect;
-    } else {
-      // layar lebih tinggi → crop vertikal
-      scaleX = textureAspect / viewportAspect;
-    }
-
-    try {
-      matRef.current.uniforms.uAspect.value.set(scaleX, scaleY);
-    } catch (e) {}
   };
 
   /* -----------------------
      startThree (setup WebGL)
      ----------------------- */
   const startThree = async () => {
-    // small delay supaya layout settle dulu
     await new Promise((r) => setTimeout(r, 50));
 
     const holder = overlayRef.current;
     if (!holder) return;
-
-    // kalau sebelumnya sudah ada renderer, jangan bikin dobel
-    if (rendererRef.current) return;
-
-    glContextLostRef.current = false;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -740,9 +666,6 @@ export default function CarouselFullFixed() {
       uProgressAnim: { value: 0 },
       uSettleAnim: { value: 0 },
       uTime: { value: 0 },
-      uQuality: { value: detectLowTier() }, // 0 = low tier, 1 = high tier
-      uAspect: { value: new THREE.Vector2(1, 1) }, // << ADD THIS
-      uFocus: { value: new THREE.Vector2(0.5, 0.5) }, // << ADD THIS
     };
 
     const material = new THREE.ShaderMaterial({
@@ -766,228 +689,59 @@ export default function CarouselFullFixed() {
       const dt = (now - last) / 1000;
       last = now;
 
-      // kalau context WebGL sudah hilang, jangan render apa-apa
-      if (glContextLostRef.current) {
-        rafRef.current = null;
-        return;
-      }
-
-      // kalau section nggak kelihatan, stop loop
-      if (!visibleRef.current) {
-        rafRef.current = null;
-        return;
-      }
-
       if (matRef.current && matRef.current.uniforms) {
         try {
           matRef.current.uniforms.uTime.value += dt;
-          matRef.current.uniforms.uProgressAnim.value =
-            uProgressAnimRef.current;
+          matRef.current.uniforms.uProgressAnim.value = uProgressAnimRef.current;
           matRef.current.uniforms.uSettleAnim.value = settleAnimRef.current;
         } catch (e) {}
       }
 
-      try {
-        renderer.render(scene, cam);
-      } catch (e) {
-        // kalau render lempar error karena context lost, matikan loop
-        glContextLostRef.current = true;
-        rafRef.current = null;
-        return;
-      }
-
+      renderer.render(scene, cam);
       rafRef.current = requestAnimationFrame(tick);
     };
 
-    // ---- WebGL context lost / restored handlers ----
-    const handleContextLost = (event) => {
-      event.preventDefault();
-      glContextLostRef.current = true;
-
-      // stop render loop
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-
-    const handleContextRestored = () => {
-      glContextLostRef.current = false;
-
-      // kalau masih kelihatan di viewport, hidupkan lagi loop
-      if (!rafRef.current && visibleRef.current) {
-        last = performance.now();
-        rafRef.current = requestAnimationFrame(tick);
-      }
-    };
-
-    renderer.domElement.addEventListener(
-      "webglcontextlost",
-      handleContextLost,
-      false
-    );
-    renderer.domElement.addEventListener(
-      "webglcontextrestored",
-      handleContextRestored,
-      false
-    );
-
-    contextListenerRef.current = {
-      handleContextLost,
-      handleContextRestored,
-    };
-
-    // ---- Resize handling: debounced ----
-    const applyResize = () => {
+    const onResize = () => {
       if (!holder || !rendererRef.current) return;
       rendererRef.current.setSize(holder.clientWidth, holder.clientHeight);
     };
 
-    const scheduleResize = () => {
-      if (resizeTimeoutRef.current) return;
-
-      resizeTimeoutRef.current = setTimeout(() => {
-        resizeTimeoutRef.current = null;
-        applyResize();
-      }, 150);
-    };
-
-    window.addEventListener("resize", scheduleResize);
-
-    // IntersectionObserver: track apakah overlay (section) kelihatan di viewport
-    if ("IntersectionObserver" in window && holder) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          const entry = entries[0];
-          const isVisible = entry.isIntersecting;
-
-          visibleRef.current = isVisible;
-
-          if (isVisible) {
-            // kalau baru masuk viewport dan loop lagi mati → hidupkan lagi
-            if (!rafRef.current && !glContextLostRef.current) {
-              last = performance.now();
-              rafRef.current = requestAnimationFrame(tick);
-            }
-
-            // saat baru kelihatan lagi, pastikan ukuran up to date
-            scheduleResize();
-          } else {
-            // keluar viewport → loop akan berhenti di tick berikutnya
-          }
-        },
-        { threshold: 0.1 }
-      );
-      io.observe(holder);
-      intersectObserverRef.current = io;
-    }
-
-    // ResizeObserver: juga pakai scheduler, bukan direct apply
+    window.addEventListener("resize", onResize);
     if ("ResizeObserver" in window) {
-      resizeObserverRef.current = new ResizeObserver(() => {
-        scheduleResize();
-      });
+      resizeObserverRef.current = new ResizeObserver(onResize);
       resizeObserverRef.current.observe(holder);
     }
 
     setReady(true);
-    updateAspectUniform(); // << ADD THIS
     rafRef.current = requestAnimationFrame(tick);
 
-    // ---- CLEANUP ----
     startThree._cleanup = () => {
-      // Stop all RAF loops
       cancelAnimationFrame(rafRef.current || 0);
-      cancelAnimationFrame(animRafRef.current || 0);
-      rafRef.current = null;
-
-      // Clear pending resize timer kalau masih ada
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-        resizeTimeoutRef.current = null;
-      }
-
-      // Disconnect ResizeObserver
-      if (resizeObserverRef.current) {
-        try {
-          resizeObserverRef.current.disconnect();
-        } catch (e) {}
-        resizeObserverRef.current = null;
-      }
-
-      // Disconnect IntersectionObserver
-      if (intersectObserverRef.current) {
-        try {
-          intersectObserverRef.current.disconnect();
-        } catch (e) {}
-        intersectObserverRef.current = null;
-      }
-
-      // Hapus window resize listener
-      window.removeEventListener("resize", scheduleResize);
-
-      // Lepas listener context lost/restored
-      if (
-        contextListenerRef.current &&
-        rendererRef.current &&
-        rendererRef.current.domElement
-      ) {
-        const { handleContextLost, handleContextRestored } =
-          contextListenerRef.current;
-        try {
-          rendererRef.current.domElement.removeEventListener(
-            "webglcontextlost",
-            handleContextLost
-          );
-          rendererRef.current.domElement.removeEventListener(
-            "webglcontextrestored",
-            handleContextRestored
-          );
-        } catch (e) {}
-      }
-      contextListenerRef.current = null;
-
-      // Dispose renderer
       try {
+        if (resizeObserverRef.current) {
+          resizeObserverRef.current.disconnect();
+          resizeObserverRef.current = null;
+        }
+        window.removeEventListener("resize", onResize);
         if (rendererRef.current) {
           rendererRef.current.dispose();
-          if (rendererRef.current.forceContextLoss) {
+          try {
             rendererRef.current.forceContextLoss();
-          }
-          if (
-            rendererRef.current.domElement &&
-            rendererRef.current.domElement.parentNode
-          ) {
-            rendererRef.current.domElement.parentNode.removeChild(
-              rendererRef.current.domElement
-            );
+          } catch (e) {}
+          if (rendererRef.current.domElement && rendererRef.current.domElement.parentNode) {
+            rendererRef.current.domElement.parentNode.removeChild(rendererRef.current.domElement);
           }
         }
       } catch (e) {}
-      rendererRef.current = null;
-
-      // Dispose material & geometry safely
       try {
-        if (matRef.current) {
-          matRef.current.dispose();
-          matRef.current = null;
-        }
-        if (quadRef.current?.geometry) {
-          quadRef.current.geometry.dispose();
-        }
+        matRef.current?.dispose?.();
+        geometry.dispose?.();
       } catch (e) {}
-
-      // Dispose textures in cache
       try {
-        if (texturesRef.current) {
-          texturesRef.current.forEach((t) => {
-            if (t?.texture?.dispose) t.texture.dispose();
-          });
-        }
+        texturesRef.current?.forEach((t) => {
+          t.texture?.dispose?.();
+        });
       } catch (e) {}
-
-      texturesRef.current = [];
-      glContextLostRef.current = false;
     };
   };
 
@@ -1006,32 +760,18 @@ export default function CarouselFullFixed() {
       try {
         if (rendererRef.current) {
           rendererRef.current.dispose();
-          rendererRef.current.forceContextLoss &&
-            rendererRef.current.forceContextLoss();
-          if (
-            rendererRef.current.domElement &&
-            rendererRef.current.domElement.parentNode
-          ) {
-            rendererRef.current.domElement.parentNode.removeChild(
-              rendererRef.current.domElement
-            );
+          rendererRef.current.forceContextLoss?.();
+          if (rendererRef.current.domElement && rendererRef.current.domElement.parentNode) {
+            rendererRef.current.domElement.parentNode.removeChild(rendererRef.current.domElement);
           }
         }
       } catch (e) {}
       try {
-        matRef.current && matRef.current.dispose && matRef.current.dispose();
+        matRef.current?.dispose?.();
       } catch (e) {}
       try {
-        texturesRef.current &&
-          texturesRef.current.forEach(
-            (t) => t.texture && t.texture.dispose && t.texture.dispose()
-          );
+        texturesRef.current?.forEach((t) => t.texture?.dispose?.());
       } catch (e) {}
-      if (intersectObserverRef.current) {
-        try {
-          intersectObserverRef.current.disconnect();
-        } catch (e) {}
-      }
     };
   }, []);
 
@@ -1043,19 +783,38 @@ export default function CarouselFullFixed() {
       {/* MAIN: sticky 100vh viewport container (all visible UI sits here) */}
       <main
         ref={mainRef}
-        className="sticky -top-px h-screen w-full overflow-hidden bg-black"
+        className="sticky top-0 h-screen w-full overflow-hidden bg-black"
         aria-label="carousel main"
       >
-        {/* Pipeline 1: hidden canvas -> WebGL */}
-        <CarouselPipeline1
-          ref={p1Ref}
-          onAllTexturesReady={handleAllTexturesReady}
-        />
+        {/* Pipeline 1 + DOM fallback slides (inside main so object-cover respects viewport) */}
+        <CarouselPipeline1 ref={p1Ref} />
+
+        {/* DOM slides (we snap domProgress to segment after transition completes)
+            — NOTE: scale uses zoomCombined (DOM-only subtle zoom) */}
+        <motion.div
+          style={{ opacity: slide1, scale: zoomCombined }}
+          className="absolute inset-0 -z-20"
+        >
+          <img src={SLIDES[0].src} fill="true" alt="" className="object-cover" />
+        </motion.div>
+
+        <motion.div
+          style={{ opacity: slide2, scale: zoomCombined }}
+          className="absolute inset-0 -z-20"
+        >
+          <img src={SLIDES[1].src} fill="true" alt="" className="object-cover" />
+        </motion.div>
+
+        <motion.div
+          style={{ opacity: slide3, scale: zoomCombined }}
+          className="absolute inset-0 -z-20"
+        >
+          <img src={SLIDES[2].src} fill="true" alt="" className="object-cover" />
+        </motion.div>
 
         {/* WebGL overlay (shader) */}
-        <motion.div
+        <div
           ref={overlayRef}
-          style={{ scale: zoomCombined }}
           className="absolute inset-0 z-30 pointer-events-none"
           aria-hidden="true"
         />
@@ -1079,36 +838,26 @@ export default function CarouselFullFixed() {
         {/* Progress Bar */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[85%] h-[2px] flex gap-2 z-40">
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div
-              style={{ scaleX: p1 }}
-              className="origin-left h-full bg-white"
-            />
+            <motion.div style={{ scaleX: p1 }} className="origin-left h-full bg-white" />
           </div>
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div
-              style={{ scaleX: p2 }}
-              className="origin-left h-full bg-white"
-            />
+            <motion.div style={{ scaleX: p2 }} className="origin-left h-full bg-white" />
           </div>
           <div className="relative w-full bg-white/10 overflow-hidden">
-            <motion.div
-              style={{ scaleX: p3 }}
-              className="origin-left h-full bg-white"
-            />
+            <motion.div style={{ scaleX: p3 }} className="origin-left h-full bg-white" />
           </div>
         </div>
 
         {/* status (debug) */}
         <div className="absolute top-4 right-4 text-white text-xs z-40">
-          Pipeline 4 {ready ? "• READY" : "• INIT"}{" "}
-          {animatingRef.current ? "• ANIM" : ""}
+          Pipeline 4 {ready ? "• READY" : "• INIT"} {animatingRef.current ? "• ANIM" : ""}
         </div>
       </main>
 
-      {/* GHOST SCROLL DRIVER */}
+      {/* GHOST SCROLL DRIVER: controls scroll progress but invisible — keeps main 100vh */}
       <div
         ref={scrollDriverRef}
-        className="h-[1000vh] w-full pointer-events-none opacity-0"
+        className="h-[300vh] w-full pointer-events-none opacity-0"
         aria-hidden="true"
       />
     </>
