@@ -391,7 +391,7 @@ function BosonNarrative() {
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container bg-[#F3F4F5] w-full  relative overflow-hidden flex items-start"
+      className="boson-narrative-container  w-full  relative overflow-hidden flex items-start"
       style={{ padding: "120px 2vw" }}
     >
       <div
@@ -1034,7 +1034,7 @@ function VideoSection() {
             borderTopLeftRadius: "100rem",
             borderTopRightRadius: "100rem",
             background: "transparent",
-            boxShadow: `0 0 0 9999px #F3F4F5`,
+            boxShadow: `0 0 0 9999px black`,
             pointerEvents: "none",
           }}
         />
@@ -1064,7 +1064,7 @@ function VideoSection() {
               lineHeight: "1.05",
             }}
           >
-            Transformation.
+            {/* Transformation. */}
           </h1>
 
           <p
@@ -1209,18 +1209,12 @@ function Projects() {
     "/clients/marrosh/mockup.png", // 8 (extra)
     "/clients/tender-touch/mockup.png", // 6
     "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra)
-    "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
+    "/clients/marrosh/mockup.png", // 8 (extra) 
     "/clients/dwm/mockup.png", // 5
     "/clients/tender-touch/mockup.png", // 6
-    "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
-    "/clients/tender-touch/mockup.png", // 2
-    "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
-    "/clients/marrosh/mockup.png", // 0
+    "/clients/hidden-city-ubud/mockup.png", // 7
+    "/clients/marrosh/mockup.png", // 8 (extra)
+    
   ];
 
   // ============================
@@ -1229,7 +1223,7 @@ function Projects() {
   // ============================
   const baseStart = 0.15;
   const step = 0.03; // small delay between starts
-  const windowLen = 0.17; // each burst end = start + windowLen
+  const windowLen = 0.12; // each burst end = start + windowLen
 
   // For each image, compute burst transform from scrollYProgress
   const bursts = images.map((_, i) => {
@@ -1314,8 +1308,8 @@ function Projects() {
       ref={scrollRef}
       style={{
         width: "100%",
-        height: "1200vh",
-        background: "#09070b",
+        height: "500vh",
+        background: "black",
         position: "relative",
       }}
     >
@@ -1392,17 +1386,15 @@ function Projects() {
             filter: textFilter,
             position: "absolute",
             color: "white",
-            fontSize: "23px",
+            fontSize: "43px",
             textAlign: "center",
-            fontWeight: 300,
-            lineHeight: 1.3,
+            fontWeight: 200,
+            lineHeight: 1,
             zIndex: 10,
-            whiteSpace: "pre-line",
-            textTransform: "uppercase"
+            whiteSpace: "pre-line", 
           }}
         >
-          {`Signals, motion, intent:
-The Boson process takes shape`}
+          ELEVATE YOUR BRAND
         </motion.div>
 
         {/* Render all image bursts (looped pattern) */}
@@ -1719,7 +1711,7 @@ function WorksList() {
   return (
     <div
       style={{
-        background: "#09070b",
+        background: "black",
         width: "100%",
         padding: "6vh 0",
         position: "relative",
@@ -1836,32 +1828,41 @@ Every decision, every detail is a lever — elevating the whole
 }
   
 function BosonScrollText() {
-  const wrapRef = useRef(null);
+  const wrapRef = React.useRef(null);
+  const hoverRef = React.useRef(null);
 
-  const TEXT = `
-We are a multicultural collective of creatives, strategists, and designers, blending global perspectives with local insight to craft brands, stories, and digital experiences that move people and create lasting clarity.
-`;
+  const pointer = React.useRef({ x: 0, y: 0 });
+  const isHovering = React.useRef(false);
+  const lastSpawn = React.useRef(0);
+  const liveImages = React.useRef(new Set());
 
-  // =============================
-  // SPLIT → WORD → CHAR
-  // =============================
-  const words = TEXT.trim().split(/(\s+)/); // keep spaces as tokens
+  const IMAGES = [
+    "https://i.pinimg.com/736x/a2/32/3b/a2323b00992937f19158ab588d7b3ae5.jpg",
+    "https://i.pinimg.com/736x/41/d8/c2/41d8c260bead65dda136dc36ff050f53.jpg",
+    "https://i.pinimg.com/736x/ab/24/1d/ab241d4ee15a8eec9865cfcde25c1928.jpg",
+    "https://i.pinimg.com/736x/2f/ef/f9/2feff9fa223efc86f58b0dac8a329b78.jpg",
+    "https://i.pinimg.com/736x/81/80/76/818076e4dab04be9bcf90b81af06edfa.jpg",
+  ];
 
+  const TEXT = `A clear brand direction and growth that moves the business forward`;
+
+  // ================= SPLIT TEXT =================
+  const words = TEXT.trim().split(/(\s+)/);
   const chars = [];
-  words.forEach((word, wi) => {
+  words.forEach((word) => {
     if (word.trim().length === 0) {
       chars.push({ type: "space", char: " " });
       return;
     }
 
-    const charArray = word.split("").map((c) => ({ type: "char", char: c }));
-    chars.push({ type: "word", chars: charArray });
+    chars.push({
+      type: "word",
+      chars: word.split("").map((c) => ({ char: c })),
+    });
   });
 
-  // =============================
-  // GSAP CHAR ANIMATION
-  // =============================
-  useEffect(() => {
+  // ================= SCROLL TEXT =================
+  React.useEffect(() => {
     const wrap = wrapRef.current;
     if (!wrap) return;
 
@@ -1870,26 +1871,29 @@ We are a multicultural collective of creatives, strategists, and designers, blen
 
     const st = ScrollTrigger.create({
       trigger: wrap,
-      start: "top 70%",     // mulai saat wrap baru nyentuh bottom viewport
-      end: "+=145%",       // selesai saat wrap keluar atas      
+      start: "top 90%",
+      end: "+=75%",
       scrub: 0.2,
       onUpdate: (self) => {
-        const progress = self.progress;
-        const filled = progress * total;
+        const filled = self.progress * total;
         const full = Math.floor(filled);
         const frac = filled - full;
 
-        for (let i = 0; i < total; i++) {
-          const el = characters[i];
+        characters.forEach((el) => {
           el.classList.remove("filled", "partial");
           el.style.setProperty("--partial", "0%");
-        }
+        });
 
-        for (let i = 0; i < full; i++) characters[i].classList.add("filled");
+        for (let i = 0; i < full; i++) {
+          characters[i]?.classList.add("filled");
+        }
 
         if (characters[full]) {
           characters[full].classList.add("partial");
-          characters[full].style.setProperty("--partial", `${Math.round(frac * 100)}%`);
+          characters[full].style.setProperty(
+            "--partial",
+            `${Math.round(frac * 100)}%`
+          );
         }
       },
     });
@@ -1897,83 +1901,222 @@ We are a multicultural collective of creatives, strategists, and designers, blen
     return () => st.kill();
   }, []);
 
+  // ================= HOVER IMAGE (MOVE-BASED) =================
+  React.useEffect(() => {
+    const area = hoverRef.current;
+    if (!area) return;
+
+    const spawnImage = () => {
+      const img = document.createElement("img");
+      img.src = IMAGES[Math.floor(Math.random() * IMAGES.length)];
+
+      img.style.position = "absolute";
+      img.style.left = pointer.current.x + "px";
+      img.style.top = pointer.current.y + "px";
+      img.style.width = "180px";
+      img.style.height = "240px";
+      img.style.objectFit = "cover";
+      img.style.pointerEvents = "none";
+      img.style.zIndex = "40";
+      img.style.transform = "translate(-50%, -50%) scale(0.85)";
+      img.style.opacity = "0";
+
+      area.appendChild(img);
+      liveImages.current.add(img);
+
+      const intro = gsap.to(img, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.35,
+        ease: "power3.out",
+      });
+
+      const outro = gsap.to(img, {
+        opacity: 0,
+        scale: 0.9,
+        duration: 0.6,
+        delay: 0.9,
+        ease: "power2.inOut",
+        onComplete: () => {
+          liveImages.current.delete(img);
+          img.remove();
+        },
+      });
+
+      img._tweens = [intro, outro];
+    };
+
+    const onMove = (e) => {
+      if (!isHovering.current) return;
+
+      const now = performance.now();
+      if (now - lastSpawn.current < 120) return;
+      lastSpawn.current = now;
+
+      const rect = area.getBoundingClientRect();
+      pointer.current.x = e.clientX - rect.left;
+      pointer.current.y = e.clientY - rect.top;
+
+      spawnImage();
+    };
+
+    const onEnter = () => {
+      isHovering.current = true;
+    };
+
+    const onLeave = (e) => {
+      isHovering.current = false;
+
+      // keluar window → jangan bunuh
+      if (!e.relatedTarget) return;
+
+      liveImages.current.forEach((img) => {
+        if (img._tweens) img._tweens.forEach((t) => t.kill());
+        img.remove();
+      });
+
+      liveImages.current.clear();
+    };
+
+    area.addEventListener("mousemove", onMove);
+    area.addEventListener("mouseenter", onEnter);
+    area.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      area.removeEventListener("mousemove", onMove);
+      area.removeEventListener("mouseenter", onEnter);
+      area.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
   return (
-    <div className="bf-outer">
-<style jsx>{`
-  .bf-outer {
-    width: 100vw;
-    min-height: 150vh;
-    padding: 10vh 3vw;
-    display: flex;
-    justify-content: center;   /* center horizontal kontainer */
-    align-items: center;       /* center vertical */
-    box-sizing: border-box;
-    background: white; 
-  }
+    <div className="bf-page" ref={hoverRef}>
+      <style jsx>{`
+        .bf-page {
+          position: relative;
+          width: 100vw;
+          min-height: 101vh;
+          background: #f3f4f5;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          box-sizing: border-box;
+          overflow: hidden;
+        }
 
-  .bf-wrap {
-    width: min(1300px, 92%);
-    line-height: 1.05;
-    border:1px solid none;
-    text-align: center;        /* teks center */
-    margin: 0 auto;            /* jaga agar wrap tetap center */
-  }
+        .bf-header {
+          padding: 3vh 7.9vw 0;
+          text-align: center;
+        }
 
-  .bf-word {
-    display: inline-block;     /* inline-block → bisa center sempurna */
-    white-space: nowrap;       /* biar kata tetap utuh */
-    margin-right: 0.4rem;
-  }
+        .bf-header-title {
+          font-family: Inter, sans-serif;
+          font-size: 12px;
+          letter-spacing: 0.12em;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: #0b0f14;
+        }
 
-  .bf-char {
-    display: inline-block;
-    color: rgba(234, 70, 50, 0.27);
-    font-weight: 600;
-    line-height: 0.98;
-    font-size: clamp(48px, 18vw, 104px);
-    background-clip: text;
-    -webkit-background-clip: text;
-  }
+        .bf-header-sub {
+          font-family: Georgia, serif;
+          font-size: 13px;
+          font-style: italic;
+          opacity: 0.75;
+        }
 
-  .bf-char.filled {
-    color: rgb(234, 70, 50);
-  }
+        .bf-outer {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 10vh 7.9vw;
+        }
 
-  .bf-char.partial {
-    color: transparent;
-    background-image: linear-gradient(
-      90deg,
-      rgb(234, 70, 50) var(--partial),
-      rgba(234, 70, 50, 0.24) var(--partial)
-    );
-  }
-`}</style>
+        .bf-wrap {
+          width: min(1300px, 92%);
+          text-align: center;
+          line-height: 1.05;
+        }
 
+        .bf-word {
+          display: inline-block;
+          white-space: nowrap;
+          margin-right: 0.4rem;
+        }
 
-      <div className="bf-wrap" ref={wrapRef}>
-        {chars.map((item, i) => {
-          if (item.type === "space") {
-            return <span key={`s-${i}`}>&nbsp;</span>;
-          }
+        .bf-char {
+          display: inline-block;
+          font-family: Inter, sans-serif;
+          font-weight: 1000;
+          font-size: clamp(48px, 18vw, 84px);
+          line-height: 0.98;
+          color: rgba(0, 0, 0, 0.25);
+          background-clip: text;
+          -webkit-background-clip: text;
+          text-transform: uppercase;
+        }
 
-          return (
-            <span className="bf-word" key={`w-${i}`}>
-              {item.chars.map((c, j) => (
-                <span
-                  key={`c-${i}-${j}`}
-                  className="bf-char"
-                  dangerouslySetInnerHTML={{
-                    __html: c.char === "<" ? "&lt;" : c.char,
-                  }}
-                />
-              ))}
-            </span>
+        .bf-char.filled {
+          color: #000;
+        }
+
+        .bf-char.partial {
+          color: transparent;
+          background-image: linear-gradient(
+            90deg,
+            #000 var(--partial),
+            rgba(0, 0, 0, 0.25) var(--partial)
           );
-        })}
+        }
+
+        .bf-footer {
+          padding: 0 7.9vw 4vh;
+          text-align: center;
+        }
+
+        .bf-footer-text {
+          font-family: Georgia, serif;
+          font-size: 14px;
+          font-style: italic;
+          opacity: 0.85;
+        }
+      `}</style>
+
+      <header className="bf-header">
+        <div className="bf-header-title">
+          We Work With The Biggest Brands
+        </div>
+        <div className="bf-header-sub">From Around the World</div>
+      </header>
+
+      <div className="bf-outer">
+        <div className="bf-wrap" ref={wrapRef}>
+          {chars.map((item, i) =>
+            item.type === "space" ? (
+              <span key={i}>&nbsp;</span>
+            ) : (
+              <span className="bf-word" key={i}>
+                {item.chars.map((c, j) => (
+                  <span key={j} className="bf-char">
+                    {c.char}
+                  </span>
+                ))}
+              </span>
+            )
+          )}
+        </div>
       </div>
+
+      <footer className="bf-footer">
+        <div className="bf-footer-text">
+          And We’re Clued Up on Culture…
+        </div>
+      </footer>
     </div>
   );
 }
+
 
 function ServicesHero() {
   return (
@@ -2034,19 +2177,97 @@ function ServicesHero() {
 }
 
 function Description() {
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const rightRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      /* ===============================
+         LEFT — HEADLINE (EPIC)
+      =============================== */
+      const title = titleRef.current;
+      const text = title.innerText;
+      title.innerHTML = "";
+
+      const lines = text.split(", ");
+      lines.forEach((line, i) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "overflow-hidden";
+
+        const span = document.createElement("span");
+        span.className = "inline-block will-change-transform";
+        span.innerText = line + (i < lines.length - 1 ? "," : "");
+
+        wrapper.appendChild(span);
+        title.appendChild(wrapper);
+      });
+
+      const spans = title.querySelectorAll("span");
+
+      gsap.fromTo(
+        spans,
+        {
+          y: 120,
+          rotateX: 55,
+          scaleY: 1.4,
+          opacity: 0,
+          filter: "blur(8px)",
+        },
+        {
+          y: 0,
+          rotateX: 0,
+          scaleY: 1,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 1.4,
+          ease: "power4.out",
+          stagger: 0.12,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%",
+          },
+        }
+      );
+
+      /* ===============================
+         RIGHT — FADE IN ONLY
+      =============================== */
+      const paragraphs = rightRef.current.querySelectorAll("p");
+
+      gsap.fromTo(
+        paragraphs,
+        {
+          opacity: 0,
+        },
+        {
+          opacity: 1,
+          duration: 0.9,
+          ease: "power1.out",
+          stagger: 0.2,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 65%",
+          },
+        }
+      );
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="w-full bg-[#F3F4F5] text-black py-32">
+    <section
+      ref={sectionRef}
+      className="w-full bg-[#F3F4F5] text-black py-32"
+    >
       <div className="max-w-screen mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
 
-        {/* LEFT SIDE — rhetorical headline */}
+        {/* LEFT — HEADLINE */}
         <div className="lg:col-span-7 flex flex-col">
-          <div className="flex items-center gap-3 text-gray-600 text-sm mb-6">
-            <span className="w-2 h-2 rounded-full bg-black inline-block" />
-            <span>Built for Growing Needs</span>
-          </div>
-
           <h1
-            className="font-sans font-medium leading-[1.05] tracking-tight text-black"
+            ref={titleRef}
+            className="font-sans font-medium leading-[1.05] tracking-tight text-black perspective-[1200px]"
             style={{ fontSize: "clamp(32px, 4vw, 54px)" }}
           >
             We build brands that move with clarity, communicate with intention,
@@ -2054,9 +2275,11 @@ function Description() {
           </h1>
         </div>
 
-        {/* RIGHT SIDE — descriptive content */}
-        <div className="lg:col-span-5 flex flex-col text-gray-700 text-[17px] leading-relaxed">
-
+        {/* RIGHT — COPY */}
+        <div
+          ref={rightRef}
+          className="lg:col-span-5 flex flex-col text-gray-700 text-[17px] leading-relaxed"
+        >
           <p className="mb-5">
             Boson is a digital agency founded in 2021 and based in Bali, working with
             clients across Qatar, Malaysia, and other regions. We focus on creating
@@ -2073,14 +2296,174 @@ function Description() {
             Whether you're refining a brand or building a new digital foundation,
             Boson brings clarity, process, and long-term stability to the table.
           </p>
-
-          {/* button */}
-          <button className="bg-[#d7ff5f] text-black px-6 py-3 rounded-full font-medium w-fit flex items-center gap-2 hover:opacity-90 transition">
-            Learn More
-            <span className="text-xl">↗</span>
-          </button>
         </div>
 
+      </div>
+    </section>
+  );
+}
+
+function ProjectShowcase() {
+  const sectionRef = useRef(null);
+  const trackRef = useRef(null);
+  const progressRef = useRef(null);
+
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const projects = [
+    {
+      id: "01",
+      title: "Real Estate &\nProperty",
+      image: "https://plus.unsplash.com/premium_photo-1678903964473-1271ecfb0288?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVhbCUyMGVzdGF0ZXxlbnwwfHwwfHx8MA%3D%3D",
+      meta: ["PRODUCTION", "LONDON", "EDELMAN", "XBOX"],
+      desc:
+        "A 6×3 metre renaissance-style oil painting to support the launch of Xbox’s flagship video game, Halo Infinite.",
+    },
+    {
+      id: "02",
+      title: "Food &\nBeverage",
+      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      meta: ["BRANDING", "BERLIN", "NIKE"],
+      desc:
+        "A visual identity system exploring silence, tension, and modern athletic discipline.",
+    },
+    {
+      id: "03",
+      title: "Lifestyle &\nHospitality",
+      image: "https://plus.unsplash.com/premium_photo-1675745329954-9639d3b74bbf?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjV8fGhvc3BpdGFsaXR5fGVufDB8fDB8fHww",
+      meta: ["EXPERIMENT", "TOKYO", "SONY"],
+      desc:
+        "An experimental campaign blending digital ritual, motion, and sound design.",
+    },
+  ];
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const track = trackRef.current;
+      const progressBar = progressRef.current;
+
+      const totalSlides = projects.length;
+      const totalWidth = track.scrollWidth;
+      const viewport = window.innerWidth;
+      const scrollDistance = totalWidth - viewport;
+
+      gsap.to(track, {
+        x: -scrollDistance,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top top",
+          end: () => `+=${totalWidth}`,
+          scrub: true,
+          pin: true,
+          anticipatePin: 1,
+          onUpdate(self) {
+            // ============================
+            // PROGRESS BAR (REAL)
+            // ============================
+            const progress = self.progress; // 0 → 1
+            gsap.set(progressBar, {
+              scaleX: progress,
+              transformOrigin: "left center",
+            });
+
+            // ============================
+            // ACTIVE SLIDE INDEX
+            // ============================
+            const index = Math.min(
+              totalSlides - 1,
+              Math.floor(progress * totalSlides)
+            );
+            setActiveIndex(index);
+          },
+        },
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative w-full h-screen bg-black text-white overflow-hidden"
+    >
+      {/* TRACK */}
+      <div className="absolute inset-0">
+        <div
+          ref={trackRef}
+          className="flex h-full"
+          style={{ width: `${projects.length * 100}vw` }}
+        >
+          {projects.map((p) => (
+            <div
+              key={p.id}
+              className="relative w-screen h-full flex-shrink-0"
+            >
+              <div className="relative max-w-[1600px] mx-auto h-full px-16 pt-24 pb-32 grid grid-cols-12">
+                {/* PROJECT LABEL */}
+                <span className="col-span-12 text-xs tracking-widest text-white/50 mb-8">
+                  PROJECT {p.id}
+                </span>
+
+                {/* IMAGE */}
+                <div className="col-span-4 col-start-5 flex justify-center z-10">
+                  <div className="relative w-[420px] aspect-[3/4]">
+                    <img
+                      src={p.image}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* TITLE — OVERLAP */}
+                <h1
+                  className="absolute left-16 top-[45%] text-[96px] leading-[0.95] font-light tracking-tight whitespace-pre-line z-20 pointer-events-none"
+                  style={{ maxWidth: "620px" }}
+                >
+                  {p.title}
+                </h1>
+
+                {/* RIGHT META */}
+                <div className="col-span-3 col-start-10 flex flex-col justify-end pt-24">
+                  <div className="mb-8 space-y-2 text-xs tracking-wide">
+                    {p.meta.map((m) => (
+                      <p key={m} className="underline underline-offset-4">
+                        {m}
+                      </p>
+                    ))}
+                  </div>
+
+                  <p className="max-w-[260px] text-sm leading-relaxed text-white/65">
+                    {p.desc}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ============================= */}
+      {/* BOTTOM PROGRESS BAR */}
+      {/* ============================= */}
+      <div className="absolute bottom-0 left-0 right-0 z-40 px-28 pb-6">
+        {/* BAR */}
+        <div className="relative h-[1px] bg-white/20 overflow-hidden">
+          <div
+            ref={progressRef}
+            className="absolute left-0 top-0 h-full w-full bg-white"
+            style={{ transform: "scaleX(0)" }}
+          />
+        </div>
+
+        {/* META */}
+        <div className="mt-4 flex items-center justify-between text-sm">
+          <span>
+            [ {activeIndex + 1} — {projects.length} ]
+          </span> 
+        </div>
       </div>
     </section>
   );
@@ -2090,63 +2473,84 @@ function Description() {
 
 function Footer() {
   return (
-    <div className="relative w-full bg-[#F3F4F5]   text-black px-[80px] py-[180px] overflow-hidden flex items-center justify-center max-[900px]:px-6 max-[900px]:py-[140px]">
+    <footer className="relative w-full bg-black text-white overflow-hidden">
+ 
 
-      {/* BOSON LOGO BACKDROP */}
-      <div className="footer-chrome absolute right-0 top-1/2 -translate-y-1/2 w-[900px] h-[1100px] opacity-[0.20] pointer-events-none select-none max-[900px]:right-[-20%] max-[900px]:w-[600px] max-[900px]:h-[750px]" />
+      {/* ========================= */}
+      {/* MAIN GRID */}
+      {/* ========================= */}
+      <div className="relative z-[2] px-[80px] py-[140px] max-[900px]:px-6 max-[900px]:py-[100px]">
+        <div className="grid grid-cols-[1.2fr_0.8fr_1fr] gap-20 max-[1100px]:grid-cols-1 max-[1100px]:gap-16">
 
-      {/* GRID */}
-      <div className="relative z-[2] grid grid-cols-[1fr_0.6fr] gap-20 w-full max-w-[1400px] max-[900px]:grid-cols-1 max-[900px]:gap-12">
+          {/* LEFT — IDENTITY */}
+          <div className="flex flex-col gap-8"> 
 
-        {/* LEFT CONTENT */}
-        <div className="flex flex-col gap-10">
+            <h2 className="text-[48px] font-light leading-[1.1] tracking-tight max-[900px]:text-[36px]">
+              Ready to talk?<br />
+              Let’s build something<br />
+              that actually lasts.
+            </h2> 
 
-          <h2 className="text-[64px] font-light leading-[1.05] tracking-tight max-[900px]:text-[42px]">
-            Let’s work<br/>together
-          </h2>
+            <p className="text-sm opacity-70 max-w-[420px] leading-relaxed">
+              Share your ideas with us and we’ll begin turning your vision into
+              something clear, sharp, and executable.
+            </p>
 
-          <div className="w-[70%] border-t border-white/10 max-[900px]:w-full" />
-
-          <a href="mailto:boson.studio@gmail.com"
-            className="inline-flex items-center justify-center bg-[#822222] px-12 py-5 text-white rounded-full text-base font-medium whitespace-nowrap opacity-95 hover:opacity-100 transition-all duration-200 tracking-wide w-fit">
-            Get in touch →
-          </a>
-
-          <div className="text-sm opacity-75 font-light">
-            boson.studio@gmail.com
+            <a
+              href="mailto:boson.studio@gmail.com"
+              className="mt-6 inline-flex items-center gap-3 text-sm tracking-wide opacity-90 hover:opacity-100 transition"
+            >
+              Get in touch →
+            </a>
           </div>
 
-          <div className="text-xs opacity-70 flex gap-3 flex-wrap">
-            <span>Based in Bali</span>•<span>Working Worldwide</span>•<span>Since 2021</span>
-          </div>
-
-          <div className="flex gap-6 text-xs opacity-70 mt-1 flex-wrap">
-            {["Behance", "LinkedIn", "Contact"].map((txt) => (
-              <a key={txt} className="cursor-pointer hover:opacity-100 transition-opacity">
-                {txt}
+          {/* CENTER — NAV */}
+          <div className="flex flex-col divide-y divide-white/10 border border-white/10">
+            {[
+              "Home",
+              "Projects",
+              "What We Do",
+              "Latest News",
+              "Get In Touch",
+            ].map((item) => (
+              <a
+                key={item}
+                className="px-8 py-6 flex items-center justify-between text-sm tracking-wide hover:bg-white/5 transition"
+              >
+                <span>{item}</span>
+                <span className="opacity-60">↗</span>
               </a>
             ))}
           </div>
 
+          {/* RIGHT — CONTACT */}
+          <div className="flex flex-col gap-6 text-sm opacity-80">
+            <div>
+              <div className="opacity-60 mb-1">Email</div>
+              <div>boson.studio@gmail.com</div>
+            </div>
+
+            <div>
+              <div className="opacity-60 mb-1">Base</div>
+              <div>Bali, Indonesia</div>
+            </div>
+
+            <div>
+              <div className="opacity-60 mb-1">Working</div>
+              <div>Worldwide</div>
+            </div>
+
+            <div className="flex gap-4 mt-4 text-xs opacity-70">
+              <a className="hover:opacity-100 transition">Behance</a>
+              <a className="hover:opacity-100 transition">LinkedIn</a>
+              <a className="hover:opacity-100 transition">Contact</a>
+            </div>
+          </div>
+
         </div>
-
-        {/* RIGHT EMPTY COLUMN FOR BALANCE */}
-        <div />
-
       </div>
-
-      <style jsx>{`
-        .footer-chrome {
-          mask-image: url("/boson-white.png");
-          -webkit-mask-image: url("/boson-white.png");
-          mask-size: contain;
-          mask-repeat: no-repeat;
-          mask-position: center;
-          background: linear-gradient(110deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 4%, rgba(255,255,255,0.25) 7%, rgba(255,255,255,0) 11%), linear-gradient(140deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 3%, rgba(255,255,255,0) 8%), radial-gradient(circle at 50% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0) 60%), radial-gradient(circle at 50% 78%, rgba(0,0,0,0.4), rgba(0,0,0,0) 70%), radial-gradient(circle at 50% 70%, rgba(0,0,0,0) 25%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.85) 85%, rgba(0,0,0,1) 100%), linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,1) 100%), linear-gradient(180deg, rgba(255,255,255,0.6), rgba(30,30,30,0.85) 45%, rgba(0,0,0,1) 95%);
-          background-blend-mode: screen, screen, screen, multiply, multiply, multiply, multiply, overlay;
-        }
-      `}</style>
-    </div>
+ 
+    </footer>
   );
 }
 
@@ -2173,16 +2577,16 @@ function Footer() {
   
       const el = bgRef.current;
   
-      // ===== BACKGROUND SCROLL TRANSITION ===== 
+      // ===== BACKGROUND SCROLL TRANSITION bg-[#F3F4F5]===== 
       // (versi NON-SCRUB → scroll cuma memicu animasi)
       ScrollTrigger.create({
-        trigger: ".industries-page",
-        start: "top 30%",
-        end: "bottom top",
+        trigger: ".chayay",
+        start: "top top",
+        end: "bottom bottom",
       
         onEnter: () => {
           gsap.to(el, {
-            backgroundColor: "#09070b",
+            backgroundColor: "#F3F4F5",
             duration: 1.2,
             ease: "power2.out",
           });
@@ -2190,7 +2594,7 @@ function Footer() {
       
         onEnterBack: () => {
           gsap.to(el, {
-            backgroundColor: "#09070b",
+            backgroundColor: "#F3F4F5",
             duration: 1.2,
             ease: "power2.out",
           });
@@ -2198,7 +2602,7 @@ function Footer() {
       
         onLeave: () => {
           gsap.to(el, {
-            backgroundColor: "#09070b",
+            backgroundColor: "#F3F4F5",
             duration: 1.2,
             ease: "power2.out",
           });
@@ -2206,7 +2610,7 @@ function Footer() {
       
         onLeaveBack: () => {
           gsap.to(el, {
-            backgroundColor: "#09070b",
+            backgroundColor: "#F3F4F5",
             duration: 1.2,
             ease: "power2.out",
           });
@@ -2221,8 +2625,9 @@ function Footer() {
   
     return (
       <div
+        className="chayay"
         ref={bgRef}
-        style={{ width: "100%", background: "#09070b", position: "relative" }}
+        style={{ width: "100%", background: "#F3F4F5", position: "relative" }}
       >
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
             <HeroJoin/>
@@ -2230,27 +2635,44 @@ function Footer() {
   
   {/* <div className="h-screen w-screen bg-white"/> */}
   
-        <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
-          <BosonNarrative />
-        </div>
-        
+          <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
+            <BosonNarrative />
+          </div>
+          
+          
         <Galery/>
         
-        <Description/>
         
-           
-          <VideoSection/>
         
-        <ServicesHero/>
+         <Description/>
+         
+        <VideoSection/>
         
-        <div style={{ position: "relative", zIndex: 2 }}>
-            <BigHeading />
-          </div>
-        
-  
         {/* <div style={{ position: "relative", zIndex: 2 }}>
+            <BigHeading />
+          </div> */}
+          
+           <ServicesHero/>
+           
+          {/* <ProjectShowcase/> */}
+        
+        
+       
+        
+        
+          {/* <div style={{ position: "relative", zIndex: 2 }}>
             <WorksList />
           </div> */}
+          
+          
+          <BosonScrollText/>  
+        
+       
+        
+       
+        
+  
+       
   
         {/* <div style={{ position: "relative", zIndex: 2 }}>
             <Projects />
@@ -2266,7 +2688,7 @@ function Footer() {
             <Carousel />
           </div> */}
         
-        {/* <div className="industries-page" style={{ position: "relative", zIndex: 2 }}>
+        {/* <div className="" style={{ position: "relative", zIndex: 2 }}>
           <IndustriesPage />
         </div> */}
         
@@ -2274,7 +2696,6 @@ function Footer() {
         
           
         
-        {/* <BosonScrollText/>   */}
         
         
 

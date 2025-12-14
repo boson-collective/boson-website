@@ -39,11 +39,9 @@ const PROJECT = [
   { src: "/clients/tender-touch/3.jpg", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/38792503/file/original-9bf97d8735da91ce194ba9bc15733b1f.png?resize=2048x1536&vertical=center", ratio: "4/5" },
   { src: "/clients/dwm/2.jpg", ratio: "4/5" },
-  
   { src: "/clients/marrosh/main.mp4", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg?resize=2048x1152&vertical=center", ratio: "4/5" },
   { src: "/clients/tender-touch/main.mp4", ratio: "4/5" },
-  
 ];
 
 export default function BosonMasonryV1() {
@@ -211,85 +209,94 @@ export default function BosonMasonryV1() {
     });
   }
 
-// =============================
-// PARALLAX — ORIGINAL BOSON 4-LANE PATTERN APPLIED TO MASONRY
-// =============================
-useEffect(() => {
-  if (!gridRef.current) return;
+  // =============================
+  // PARALLAX
+  // =============================
+  useEffect(() => {
+    if (!gridRef.current) return;
 
-  const lenis = new Lenis({
-    duration: 1.1,
-    smoothWheel: true,
-    easing: (t) => Math.min(1, 1 - Math.pow(2, -10 * t)),
-  });
-  lenisRef.current = lenis;
-
-  function raf(time) {
-    lenis.raf(time);
-    rafScrollRef.current = requestAnimationFrame(raf);
-  }
-  rafScrollRef.current = requestAnimationFrame(raf);
-
-  const items = Array.from(gridRef.current.querySelectorAll(".parallax-item"));
-
-  // 1. DETECT REAL MASONRY COLUMNS VIA offsetLeft
-  const columnMap = {};
-  items.forEach((el) => {
-    const x = el.offsetLeft;
-    if (!columnMap[x]) columnMap[x] = [];
-    columnMap[x].push(el);
-  });
-
-  // 2. SORT LEFT → RIGHT
-  const colKeys = Object.keys(columnMap).sort((a, b) => a - b);
-
-  // 3. TRUE BOSON PARALLAX PATTERN (4-step loop)
-  // EXACT pattern:
-  // 0: -250
-  // 1:  20
-  // 2: -250
-  // 3:  20
-  const pattern = [-250, 20, -250, 20];
-
-  // 4. APPLY TO EVERY COLUMN
-  colKeys.forEach((colX, laneIndex) => {
-    const colEls = columnMap[colX];
-
-    const parallax = pattern[laneIndex % 4];
-
-    // set initial offset
-    gsap.set(colEls, { y: parallax * -0.28 });
-
-    // animate to final offset
-    gsap.to(colEls, {
-      y: parallax,
-      ease: "none",
-      scrollTrigger: {
-        trigger: gridRef.current,
-        start: "top bottom+=25%",
-        end: "bottom top-=25%",
-        scrub: 2.8,
-      },
+    const lenis = new Lenis({
+      duration: 1.1,
+      smoothWheel: true,
+      easing: (t) => Math.min(1, 1 - Math.pow(2, -10 * t)),
     });
-  });
+    lenisRef.current = lenis;
 
-  return () => {
-    cancelAnimationFrame(rafScrollRef.current);
-    lenis.destroy();
-    ScrollTrigger.getAll().forEach((t) => t.kill());
-  };
-}, []);
+    function raf(time) {
+      lenis.raf(time);
+      rafScrollRef.current = requestAnimationFrame(raf);
+    }
+    rafScrollRef.current = requestAnimationFrame(raf);
 
+    const items = Array.from(gridRef.current.querySelectorAll(".parallax-item"));
+    const columnMap = {};
+
+    items.forEach((el) => {
+      const x = el.offsetLeft;
+      if (!columnMap[x]) columnMap[x] = [];
+      columnMap[x].push(el);
+    });
+
+    const colKeys = Object.keys(columnMap).sort((a, b) => a - b);
+    const pattern = [-250, 20, -250, 20];
+
+    colKeys.forEach((colX, laneIndex) => {
+      const colEls = columnMap[colX];
+      const parallax = pattern[laneIndex % 4];
+
+      gsap.set(colEls, { y: parallax * -0.28 });
+
+      gsap.to(colEls, {
+        y: parallax,
+        ease: "none",
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: "top bottom+=25%",
+          end: "bottom top-=25%",
+          scrub: 2.8,
+        },
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(rafScrollRef.current);
+      lenis.destroy();
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, []);
 
   // =============================
   // RENDER
   // =============================
   return (
-    <div ref={rootRef} className="min-h-screen bg-[#F3F4F5] text-white pt-20  pb-10">
+    <div
+      ref={rootRef}
+      className="relative min-h-screen bg-[#F3F4F5] text-white pt-20 pb-10 overflow-hidden"
+    >
+      {/* TOP WHITE FADE */}
+      <div
+  className="pointer-events-none absolute top-0 left-0 w-full h-[200px] z-30"
+  style={{
+    background:
+      "linear-gradient(to bottom, #F3F4F5 0%, rgba(243,244,245,0.95) 35%, rgba(243,244,245,0.65) 60%, rgba(243,244,245,0.0) 100%)",
+  }}
+/>
+
+
+      {/* BOTTOM WHITE FADE */}
+      <div
+  className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-30"
+  style={{
+    background:
+      "linear-gradient(to top, #F3F4F5 0%, #F3F4F5 40%, rgba(243,244,245,0.9) 60%, rgba(243,244,245,0.0) 100%)",
+  }}
+/>
+
+
       <div
         ref={gridRef}
         className={cn(
-          "w-full gap-8 pt-10",
+          "w-full gap-8 pt-10 relative z-10",
           COLUMN_CLASS,
           "masonry-parent"
         )}
@@ -317,12 +324,12 @@ useEffect(() => {
                       muted
                       loop
                       playsInline
-                      className="w-full h-full object-cover "
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <img
                       src={item.src}
-                      className="w-full h-full object-cover "
+                      className="w-full h-full object-cover"
                       draggable={false}
                     />
                   )}
