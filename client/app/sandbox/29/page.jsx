@@ -1422,7 +1422,7 @@ function BigHeading() {
   return (
     <div
       ref={ref}
-      className="relative bg-[#f1f2f3] overflow-hidden w-full big-heading-container"
+      className="relative bg-black overflow-hidden w-full big-heading-container"
       style={{ height: "150vh" }}
     >
       <div
@@ -1440,7 +1440,7 @@ function BigHeading() {
             style={{
               x: topX,
               transform: "translateY(10%)",
-              color: "black",
+              color: "white",
               fontSize: "30vw",
               fontWeight: 600,
               lineHeight: 0.8,
@@ -1449,9 +1449,9 @@ function BigHeading() {
               gap: "4vw",
             }}
           >
-            <span>What We Do -</span>
-            <span>What We Do -</span>
-            <span>What We Do</span>
+            <span>Work -</span>
+            <span>Work -</span>
+            <span>Work</span>
           </motion.div>
         </div>
 
@@ -1465,14 +1465,13 @@ function BigHeading() {
             style={{
               x: bottomX,
               transform: "translateY(-10%)",
-              color: "black",
+              color: "#3a3a3a",
               fontSize: "30vw",
               fontWeight: 600,
               lineHeight: 0.8,
               opacity: 0.45,
               textTransform: "uppercase",
               gap: "4vw",
-              
             }}
           >
             <span>Experiences -</span>
@@ -1717,25 +1716,7 @@ function WorksList() {
         position: "relative",
       }}
     >
-      
-      {/* BOSON SUBHEADER */}
-<div
-  style={{
-    width: "100%",
-    color: "white",
-    textAlign: "center",
-    fontSize: "1.1vw",
-    fontWeight: 300,
-    opacity: 0.7,
-    marginBottom: "6vh",
-    letterSpacing: "0.02em",
-    lineHeight: 1.4,
-    padding: "0 10vw",
-    textTransform: "none",
-  }}
->
-Every decision, every detail is a lever — elevating the whole
-</div>
+       
 
       
       {items.map((item, i) => (
@@ -2648,21 +2629,21 @@ function Footer() {
          
         <VideoSection/>
         
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <BigHeading />
-          </div> */}
+   
           
            <ServicesHero/>
            
-          {/* <ProjectShowcase/> */}
+          <ProjectShowcase/>
         
         
-       
+            <div style={{ position: "relative", zIndex: 2 }}>
+            <BigHeading />
+          </div>
         
         
-          {/* <div style={{ position: "relative", zIndex: 2 }}>
+          <div style={{ position: "relative", zIndex: 2 }}>
             <WorksList />
-          </div> */}
+          </div>
           
           
           <BosonScrollText/>  
