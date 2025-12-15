@@ -271,16 +271,17 @@ export default function BosonMasonryV1() {
   return (
     <div
       ref={rootRef}
-      className="relative min-h-screen bg-[#F3F4F5] text-white pt-20 pb-10 overflow-hidden"
+      className="relative min-h-screen text-white pt-20 pb-10 overflow-hidden"
     >
       {/* TOP WHITE FADE */}
       <div
   className="pointer-events-none absolute top-0 left-0 w-full h-[200px] z-30"
   style={{
     background:
-      "linear-gradient(to bottom, #F3F4F5 0%, rgba(243,244,245,0.95) 35%, rgba(243,244,245,0.65) 60%, rgba(243,244,245,0.0) 100%)",
+      "linear-gradient(to bottom, #000000 0%, rgba(0,0,0,0.95) 35%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.0) 100%)",
   }}
 />
+
 
 
       {/* BOTTOM WHITE FADE */}

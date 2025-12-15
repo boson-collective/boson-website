@@ -669,7 +669,7 @@ class Background extends InteractiveObject {
       color1: [0.914, 0.412, 0.349], // Soft bright (#E96959)
       color2: [0.796, 0.294, 0.243], // Base (#CB4B3E)
       
-      color3: [0.87, 0.85, 0.81]
+      color3: [0, 0, 0]
 , // Rich dark navy-black
       colorAccent: new THREE.Color(0.0, 0.0, 0.0),
       uLinesBlur: 0.33,   // was 0.25 → lebih blur
