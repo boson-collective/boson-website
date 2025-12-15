@@ -271,7 +271,7 @@ export default function BosonMasonryV1() {
   return (
     <div
       ref={rootRef}
-      className="relative min-h-screen text-white pt-20 pb-10 overflow-hidden"
+      className="relative min-h-screen bg-black text-white pt-20 pb-10 overflow-hidden"
     >
       {/* TOP WHITE FADE */}
       <div
