@@ -392,7 +392,7 @@ function BosonNarrative() {
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container  w-full  relative overflow-hidden flex items-start"
+      className="boson-narrative-container bg-black w-full  relative overflow-hidden flex items-start"
       style={{ padding: "120px 2vw" }}
     >
       <div
