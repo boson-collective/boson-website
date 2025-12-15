@@ -110,7 +110,7 @@ return (
       transition={{ delay: 2.8, duration: 2.3, ease: "easeOut" }}
       className="absolute inset-0 z-10 flex items-center justify-center"
     >
-      {/* <div className="boson-chrome-v4" /> */}
+      <div className="boson-chrome-v4" />
     </motion.div>
  
 
@@ -129,15 +129,16 @@ return (
         mask-position: center;
         mask-repeat: no-repeat;
 
-        background:
+        background: 
+          #DED9CF;
+          /* 
           linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
-          radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%),
-          #ebe8e0;
+          radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%), */
 
         background-blend-mode: screen, multiply;
 
         filter: blur(0.6px);
-        opacity: 0.5;
+        opacity: 0.3;
       }
     `}</style>
   </div>
