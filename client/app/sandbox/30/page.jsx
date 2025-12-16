@@ -7,7 +7,6 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import Image from "next/image";
 gsap.registerPlugin(ScrollTrigger);
-import Galery from '../22/page.jsx'
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
@@ -380,20 +379,40 @@ function BosonNarrative() {
   // ====================================
   useEffect(() => {
     if (!baseTextRef.current || isMobile) return;
- 
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const split = new SplitType(baseTextRef.current, { types: "words" });
+
+    gsap.from(split.words, {
+      opacity: 0,
+      y: 20,
+      duration: 2.9,
+      ease: "power3.out",
+      stagger: 0.03,
+      scrollTrigger: {
+        trigger: baseTextRef.current,
+        start: "top 80%", // <<== INI YANG LO MINTA
+        toggleActions: "play none none none",
+      },
+    });
+
+    return () => {
+      split.revert();
+    };
   }, [isMobile]);
 
   // ====================================
   // TEXT
   // ====================================
-  const text = `              We are a social media agency that helps brands stay consistent online. We keep everything on track so you can stay focused on what matters`;
+  const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
 
   return (
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container bg-black w-full  relative overflow-hidden flex items-start"
-      style={{ padding: "120px 2vw" }}
+      className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
+      style={{ padding: "120px 6vw" }}
     >
       <div
         style={{
@@ -401,8 +420,8 @@ function BosonNarrative() {
           width: "100%",
           whiteSpace: "pre-wrap",
           fontSize: "clamp(18px, 6vw, 72px)",
-          lineHeight: 1.05,
-          fontWeight: 400, 
+          lineHeight: 1.25,
+          fontWeight: 300,
         }}
       >
        
@@ -414,7 +433,7 @@ function BosonNarrative() {
           style={{
             color: isMobile
               ? "rgba(255,255,255,0.96)"
-              : "rgba(255,255,255,0.9)",
+              : "rgba(255,255,255,0.25)",
           }}
         >
            <span className="mr-32"></span>{text}
@@ -1118,295 +1137,460 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 }
 
 function Projects() {
-  const scrollRef = useRef(null);
+const scrollRef = useRef(null);
 
-  // PROGRESS UTAMA — untuk burst (TETAP seperti semula)
-  const { scrollYProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start start", "end end"],
-  });
+// ==================================================
+// SECTION SCROLL (UNTUK VISUAL & TRANSISI)
+// ==================================================
+const { scrollYProgress } = useScroll({
+  target: scrollRef,
+  offset: ["start start", "end end"],
+});
 
-  
-  const { scrollYProgress: dotProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start end", "end end"],
-  });
-  
-  const slowDotProgress = useTransform(dotProgress, v => v * 0.15);
+// ==================================================
+// GLOBAL SCROLL (UNTUK DOT — NEVER STOPS)
+// ==================================================
+const { scrollY } = useScroll();
 
-  
-  
-  // ROTATION VALUES (for orbits) — pakai introProgress
-  const rotate1 = useTransform(slowDotProgress, [0, 1], [0, 7200]);
-  const rotate2 = useTransform(slowDotProgress, [0, 1], [0, -5400]);
-  const rotate3 = useTransform(slowDotProgress, [0, 1], [0, 9000]);
-    
-  
-  // PROGRESS INTRO — dari pertama kelihatan sampai titik sticky
-  const { scrollYProgress: introProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start end", "start start"],
-  });
-  // ============================
-  // TEXT REVEAL with Framer Motion
-  // ============================
-  // mulai reveal begitu komponen kelihatan, selesai pas sticky
-  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-  const textFilter = useTransform(introProgress, [0, 1], [
-    "blur(20px)",
-    "blur(0px)",
-  ]);
+// normalize global scroll → smooth & slow
+const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
-  // ORBIT CONFIGS
-  const c1 = { cx: 425, cy: 350, r: 250 };
-  const c2 = { cx: 325, cy: 500, r: 250 };
-  const c3 = { cx: 525, cy: 500, r: 250 };
+const rotate1 = useTransform(spinBase, (v) => v);
+const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
+const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-  const g1Ref = useRef(null);
-  const g2Ref = useRef(null);
-  const g3Ref = useRef(null);
+// ==================================================
+// LIGHT MODE TRANSITION
+// ==================================================
+const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
 
-  useEffect(() => {
-    const setTransform = (g, cx, cy, deg) => {
-      if (!g) return;
-      g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
-    };
+const bgColor = useTransform(
+  lightProgress,
+  [0, 1],
+  ["rgb(0,0,0)", "#f3f4f5"]
+);
 
-    setTransform(g1Ref.current, c1.cx, c1.cy, rotate1.get());
-    setTransform(g2Ref.current, c2.cx, c2.cy, rotate2.get());
-    setTransform(g3Ref.current, c3.cx, c3.cy, rotate3.get());
+const textColor = useTransform(
+  lightProgress,
+  [0, 1],
+  ["rgb(255,255,255)", "rgb(0,0,0)"]
+);
 
-    const unsub1 = rotate1.onChange((v) =>
-      setTransform(g1Ref.current, c1.cx, c1.cy, v)
-    );
-    const unsub2 = rotate2.onChange((v) =>
-      setTransform(g2Ref.current, c2.cx, c2.cy, v)
-    );
-    const unsub3 = rotate3.onChange((v) =>
-      setTransform(g3Ref.current, c3.cx, c3.cy, v)
-    );
+const orbitStroke = useTransform(
+  lightProgress,
+  [0, 1],
+  ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
+);
 
-    return () => {
-      unsub1?.();
-      unsub2?.();
-      unsub3?.();
-    };
-  }, [rotate1, rotate2, rotate3]);
+const dotFill = useTransform(
+  lightProgress,
+  [0, 1],
+  ["rgb(255,255,255)", "rgb(0,0,0)"]
+);
 
-  // ============================
-  // IMAGES LIST
-  // ============================
-  // original 4 + 5 extra (looping through the same assets as example)
-  const images = [
-    "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
-    "/clients/tender-touch/mockup.png", // 2
-    "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
-    "/clients/tender-touch/mockup.png", // 6
-    "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra)
-    "/clients/tender-touch/mockup.png", // 6
-    "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra) 
-    "/clients/dwm/mockup.png", // 5
-    "/clients/tender-touch/mockup.png", // 6
-    "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra)
-    
-  ];
+// ==================================================
+// INTRO TEXT
+// ==================================================
+const { scrollYProgress: introProgress } = useScroll({
+  target: scrollRef,
+  offset: ["start end", "start start"],
+});
 
-  // ============================
-  // STAGGERED BURST TIMING (micro-stagger)
-  // base start, step, window length
-  // ============================
-  const baseStart = 0.15;
-  const step = 0.03; // small delay between starts
-  const windowLen = 0.12; // each burst end = start + windowLen
+const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+const textFilter = useTransform(introProgress, [0, 1], [
+  "blur(20px)",
+  "blur(0px)",
+]);
 
-  // For each image, compute burst transform from scrollYProgress
-  const bursts = images.map((_, i) => {
-    const s = baseStart + i * step;
-    const e = s + windowLen;
-    return useTransform(scrollYProgress, [s, e], [0, 1]);
-  });
+// ==================================================
+// ORBIT GEOMETRY
+// ==================================================
+const c1 = { cx: 425, cy: 350, r: 250 };
+const c2 = { cx: 325, cy: 500, r: 250 };
+const c3 = { cx: 525, cy: 500, r: 250 };
 
-  // ============================
-  // RANDOM SEEDS per image (stabil antar render)
-  // ============================
-  const randomSeedsRef = useRef(null);
-  if (!randomSeedsRef.current) {
-    randomSeedsRef.current = images.map(() => ({
-      xOffset: (Math.random() - 0.5) * 80, // -40..40
-      yOffset: (Math.random() - 0.5) * 80, // -40..40
-      zOffset: (Math.random() - 0.5) * 800, // -400..400
-      rotStart: (Math.random() - 0.5) * 4, // -2..2 deg
-      rotEnd: (Math.random() - 0.5) * 10, // -5..5 deg
-      blurBoost: Math.random(), // 0..1
-    }));
-  }
-  const randomSeeds = randomSeedsRef.current;
+const g1Ref = useRef(null);
+const g2Ref = useRef(null);
+const g3Ref = useRef(null);
 
-  // ============================
-  // FORWARD MOTION VECTOR — Combo DEWA
-  // A: cepat dekat kamera
-  // B: smooth keluar frame
-  // D: motion blur
-  // E: randomization halus
-  // ============================
-  function createMotionVector(b, pattern, seed) {
-    // Z: piecewise — cepat ke kamera, halus keluar
-    const z = useTransform(b, [0, 0.4, 1], [-3000, 0, 5000 + seed.zOffset]);
+useEffect(() => {
+  const apply = (g, cx, cy, deg) => {
+    if (!g) return;
+    g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
+  };
 
-    // base arah 4-kuadran
-    const baseX =
-      pattern === 0
-        ? 220 // right-top
-        : pattern === 1
-        ? -220 // left-top
-        : pattern === 2
-        ? 220 // right-bottom
-        : -220; // left-bottom;
+  const u1 = rotate1.on("change", (v) =>
+    apply(g1Ref.current, c1.cx, c1.cy, v)
+  );
+  const u2 = rotate2.on("change", (v) =>
+    apply(g2Ref.current, c2.cx, c2.cy, v)
+  );
+  const u3 = rotate3.on("change", (v) =>
+    apply(g3Ref.current, c3.cx, c3.cy, v)
+  );
 
-    const baseY = pattern <= 1 ? -200 : 200;
+  return () => {
+    u1();
+    u2();
+    u3();
+  };
+}, [rotate1, rotate2, rotate3]);
 
-    // XY + random offset halus
-    const x = useTransform(b, [0, 1], [0, baseX + seed.xOffset]);
-    const y = useTransform(b, [0, 1], [0, baseY + seed.yOffset]);
+// ==================================================
+// IMAGES
+// ==================================================
+const images = [
+  "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
+  "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
+  "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
+  "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
+  "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
+  "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
+  "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
+  "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
+  "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
+  "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
+  "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
+  "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
+  "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
+  "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
+  "/clients/tender-touch/6.jpg",
+];
 
-    // scale natural berbasis depth (nggak meledak)
-    const scale = useTransform(b, [0, 1], [0.3, 1.2]);
+const baseStart = 0.15;
+const step = 0.05;
+const windowLen = 0.15;
 
-    return { x, y, z, scale };
-  }
+const bursts = images.map((_, i) =>
+  useTransform(
+    scrollYProgress,
+    [baseStart + i * step, baseStart + i * step + windowLen],
+    [0, 1]
+  )
+);
 
-  // ============================
-  // motion props per image
-  // ============================
-  const motionPropsList = bursts.map((b, idx) => {
-    const pattern = idx % 4;
-    const seed = randomSeeds[idx % randomSeeds.length];
+const motionPropsList = bursts.map((b, i) => {
+  const dir = i % 4;
+  return {
+    x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
+    y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
+    z: useTransform(b, [0, 1], [-2000, 3000]),
+    scale: useTransform(b, [0, 1], [0.4, 1.1]),
+    opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
+  };
+});
 
-    const { x, y, z, scale } = createMotionVector(b, pattern, seed);
-
-    return {
-      burst: b,
-      x,
-      y,
-      z,
-      scale,
-      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
-    };
-  });
-
-  // ---------------------------
-  // Render
-  // ---------------------------
-  return (
+// ==================================================
+// RENDER
+// ==================================================
+return (
+  <motion.div
+    ref={scrollRef}
+    style={{
+      width: "100%",
+      height: "500vh",
+      position: "relative",
+      backgroundColor: bgColor,
+    }}
+  >
     <div
-      ref={scrollRef}
       style={{
-        width: "100%",
-        height: "500vh",
-        background: "black",
-        position: "relative",
+        position: "sticky",
+        top: 0,
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+        pointerEvents: "none",
+        perspective: "1800px",
+        transformStyle: "preserve-3d",
       }}
     >
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          width: "97vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          overflow: "hidden", // per request: keep hidden
-          pointerEvents: "none",
+      {/* ORBITS */}
+      <svg viewBox="0 0 850 850" width="850" height="850">
+        {[c1, c2, c3].map((c, i) => (
+          <motion.circle
+            key={i}
+            cx={c.cx}
+            cy={c.cy}
+            r={c.r}
+            fill="none"
+            strokeWidth="0.5"
+            style={{ stroke: orbitStroke }}
+          />
+        ))}
 
-          perspective: "1800px",
-          perspectiveOrigin: "50% 50%",
-          transformStyle: "preserve-3d",
+        <motion.g ref={g1Ref}>
+          <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
+        </motion.g>
+        <motion.g ref={g2Ref}>
+          <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
+        </motion.g>
+        <motion.g ref={g3Ref}>
+          <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
+        </motion.g>
+      </svg>
+
+      {/* TEXT */}
+      <motion.div
+        style={{
+          opacity: textOpacity,
+          y: textY,
+          filter: textFilter,
+          color: textColor,
+          position: "absolute",
+          fontSize: "43px",
+          fontWeight: 200,
+          lineHeight: 1,
+          textAlign: "center",
+          whiteSpace: "pre-line",
+          zIndex: 10,
         }}
       >
-        {/* ORBIT SVG */}
-        <svg
-          viewBox="0 0 850 850"
-          width="850"
-          height="850"
-          style={{ position: "absolute" }}
-        >
-          <circle
-            cx={c1.cx}
-            cy={c1.cy}
-            r={c1.r}
-            stroke="white"
-            strokeWidth="0.5"
-            opacity="0.15"
-            fill="none"
-          />
-          <circle
-            cx={c2.cx}
-            cy={c2.cy}
-            r={c2.r}
-            stroke="white"
-            strokeWidth="0.5"
-            opacity="0.15"
-            fill="none"
-          />
-          <circle
-            cx={c3.cx}
-            cy={c3.cy}
-            r={c3.r}
-            stroke="white"
-            strokeWidth="0.5"
-            opacity="0.15"
-            fill="none"
-          />
+        A world where uncertainty <br />
+        becomes clarity.
+      </motion.div>
 
-          <g ref={g1Ref} transform={`translate(${c1.cx} ${c1.cy}) rotate(0)`}>
-            <circle cx={c1.r} cy={0} r={3} fill="white" />
-          </g>
-
-          <g ref={g2Ref} transform={`translate(${c2.cx} ${c2.cy}) rotate(0)`}>
-            <circle cx={c2.r} cy={0} r={3} fill="white" />
-          </g>
-
-          <g ref={g3Ref} transform={`translate(${c3.cx} ${c3.cy}) rotate(0)`}>
-            <circle cx={c3.r} cy={0} r={3} fill="white" />
-          </g>
-        </svg>
-
-        {/* TEXT */}
-        <motion.div
-          style={{
-            opacity: textOpacity,
-            y: textY,
-            filter: textFilter,
-            position: "absolute",
-            color: "white",
-            fontSize: "43px",
-            textAlign: "center",
-            fontWeight: 200,
-            lineHeight: 1,
-            zIndex: 10,
-            whiteSpace: "pre-line", 
-          }}
-        >
-          ELEVATE YOUR BRAND
-        </motion.div>
-
-        {/* Render all image bursts (looped pattern) */}
-        {images.map((src, i) => (
-          <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
-        ))}
-      </div>
+      {/* IMAGES */}
+      {images.map((src, i) => (
+        <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
+      ))}
     </div>
-  );
+  </motion.div>
+);
 }
 
+function Galery() {
+  const GRID_COLUMNS = 5;
+
+  const LANES = [
+    {
+      col: 1,
+      speed: -160,
+      items: [
+        { src: "/clients/tender-touch/10.jpg", top: "220vh" },
+        {
+          src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg",
+          top: "380vh",
+        },
+      ],
+    },
+    {
+      col: 2,
+      speed: 120,
+      items: [
+        {
+          src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg",
+          top: "80vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg",
+          top: "300vh",
+        },
+      ],
+    },
+    {
+      col: 3,
+      speed: -140,
+      items: [
+        { src: "/clients/tender-touch/5.jpg", top: "160vh" },
+        { src: "/clients/dwm/2.jpg", top: "280vh" },
+        {
+          src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg",
+          top: "420vh",
+        },
+      ],
+    },
+    {
+      col: 4,
+      speed: 100,
+      items: [
+        {
+          src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg",
+          top: "120vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg",
+          top: "340vh",
+        },
+      ],
+    },
+    {
+      col: 5,
+      speed: -160,
+      items: [
+        {
+          src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg",
+          top: "250vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg",
+          top: "430vh",
+        },
+      ],
+    },
+  ];
+
+  const sectionRef = useRef(null);
+  const textPinRef = useRef(null);
+  const cursorRef = useRef(null);
+
+  // =========================
+  // PARALLAX
+  // =========================
+  useEffect(() => {
+    gsap.utils.toArray(".lane").forEach((lane, i) => {
+      const speed = LANES[i].speed;
+
+      gsap.fromTo(
+        lane,
+        { y: speed * -0.35 },
+        {
+          y: speed,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.6,
+          },
+        }
+      );
+    });
+
+    ScrollTrigger.create({
+      trigger: sectionRef.current,
+      start: "top top",
+      end: "bottom bottom",
+      pin: textPinRef.current,
+      pinSpacing: false,
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+    };
+  }, []);
+
+  // =========================
+  // CUSTOM CURSOR DOT
+  // =========================
+  useEffect(() => {
+    const section = sectionRef.current;
+    const cursor = cursorRef.current;
+    if (!section || !cursor) return;
+
+    const move = (e) => {
+      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    };
+
+    const enter = () => {
+      section.style.cursor = "none";
+      cursor.style.opacity = "1";
+    };
+
+    const leave = () => {
+      section.style.cursor = "auto";
+      cursor.style.opacity = "0";
+    };
+
+    window.addEventListener("mousemove", move);
+    section.addEventListener("mouseenter", enter);
+    section.addEventListener("mouseleave", leave);
+
+    return () => {
+      window.removeEventListener("mousemove", move);
+      section.removeEventListener("mouseenter", enter);
+      section.removeEventListener("mouseleave", leave);
+    };
+  }, []);
+
+  return (
+    <>
+      {/* CUSTOM CURSOR DOT */}
+      <div
+        ref={cursorRef}
+        className="fixed top-0 left-0 z-[9999] pointer-events-none opacity-0"
+        style={{
+          width: "20px",
+          height: "20px",
+          borderRadius: "50%",
+          background: "white",
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+
+      <section
+        ref={sectionRef}
+        className="relative min-h-[480vh] bg-black text-white overflow-hidden"
+      >
+        {/* GRID */}
+        <div
+          className="absolute inset-0 z-10 pointer-events-none grid"
+          style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
+        >
+          {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
+            <div
+              key={i}
+              className="border-r border-white/20 last:border-r-0"
+            />
+          ))}
+        </div>
+
+        {/* PINNED TEXT */}
+        <div
+          ref={textPinRef}
+          className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center z-30 pointer-events-none"
+        >
+          <div className="text-center max-w-[90vw] px-6">
+            <span className="block text-[11px] tracking-[0.22em] opacity-70 mb-6">
+              GET STARTED
+            </span>
+            <h1 className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)]">
+              Let&apos;s make
+              <br />
+              things happen.
+            </h1>
+          </div>
+        </div>
+
+        {/* IMAGES */}
+        <div
+          className="absolute inset-0 z-20 grid"
+          style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
+        >
+          {LANES.map((lane, i) => (
+            <div
+              key={i}
+              className="lane relative h-full flex justify-center"
+              style={{ gridColumn: lane.col }}
+            >
+              {lane.items.map((item, j) => (
+                <figure
+                  key={j}
+                  className="absolute w-[240px] aspect-[3/4] bg-neutral-900 overflow-hidden"
+                  style={{ top: item.top }}
+                >
+                  <img
+                    src={item.src}
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                </figure>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* FADES */}
+        <div className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40 bg-gradient-to-b from-black via-black/90 to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40 bg-gradient-to-t from-black via-black/90 to-transparent" />
+      </section>
+    </>
+  );
+}
 
 
 function BigHeading() {
@@ -2101,62 +2285,215 @@ function BosonScrollText() {
 
 
 function ServicesHero() {
+  const cursorRef = useRef(null);
+  const sectionRef = useRef(null);
+  const [hoverIndex, setHoverIndex] = useState(null);
+  const [inside, setInside] = useState(false);
+
+  // =====================
+  // CUSTOM CURSOR FOLLOW (SECTION ONLY)
+  // SCALE REVEAL + SCALE VANISH
+  // =====================
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    const section = sectionRef.current;
+    if (!cursor || !section) return;
+
+    const move = (e) => {
+      const rect = section.getBoundingClientRect();
+
+      const isInside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      // position always updates
+      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+
+      setInside(isInside);
+    };
+
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+
+  // =====================
+  // DATA
+  // =====================
+  const services = [
+    {
+      label: "Social Media Marketing",
+      image:
+        "https://i.pinimg.com/736x/20/dc/20/20dc2018ff68b43705e167cfd0452b85.jpg",
+    },
+    {
+      label: "Content Production",
+      image:
+        "https://i.pinimg.com/736x/2e/14/bd/2e14bda3c06055b6345f718e2ea23620.jpg",
+    },
+    {
+      label: "Branding",
+      image:
+        "https://i.pinimg.com/1200x/f7/91/37/f79137ca724f78b5e0dd7e4820ad13f2.jpg",
+    },
+    {
+      label: "Website Development",
+      image:
+        "https://i.pinimg.com/736x/ef/82/3e/ef823e9611b89a12bb0503bfb8dc0ec5.jpg",
+    },
+  ];
+
   return (
-    <section className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden">
-      <div className="max-w-screen mx-auto h-full px-8 lg:px-16 py-12 flex flex-col">
+    <section
+      ref={sectionRef}
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
+    >
+      {/* ===================== */}
+      {/* CUSTOM GREEN CURSOR */}
+      {/* SCALE REVEAL */}
+      {/* ===================== */}
+      <div
+        ref={cursorRef}
+        className="pointer-events-none fixed top-0 left-0 z-[9999]"
+        style={{
+          transform: "translate3d(-9999px, -9999px, 0)",
+        }}
+      >
+        <div
+          className="w-[70px] h-[70px] rounded-full bg-[#C8FF4D] flex items-center justify-center"
+          style={{
+            transform: inside ? "scale(1)" : "scale(0)",
+            opacity: inside ? 1 : 0,
+            transition:
+              "transform 220ms cubic-bezier(0.22,1,0.36,1), opacity 180ms ease-out",
+            transformOrigin: "center",
+          }}
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="black"
+            strokeWidth="2"
+          >
+            <path d="M7 17L17 7" />
+            <path d="M7 7h10v10" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 sm:py-12 flex flex-col">
+        {/* ===================== */}
         {/* TOP BAR */}
-        <div className="w-full flex items-start justify-between pt-6">
-          {/* left tiny label */}
+        {/* ===================== */}
+        <div className="w-full flex flex-col md:flex-row md:items-start md:justify-between gap-8 pt-4 sm:pt-6">
           <div className="text-sm text-gray-600 flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-black/80 inline-block" />
             <span className="opacity-80">Our Expertise</span>
           </div>
 
-          {/* center headline */}
-          <h2 className="hidden md:block text-center text-black font-medium leading-tight max-w-[700px] text-[clamp(20px,3vw,40px)]">
-            How we take your <br /> business to the next level
+          <h2 className="text-center text-black font-medium leading-tight max-w-[700px] mx-auto md:mx-0 text-[clamp(22px,4vw,40px)]">
+            How we take your <br className="hidden sm:block" />
+            business to the next level
           </h2>
 
-          {/* right panel */}
           <div className="hidden lg:flex flex-col items-end text-right max-w-xs">
-            <p className="text-gray-600 text-sm mb-4">
-              We are a digital marketing agency with expertise, and we're on a mission to
-              help you take the next step in your business.
+            <p className="text-gray-600 text-sm leading-relaxed">
+              We are a digital marketing agency with expertise, and we're on a
+              mission to help you take the next step in your business.
             </p>
           </div>
         </div>
 
-        {/* MAIN ROW */}
-        <div className="relative flex-1 mt-32 grid grid-cols-12 gap-6 items-start">
-          {/* left gutter */}
-          <div className="col-span-4" />
+        {/* ===================== */}
+        {/* MAIN CONTENT */}
+        {/* ===================== */}
+        <div className="relative flex-1 mt-16 sm:mt-24 lg:mt-32 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-start">
+          <div className="hidden xl:block xl:col-span-2" />
 
-          {/* center big list */}
-          <div className="col-span-8 flex flex-col gap-10 justify-start">
-            {["Social Media Marketing", "Content Production", "Branding", "Website Development"].map((label) => (
-              <div key={label} className="relative">
-                <h3
-                  className="font-sans font-semibold text-black leading-[0.9] tracking-tight"
-                  style={{
-                    fontSize: "clamp(48px, 12vw, 120px)",
-                    lineHeight: 0.95,
-                  }}
+          <div className="col-span-1 lg:col-span-12 xl:col-span-10 flex flex-col">
+            {services.map((item, i) => {
+              const isHovering = hoverIndex !== null;
+              const isActive = hoverIndex === i;
+
+              const words = item.label.split(" ");
+              const lastWord = words.at(-1);
+              const firstLine = words.slice(0, -1).join(" ");
+
+              const colorState = !isHovering
+                ? "text-black"
+                : isActive
+                ? "text-black"
+                : "text-black/30";
+
+              return (
+                <div
+                  key={item.label}
+                  className="py-6 sm:py-8"
+                  onMouseEnter={() => setHoverIndex(i)}
+                  onMouseLeave={() => setHoverIndex(null)}
                 >
-                  {label}
-                </h3>
+                  <div className="flex items-center">
+                    <div
+                      className={`relative h-[110px] overflow-hidden transition-all duration-300 ease-out w-[160px] mr-6 xl:w-0 xl:mr-0 ${
+                        isActive ? "xl:w-[160px] xl:mr-8" : ""
+                      }`}
+                    >
+                      <img
+                        src={item.image}
+                        alt=""
+                        className={`h-full w-full object-cover rounded-md transition-all duration-300 ease-out opacity-100 scale-100 xl:opacity-0 xl:scale-95 ${
+                          isActive ? "xl:opacity-100 xl:scale-100" : ""
+                        }`}
+                      />
+                    </div>
 
-                <div className="mt-6 border-t border-black/10 w-full" />
-              </div>
-            ))}
+                    <h3
+                      className={`hidden sm:block font-sans font-semibold tracking-tight leading-[1.05] transition-colors duration-150 ${colorState}`}
+                      style={{
+                        fontSize: "clamp(36px, 7vw, 95px)",
+                      }}
+                    >
+                      {item.label}
+                    </h3>
+
+                    <h3
+                      className={`block sm:hidden flex flex-col tracking-tight transition-colors duration-150 ${colorState}`}
+                    >
+                      <span className="text-[18px] font-light leading-none opacity-70 mb-1">
+                        {firstLine}
+                      </span>
+                      <span
+                        className="font-semibold leading-[0.95]"
+                        style={{
+                          fontSize: "clamp(34px, 8.5vw, 60px)",
+                        }}
+                      >
+                        {lastWord}
+                      </span>
+                    </h3>
+                  </div>
+
+                  <div className="mt-4 sm:mt-6 border-t border-black/10 w-full" />
+                </div>
+              );
+            })}
           </div>
-
-          {/* right gutter */}
-          <div className="col-span-1" />
         </div>
       </div>
     </section>
   );
 }
+
+
+
+
+
+
+
+
 
 function Description() {
   const sectionRef = useRef(null);
@@ -2252,8 +2589,7 @@ function Description() {
             className="font-sans font-medium leading-[1.05] tracking-tight text-black perspective-[1200px]"
             style={{ fontSize: "clamp(32px, 4vw, 54px)" }}
           >
-            We build brands that move with clarity, communicate with intention,
-            and scale smoothly in a world that never stops shifting.
+            We are a social media agency that helps brands stay consistent online. We keep everything on track so you can stay focused on what <span className="italic ">matters.</span>  
           </h1>
         </div>
 
@@ -2296,7 +2632,8 @@ function ProjectShowcase() {
     {
       id: "01",
       title: "Real Estate &\nProperty",
-      image: "https://plus.unsplash.com/premium_photo-1678903964473-1271ecfb0288?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmVhbCUyMGVzdGF0ZXxlbnwwfHwwfHx8MA%3D%3D",
+      image:
+        "https://plus.unsplash.com/premium_photo-1678903964473-1271ecfb0288?w=900&auto=format&fit=crop&q=60",
       meta: ["PRODUCTION", "LONDON", "EDELMAN", "XBOX"],
       desc:
         "A 6×3 metre renaissance-style oil painting to support the launch of Xbox’s flagship video game, Halo Infinite.",
@@ -2304,7 +2641,8 @@ function ProjectShowcase() {
     {
       id: "02",
       title: "Food &\nBeverage",
-      image: "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1365&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      image:
+        "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1365&auto=format&fit=crop",
       meta: ["BRANDING", "BERLIN", "NIKE"],
       desc:
         "A visual identity system exploring silence, tension, and modern athletic discipline.",
@@ -2312,7 +2650,17 @@ function ProjectShowcase() {
     {
       id: "03",
       title: "Lifestyle &\nHospitality",
-      image: "https://plus.unsplash.com/premium_photo-1675745329954-9639d3b74bbf?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjV8fGhvc3BpdGFsaXR5fGVufDB8fDB8fHww",
+      image:
+        "https://images.unsplash.com/photo-1583873743670-6d60e445a7e2?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      meta: ["EXPERIMENT", "TOKYO", "SONY"],
+      desc:
+        "An experimental campaign blending digital ritual, motion, and sound design.",
+    },
+    {
+      id: "04",
+      title: "Drone &\nAerial Media",
+      image:
+        "https://images.unsplash.com/photo-1533358122925-6eb2658855bb?q=80&w=1335&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       meta: ["EXPERIMENT", "TOKYO", "SONY"],
       desc:
         "An experimental campaign blending digital ritual, motion, and sound design.",
@@ -2320,45 +2668,102 @@ function ProjectShowcase() {
   ];
 
   useLayoutEffect(() => {
+    if (window.innerWidth < 1024) return;
+
     const ctx = gsap.context(() => {
       const track = trackRef.current;
       const progressBar = progressRef.current;
 
-      const totalSlides = projects.length;
-      const totalWidth = track.scrollWidth;
-      const viewport = window.innerWidth;
-      const scrollDistance = totalWidth - viewport;
+      const totalWidth = track.scrollWidth - window.innerWidth;
 
-      gsap.to(track, {
-        x: -scrollDistance,
+      // =====================
+      // MAIN HORIZONTAL SCROLL
+      // =====================
+      const mainTween = gsap.to(track, {
+        x: -totalWidth,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${totalWidth}`,
+          end: () => `+=${track.scrollWidth}`,
           scrub: true,
           pin: true,
           anticipatePin: 1,
           onUpdate(self) {
-            // ============================
-            // PROGRESS BAR (REAL)
-            // ============================
-            const progress = self.progress; // 0 → 1
             gsap.set(progressBar, {
-              scaleX: progress,
+              scaleX: self.progress,
               transformOrigin: "left center",
             });
 
-            // ============================
-            // ACTIVE SLIDE INDEX
-            // ============================
-            const index = Math.min(
-              totalSlides - 1,
-              Math.floor(progress * totalSlides)
+            setActiveIndex(
+              Math.min(
+                projects.length - 1,
+                Math.floor(self.progress * projects.length)
+              )
             );
-            setActiveIndex(index);
           },
         },
+      });
+
+      // =====================
+      // HORIZONTAL PARALLAX (POLISHED)
+      // =====================
+
+      // TITLE — foreground (berat, subtle)
+      gsap.utils.toArray(".parallax-title").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { x: 40 },
+          {
+            x: -40,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: mainTween,
+              start: "left right",
+              end: "right left",
+              scrub: 0.6,
+            },
+          }
+        );
+      });
+
+      // IMAGE — mid depth
+      gsap.utils.toArray(".parallax-image").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { x: 90 },
+          {
+            x: -90,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: mainTween,
+              start: "left right",
+              end: "right left",
+              scrub: 0.6,
+            },
+          }
+        );
+      });
+
+      // META — background
+      gsap.utils.toArray(".parallax-meta").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { x: 140 },
+          {
+            x: -140,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: mainTween,
+              start: "left right",
+              end: "right left",
+              scrub: 0.6,
+            },
+          }
+        );
       });
     }, sectionRef);
 
@@ -2368,58 +2773,51 @@ function ProjectShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen bg-black text-white overflow-hidden"
+      className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
-      {/* TRACK */}
-      <div className="absolute inset-0">
+      <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
-          className="flex h-full"
-          style={{ width: `${projects.length * 100}vw` }}
+          className="flex flex-col lg:flex-row"
+          style={{
+            width:
+              typeof window !== "undefined" && window.innerWidth >= 1024
+                ? `${projects.length * 100}vw`
+                : "100%",
+          }}
         >
           {projects.map((p) => (
             <div
               key={p.id}
-              className="relative w-screen h-full flex-shrink-0"
+              className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
             >
-              <div className="relative max-w-[1600px] mx-auto h-full px-16 pt-24 pb-32 grid grid-cols-12">
-                {/* PROJECT LABEL */}
-                <span className="col-span-12 text-xs tracking-widest text-white/50 mb-8">
+              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12">
+                <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
                   PROJECT {p.id}
                 </span>
 
-                {/* IMAGE */}
-                <div className="col-span-4 col-start-5 flex justify-center z-10">
-                  <div className="relative w-[420px] aspect-[3/4]">
+                <h1 className="parallax-title lg:absolute lg:left-16 lg:top-[45%] text-[96px] leading-[0.95] font-light whitespace-pre-line z-20">
+                  {p.title}
+                </h1>
+
+                <div className="lg:col-span-4 lg:col-start-5 flex justify-center z-10">
+                  <div className="parallax-image relative w-[420px] aspect-[3/4]">
                     <img
                       src={p.image}
-                      alt=""
                       className="absolute inset-0 w-full h-full object-cover"
                     />
                   </div>
                 </div>
 
-                {/* TITLE — OVERLAP */}
-                <h1
-                  className="absolute left-16 top-[45%] text-[96px] leading-[0.95] font-light tracking-tight whitespace-pre-line z-20 pointer-events-none"
-                  style={{ maxWidth: "620px" }}
-                >
-                  {p.title}
-                </h1>
-
-                {/* RIGHT META */}
-                <div className="col-span-3 col-start-10 flex flex-col justify-end pt-24">
-                  <div className="mb-8 space-y-2 text-xs tracking-wide">
+                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 justify-end">
+                  <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
-                      <p key={m} className="underline underline-offset-4">
+                      <p key={m} className="underline">
                         {m}
                       </p>
                     ))}
                   </div>
-
-                  <p className="max-w-[260px] text-sm leading-relaxed text-white/65">
-                    {p.desc}
-                  </p>
+                  <p className="text-sm text-white/60">{p.desc}</p>
                 </div>
               </div>
             </div>
@@ -2427,24 +2825,15 @@ function ProjectShowcase() {
         </div>
       </div>
 
-      {/* ============================= */}
-      {/* BOTTOM PROGRESS BAR */}
-      {/* ============================= */}
-      <div className="absolute bottom-0 left-0 right-0 z-40 px-28 pb-6">
-        {/* BAR */}
-        <div className="relative h-[1px] bg-white/20 overflow-hidden">
+      <div className="hidden lg:block absolute bottom-0 left-0 right-0 px-28 pb-6">
+        <div className="h-[1px] bg-white/20">
           <div
             ref={progressRef}
-            className="absolute left-0 top-0 h-full w-full bg-white"
-            style={{ transform: "scaleX(0)" }}
+            className="h-full bg-white origin-left scale-x-0"
           />
         </div>
-
-        {/* META */}
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <span>
-            [ {activeIndex + 1} — {projects.length} ]
-          </span> 
+        <div className="mt-4 text-sm">
+          [ {activeIndex + 1} — {projects.length} ]
         </div>
       </div>
     </section>
@@ -2455,7 +2844,7 @@ function ProjectShowcase() {
 
 function Footer() {
   return (
-    <footer className="relative w-full bg-[#F3F4F5] text-black overflow-hidden">
+    <footer className="relative w-full bg-[#c9574b] text-white overflow-hidden">
       {/* ========================= */}
       {/* MAIN GRID */}
       {/* ========================= */}
@@ -2470,21 +2859,21 @@ function Footer() {
               that actually lasts.
             </h2>
 
-            <p className="text-sm text-black/70 max-w-[420px] leading-relaxed">
+            <p className="text-sm text-white/75 max-w-[420px] leading-relaxed">
               Share your ideas with us and we’ll begin turning your vision into
               something clear, sharp, and executable.
             </p>
 
             <a
               href="mailto:boson.studio@gmail.com"
-              className="mt-6 inline-flex items-center gap-3 text-sm tracking-wide text-black/80 hover:text-black transition"
+              className="mt-6 inline-flex items-center gap-3 text-sm tracking-wide text-white/80 hover:text-white transition"
             >
               Get in touch →
             </a>
           </div>
 
           {/* CENTER — NAV */}
-          <div className="flex flex-col divide-y divide-black/10 border border-black/10 bg-white">
+          <div className="flex flex-col divide-y divide-white/15 border border-white/15 bg-white/5 backdrop-blur">
             {[
               "Home",
               "Projects",
@@ -2494,35 +2883,35 @@ function Footer() {
             ].map((item) => (
               <a
                 key={item}
-                className="px-8 py-6 flex items-center justify-between text-sm tracking-wide hover:bg-black/5 transition"
+                className="px-8 py-6 flex items-center justify-between text-sm tracking-wide hover:bg-white/10 transition"
               >
                 <span>{item}</span>
-                <span className="opacity-50">↗</span>
+                <span className="opacity-60">↗</span>
               </a>
             ))}
           </div>
 
           {/* RIGHT — CONTACT */}
-          <div className="flex flex-col gap-6 text-sm text-black/75">
+          <div className="flex flex-col gap-6 text-sm text-white/75">
             <div>
-              <div className="text-black/50 mb-1">Email</div>
+              <div className="text-white/50 mb-1">Email</div>
               <div>boson.studio@gmail.com</div>
             </div>
 
             <div>
-              <div className="text-black/50 mb-1">Base</div>
+              <div className="text-white/50 mb-1">Base</div>
               <div>Bali, Indonesia</div>
             </div>
 
             <div>
-              <div className="text-black/50 mb-1">Working</div>
+              <div className="text-white/50 mb-1">Working</div>
               <div>Worldwide</div>
             </div>
 
-            <div className="flex gap-4 mt-4 text-xs text-black/60">
-              <a className="hover:text-black transition">Behance</a>
-              <a className="hover:text-black transition">LinkedIn</a>
-              <a className="hover:text-black transition">Contact</a>
+            <div className="flex gap-4 mt-4 text-xs text-white/60">
+              <a className="hover:text-white transition">Behance</a>
+              <a className="hover:text-white transition">LinkedIn</a>
+              <a className="hover:text-white transition">Contact</a>
             </div>
           </div>
 
@@ -2531,6 +2920,8 @@ function Footer() {
     </footer>
   );
 }
+
+
 
 
  
@@ -2558,43 +2949,43 @@ function Footer() {
   
       // ===== BACKGROUND SCROLL TRANSITION bg-[#F3F4F5]===== 
       // (versi NON-SCRUB → scroll cuma memicu animasi)
-      ScrollTrigger.create({
-        trigger: ".chayay",
-        start: "top top",
-        end: "bottom bottom",
+      // ScrollTrigger.create({
+      //   trigger: ".chayay",
+      //   start: "top top",
+      //   end: "bottom bottom",
       
-        onEnter: () => {
-          gsap.to(el, {
-            backgroundColor: "#F3F4F5",
-            duration: 1.2,
-            ease: "power2.out",
-          });
-        },
+      //   onEnter: () => {
+      //     gsap.to(el, {
+      //       backgroundColor: "#F3F4F5",
+      //       duration: 1.2,
+      //       ease: "power2.out",
+      //     });
+      //   },
       
-        onEnterBack: () => {
-          gsap.to(el, {
-            backgroundColor: "#F3F4F5",
-            duration: 1.2,
-            ease: "power2.out",
-          });
-        },
+      //   onEnterBack: () => {
+      //     gsap.to(el, {
+      //       backgroundColor: "#F3F4F5",
+      //       duration: 1.2,
+      //       ease: "power2.out",
+      //     });
+      //   },
       
-        onLeave: () => {
-          gsap.to(el, {
-            backgroundColor: "#F3F4F5",
-            duration: 1.2,
-            ease: "power2.out",
-          });
-        },
+      //   onLeave: () => {
+      //     gsap.to(el, {
+      //       backgroundColor: "#F3F4F5",
+      //       duration: 1.2,
+      //       ease: "power2.out",
+      //     });
+      //   },
       
-        onLeaveBack: () => {
-          gsap.to(el, {
-            backgroundColor: "#F3F4F5",
-            duration: 1.2,
-            ease: "power2.out",
-          });
-        },
-      });
+      //   onLeaveBack: () => {
+      //     gsap.to(el, {
+      //       backgroundColor: "#F3F4F5",
+      //       duration: 1.2,
+      //       ease: "power2.out",
+      //     });
+      //   },
+      // });
       
   
       return () => ScrollTrigger.getAll().forEach((st) => st.kill());
@@ -2609,17 +3000,21 @@ function Footer() {
         style={{ width: "100%", background: "black", position: "relative" }}
       >
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
-            <HeroJoin/>
-          </div>
+          <HeroJoin/>
+        </div>
   
-  {/* <div className="h-screen w-screen bg-white"/> */}
+        {/* <div className="h-screen w-screen bg-white"/> */}
   
           <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
             <BosonNarrative />
           </div>
           
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <Projects />
+          </div>
           
-        <Galery/>
+          
+       
         
         
         
@@ -2647,15 +3042,13 @@ function Footer() {
           {/* <BosonScrollText/>   */}
         
        
-        
+         <Galery/>
        
         
   
        
   
-        <div style={{ position: "relative", zIndex: 2 }}>
-            <Projects />
-          </div>
+        
   
         {/* <MeetBoson /> */}
   
