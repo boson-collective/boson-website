@@ -3,14 +3,15 @@
 import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffect, useMemo } from "react";
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
-import ScrollTrigger from "gsap/ScrollTrigger";
+import ScrollTrigger from "gsap/ScrollTrigger"
+import SplitText from "gsap/SplitText";;
 import SplitType from "split-type";
 import Image from "next/image";
-gsap.registerPlugin(ScrollTrigger);
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
 
+gsap.registerPlugin(ScrollTrigger,SplitText);
 
 
 function Webglbg() {
@@ -320,27 +321,18 @@ function HeroJoin() {
 
 function BosonNarrative() {
   const wrap = useRef(null);
-  const baseTextRef = useRef(null); // stagger applied here
-
   const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
   const [isMobile, setIsMobile] = useState(false);
 
-  // ====================================
-  // MOBILE CHECK
-  // ====================================
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const handleChange = (e) => setIsMobile(e.matches);
-
     handleChange(mq);
     mq.addEventListener("change", handleChange);
     return () => mq.removeEventListener("change", handleChange);
   }, []);
 
-  // ====================================
-  // SPOTLIGHT FOLLOW
-  // ====================================
   useEffect(() => {
     if (isMobile) {
       setPos({ x: -9999, y: -9999 });
@@ -356,7 +348,6 @@ function BosonNarrative() {
         const speed = 0.06;
         return { x: prev.x + dx * speed, y: prev.y + dy * speed };
       });
-
       frame = requestAnimationFrame(animate);
     };
 
@@ -366,7 +357,6 @@ function BosonNarrative() {
 
   const handleMove = (e) => {
     if (!wrap.current || isMobile) return;
-
     const rect = wrap.current.getBoundingClientRect();
     targetPos.current = {
       x: e.clientX - rect.left,
@@ -374,37 +364,6 @@ function BosonNarrative() {
     };
   };
 
-  // ====================================
-  // STAGGER ON BASE TEXT (WITH SCROLLTRIGGER)
-  // ====================================
-  useEffect(() => {
-    if (!baseTextRef.current || isMobile) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const split = new SplitType(baseTextRef.current, { types: "words" });
-
-    gsap.from(split.words, {
-      opacity: 0,
-      y: 20,
-      duration: 2.9,
-      ease: "power3.out",
-      stagger: 0.03,
-      scrollTrigger: {
-        trigger: baseTextRef.current,
-        start: "top 80%", // <<== INI YANG LO MINTA
-        toggleActions: "play none none none",
-      },
-    });
-
-    return () => {
-      split.revert();
-    };
-  }, [isMobile]);
-
-  // ====================================
-  // TEXT
-  // ====================================
   const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
 
   return (
@@ -419,29 +378,16 @@ function BosonNarrative() {
           position: "relative",
           width: "100%",
           whiteSpace: "pre-wrap",
-          fontSize: "clamp(18px, 6vw, 72px)",
+          fontSize: "clamp(28px, 6vw, 74px)",
           lineHeight: 1.25,
-          fontWeight: 300,
+          fontWeight: 400,
+          color: isMobile
+            ? "rgba(255,255,255,0.96)"
+            : "rgba(255,255,255,0.085)",
         }}
       >
-       
-        {/* ====================================
-            LAYER 1 — BASE DIM TEXT (ANIMATED)
-        ==================================== */}
-        <div
-          ref={baseTextRef}
-          style={{
-            color: isMobile
-              ? "rgba(255,255,255,0.96)"
-              : "rgba(255,255,255,0.25)",
-          }}
-        >
-           <span className="mr-32"></span>{text}
-        </div>
+         <span className="mr-32"></span>{text}
 
-        {/* ====================================
-            LAYER 2 — HIGHLIGHT W/ SPOTLIGHT MASK
-        ==================================== */}
         {!isMobile && (
           <div
             style={{
@@ -449,13 +395,12 @@ function BosonNarrative() {
               position: "absolute",
               inset: 0,
               color: "rgba(255,255,255,0.96)",
-
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.12) 30%,
-                  rgba(255,255,255,0.03) 55%,
+                  rgba(255,255,255,0.10) 30%,
+                  rgba(255,255,255,0.02) 55%,
                   rgba(255,255,255,0) 100%
                 )
               `,
@@ -463,14 +408,14 @@ function BosonNarrative() {
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.12) 30%,
-                  rgba(255,255,255,0.03) 55%,
+                  rgba(255,255,255,0.10) 30%,
+                  rgba(255,255,255,0.02) 55%,
                   rgba(255,255,255,0) 100%
                 )
               `,
             }}
           >
-            <span className="mr-32"></span>{text}
+             <span className="mr-32"></span>{text}
           </div>
         )}
       </div>
@@ -973,40 +918,35 @@ function VideoSection() {
     hole.style.width = `${holeBaseW}px`;
     hole.style.height = `${holeBaseH}px`;
 
-    // TIMELINE SCALE
-    gsap.timeline({
-      scrollTrigger: {
-        trigger: outer,
-        start: "top top",
-        end: "+=100%",
-        scrub: true,
-      },
-    })
+    // HOLE + VIDEO
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: outer,
+          start: "top top",
+          end: "+=100%",
+          scrub: true,
+        },
+      })
       .to(hole, {
         scale: holeMaxScale,
         transformOrigin: "50% 50%",
         ease: "none",
       })
-      .fromTo(
-        video,
-        { scale: 1.8 },
-        { scale: 1, ease: "none" },
-        0
-      );
+      .fromTo(video, { scale: 1.8 }, { scale: 1, ease: "none" }, 0);
 
-    // TIMELINE TEXT — SCRUB REALTIME
+    // TEXT FADE (KEEP IT MINIMAL)
     gsap.fromTo(
       text,
-      { opacity: 0, y: 40 },
+      { opacity: 0 },
       {
         opacity: 1,
-        y: 0,
         ease: "none",
         scrollTrigger: {
           trigger: outer,
-          start: "top+=30% top",   // muncul sedikit setelah lubang mulai membesar
-          end: "top+=60% top",     // selesai fade-in sebelum sticky selesai
-          scrub: true,             // KUNCI: untuk reverse pas scroll naik
+          start: "top+=40% top",
+          end: "top+=60% top",
+          scrub: true,
         },
       }
     );
@@ -1028,6 +968,7 @@ function VideoSection() {
           overflow: "hidden",
         }}
       >
+        {/* VIDEO */}
         <video
           ref={videoRef}
           src="https://www.pexels.com/id-id/download/video/3888252/"
@@ -1044,6 +985,7 @@ function VideoSection() {
           }}
         />
 
+        {/* MASK */}
         <div
           ref={holeRef}
           style={{
@@ -1054,51 +996,59 @@ function VideoSection() {
             borderTopLeftRadius: "100rem",
             borderTopRightRadius: "100rem",
             background: "transparent",
-            boxShadow: `0 0 0 9999px black`,
+            boxShadow: "0 0 0 9999px black",
             pointerEvents: "none",
           }}
         />
 
-        {/* TEXT ABOVE VIDEO */}
+        {/* TEXT + SYSTEM LINE */}
         <div
           ref={textRef}
           style={{
             position: "absolute",
-            bottom: "0%",
-            left: 0,
-            width: "100%",
-            color: "white",
-            padding: "10px 60px 30px 60px",
+            inset: 0,
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            paddingLeft: "8vw",
+            color: "white",
             pointerEvents: "none",
-            borderTop: "1px solid rgba(255,255,255,0.4)",
           }}
         >
-          <h1
+          <div
             style={{
-              fontSize: "64px",
-              fontWeight: 600,
-              width: "40%",
-              lineHeight: "1.05",
+              position: "relative",
+              maxWidth: "720px",
             }}
           >
-            {/* Transformation. */}
-          </h1>
+            {/* VERTICAL SYSTEM LINE */}
+            <div
+              style={{
+                position: "absolute",
+                left: "-24px",
+                top: "0.3em",       // anchor near "If"
+                width: "1px",
+                height: "260px",
+                background: "rgba(255,255,255,0.12)",
+              }}
+            />
 
-          <p
-            style={{
-              width: "40%",
-              fontSize: "26px",
-              lineHeight: "1.2",
-              opacity: 0.9,
-            }}
-          >
-            <span className="mr-20"></span>We are a multicultural collective of creatives, strategists, and designers,
-            blending global perspectives with local insight to craft brands,
-            stories, and digital experiences that move people and create lasting clarity.
-          </p>
+            <h2
+              style={{
+                fontSize: "clamp(26px, 3.4vw, 40px)",
+                lineHeight: "1.25",
+                fontWeight: 500,
+                margin: 0,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              If your content feels inconsistent,
+              <br />
+              it’s not a content problem.
+              <br />
+              It’s a system problem.
+            </h2>
+          </div>
         </div>
       </section>
     </div>
@@ -2500,126 +2450,203 @@ function Description() {
   const titleRef = useRef(null);
   const rightRef = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    let headlineTween;
+
     const ctx = gsap.context(() => {
-      /* ===============================
-         LEFT — HEADLINE (EPIC)
-      =============================== */
-      const title = titleRef.current;
-      const text = title.innerText;
-      title.innerHTML = "";
+      document.fonts.ready.then(() => {
 
-      const lines = text.split(", ");
-      lines.forEach((line, i) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "overflow-hidden";
+        /* =========================
+           LEFT — HEADLINE (PAS)
+        ========================= */
 
-        const span = document.createElement("span");
-        span.className = "inline-block will-change-transform";
-        span.innerText = line + (i < lines.length - 1 ? "," : "");
+        gsap.set(titleRef.current, { opacity: 1 });
 
-        wrapper.appendChild(span);
-        title.appendChild(wrapper);
+        SplitText.create(titleRef.current, {
+          type: "lines,words",
+          linesClass: "line",
+          autoSplit: true,
+          mask: "lines",
+          onSplit(self) {
+            headlineTween = gsap.from(self.lines, {
+              yPercent: 40,
+              opacity: 0,
+              duration: 1.2,
+              stagger: 0.12,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 72%",
+                once: true,
+              },
+            });
+
+            return headlineTween;
+          },
+        });
+
+        /* =========================
+           RIGHT — BODY COPY
+        ========================= */
+
+        const paragraphs = rightRef.current.querySelectorAll("p[data-animate]");
+
+        paragraphs.forEach((p) => {
+          const split = SplitText.create(p, {
+            type: "lines",
+            linesClass: "line",
+            autoSplit: true,
+            mask: "lines",
+          });
+
+          gsap.from(split.lines, {
+            yPercent: 38,
+            opacity: 0,
+            duration: 1.3,
+            stagger: 0.04,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 72%",
+              once: true,
+            },
+          });
+        });
+
       });
-
-      const spans = title.querySelectorAll("span");
-
-      gsap.fromTo(
-        spans,
-        {
-          y: 120,
-          rotateX: 55,
-          scaleY: 1.4,
-          opacity: 0,
-          filter: "blur(8px)",
-        },
-        {
-          y: 0,
-          rotateX: 0,
-          scaleY: 1,
-          opacity: 1,
-          filter: "blur(0px)",
-          duration: 1.4,
-          ease: "power4.out",
-          stagger: 0.12,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%",
-          },
-        }
-      );
-
-      /* ===============================
-         RIGHT — FADE IN ONLY
-      =============================== */
-      const paragraphs = rightRef.current.querySelectorAll("p");
-
-      gsap.fromTo(
-        paragraphs,
-        {
-          opacity: 0,
-        },
-        {
-          opacity: 1,
-          duration: 0.9,
-          ease: "power1.out",
-          stagger: 0.2,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 65%",
-          },
-        }
-      );
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      if (headlineTween) headlineTween.kill();
+      ctx.revert();
+    };
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="w-full bg-[#F3F4F5] text-black py-32"
-    >
+    <section ref={sectionRef} className="w-full bg-[#F3F4F5] text-black py-32">
       <div className="max-w-screen mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
-
         {/* LEFT — HEADLINE */}
-        <div className="lg:col-span-7 flex flex-col">
+        <div className="lg:col-span-7">
           <h1
             ref={titleRef}
-            className="font-sans font-medium leading-[1.05] tracking-tight text-black perspective-[1200px]"
+            className="font-sans font-medium leading-[1.15] tracking-tight text-black opacity-0"
             style={{ fontSize: "clamp(32px, 4vw, 54px)" }}
           >
-            We are a social media agency that helps brands stay consistent online. We keep everything on track so you can stay focused on what <span className="italic ">matters.</span>  
+            We are a social media agency that helps brands stay{" "}
+            <span className="italic">consistent</span> online. We keep
+            everything on track so you can stay focused on what{" "}
+            <span className="italic">matters.</span>
           </h1>
         </div>
 
-        {/* RIGHT — COPY */}
+        {/* RIGHT — COPY + STATS */}
         <div
           ref={rightRef}
-          className="lg:col-span-5 flex flex-col text-gray-700 text-[17px] leading-relaxed"
+          className="lg:col-span-5 flex flex-col text-neutral-800 text-[17px] leading-relaxed"
         >
-          <p className="mb-5">
-            Boson is a digital agency founded in 2021 and based in Bali, working with
-            clients across Qatar, Malaysia, and other regions. We focus on creating
-            structured, reliable systems for brands that want to scale with confidence.
+          <p data-animate className="mb-5">
+            Boson is a digital agency founded in 2021 and based in Bali, working
+            with clients across Qatar, Malaysia, and other regions. We focus on
+            creating structured, reliable systems for brands that want to scale
+            with confidence.
           </p>
 
-          <p className="mb-5">
-            Our work combines design, development, and brand operations, giving teams
-            a toolkit that keeps everything consistent — from visuals to messaging to
-            digital experience. No clutter, no unnecessary layers.
+          <p data-animate className="mb-5">
+            Our work combines design, development, and brand operations, giving
+            teams a toolkit that keeps everything consistent — from visuals to
+            messaging to digital experience. No clutter, no unnecessary layers.
           </p>
 
-          <p className="mb-8">
-            Whether you're refining a brand or building a new digital foundation,
-            Boson brings clarity, process, and long-term stability to the table.
+          <p data-animate className="mb-6">
+            Whether you're refining a brand or building a new digital
+            foundation, Boson brings clarity, process, and long-term stability
+            to the table.
           </p>
+
+          {/* =========================
+   STATS — NARRATIVE: SCALE → MARKETS → REACH
+========================= */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-8 border-t border-black/20">
+            {/* STAT 1 — PROJECT SCALE */}
+            <div className="flex flex-col gap-2">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.3"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 21V9" />
+              </svg>
+
+              <div className="text-[34px] font-semibold tracking-[-0.02em]">
+                100+
+              </div>
+
+              <p className="text-sm text-neutral-500 leading-snug">
+                Large-scale projects delivered for festivals, agencies, and
+                brands.
+              </p>
+            </div>
+
+            {/* STAT 2 — MARKETS */}
+            <div className="flex flex-col gap-2">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.3"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+
+              <div className="text-[34px] font-semibold tracking-[-0.02em]">
+                3+
+              </div>
+
+              <p className="text-sm text-neutral-500 leading-snug">
+                Markets served across Qatar, Indonesia, and Malaysia.
+              </p>
+            </div>
+
+            {/* STAT 3 — REACH */}
+            <div className="flex flex-col gap-2">
+              <svg
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.3"
+              >
+                <circle cx="12" cy="7" r="4" />
+                <path d="M5.5 21a6.5 6.5 0 0 1 13 0" />
+              </svg>
+
+              <div className="text-[34px] font-semibold tracking-[-0.02em]">
+                2.5m
+              </div>
+
+              <p className="text-sm text-neutral-500 leading-snug">
+              Audience reached across digital platforms and brand campaigns.
+              </p>
+            </div>
+          </div>
         </div>
-
       </div>
     </section>
   );
 }
+
+
+
+
 
 function ProjectShowcase() {
   const sectionRef = useRef(null);

@@ -12,7 +12,7 @@ export default function Logo3D() {
     scene.background = new THREE.Color(0x000000)  // Background hitam
 
     // Camera setup
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
     camera.position.z = 10  // Posisi kamera agak jauh
 
     // Renderer setup
