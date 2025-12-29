@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffect, useMemo } from "react";
+import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffect, useMemo, useId } from "react";
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
 import ScrollTrigger from "gsap/ScrollTrigger"
@@ -10,6 +10,7 @@ import Image from "next/image";
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
+import * as THREE from "three";
 
 gsap.registerPlugin(ScrollTrigger,SplitText);
 
@@ -38,98 +39,102 @@ function Webglbg() {
 /* ==========================================
    HERO (PERSIS PUNYA LO)
    ========================================== */
-function Hero() {
-const { scrollY } = useScroll();
-const y = useTransform(scrollY, [0, 500], [0, 80]);
-
-return (
-  <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
-    <Webglbg />
-    
-    {/* NAV */}
-    <motion.div
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 0.75, y: 0 }}
-      transition={{ delay: 2, duration: 0.6, ease: "easeOut" }}
-      className="absolute top-6 text-white sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
-    >
-      <div className="flex gap-4 sm:gap-8">
-        <span>About</span>
-        <span>Services</span>
-      </div>
-      <div className="flex gap-4 sm:gap-8">
-        <span>Works</span>
-        <span>Contact</span>
-      </div>
-    </motion.div>
-    
-    {/* SIDE LEFT */}
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 0.6, y: 0 }}
-      transition={{ delay: 2.3, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-[28%] text-white sm:bottom-[22%] left-1/2 sm:left-20 sm:text-left -translate-x-1/2 sm:translate-x-0 
-      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-start z-20"
-    >
-      A system-driven studio
-      <br />
-      for modern identity & engineering
-    </motion.div>
-
-    {/* SIDE RIGHT */}
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 0.6, y: 0 }}
-      transition={{ delay: 2.35, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-[20%] text-white sm:bottom-[22%] right-1/2 sm:right-20 sm:text-right translate-x-1/2 sm:translate-x-0
-      text-[11px] sm:text-sm leading-relaxed max-w-[240px] text-center sm:text-right z-20"
-    >
-      Focused on how to shape
-      <br />
-      the future, driving it forward
-    </motion.div>
-    
-    {/* FOOTER */}
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 0.55, y: 0 }}
-      transition={{ delay: 2.4, duration: 0.6, ease: "easeOut" }}
-      className="absolute bottom-6 text-white sm:bottom-10 w-full px-6 sm:px-20 flex justify-between 
-      text-[10px] sm:text-xs tracking-wide z-20"
-    >
-      <span>06°10&apos;00&quot;S</span>
-      <span>Bali, Indonesia</span>
-      <span>106°49&apos;00&quot;E</span>
-    </motion.div>
  
-
-    {/* BOSON CHROME */}
-    <motion.div
-      initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
-      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-      transition={{ delay: 2.8, duration: 2.3, ease: "easeOut" }}
-      className="absolute inset-0 z-10 flex items-center justify-center"
-    >
-      <div className="boson-chrome-v4" />
-    </motion.div>
- 
-
-    {/* CHROME CSS */}
-    <style jsx>{`
-      .boson-chrome-v4 {
-        position: absolute;
-        inset: 0;
-        margin: auto;
-        width: min(90vw, 1250px);
-        height: min(90vw, 1250px);
-
-        mask-image: url("/boson-white.png");
-        -webkit-mask-image: url("/boson-white.png");
-        mask-size: contain;
-        mask-position: center;
-        mask-repeat: no-repeat;
-
-        background: 
+   function Hero() {
+    const { scrollY } = useScroll();
+    const y = useTransform(scrollY, [0, 500], [0, 80]);
+  
+    const BOSON_DELAY = 2.8;
+    const TEXT_DELAY = BOSON_DELAY + 1.5;
+  
+    return (
+      <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
+        <Webglbg />
+  
+        {/* NAV */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 0.75, y: 0 }}
+          transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+          className="absolute top-6 text-white sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
+        >
+          <div className="flex gap-4 sm:gap-8">
+            <span>About</span>
+            <span>Services</span>
+          </div>
+          <div className="flex gap-4 sm:gap-8">
+            <span>Works</span>
+            <span>Contact</span>
+          </div>
+        </motion.div>
+  
+        {/* SIDE LEFT */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.6, y: 0 }}
+          transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-[28%] text-white sm:bottom-[22%] left-1/2 sm:left-20 
+          -translate-x-1/2 sm:translate-x-0 text-[11px] sm:text-sm leading-relaxed 
+          max-w-[240px] text-center sm:text-start z-20"
+        >
+          A system-driven studio
+          <br />
+          for modern identity & engineering
+        </motion.div>
+  
+        {/* SIDE RIGHT */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.6, y: 0 }}
+          transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-[20%] text-white sm:bottom-[22%] right-1/2 sm:right-20 
+          translate-x-1/2 sm:translate-x-0 text-[11px] sm:text-sm leading-relaxed 
+          max-w-[240px] text-center sm:text-right z-20"
+        >
+          Focused on how to shape
+          <br />
+          the future, driving it forward
+        </motion.div>
+  
+        {/* FOOTER */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.55, y: 0 }}
+          transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+          className="absolute bottom-6 text-white sm:bottom-10 w-full px-6 sm:px-20 
+          flex justify-between text-[10px] sm:text-xs tracking-wide z-20"
+        >
+          <span>06°10&apos;00&quot;S</span>
+          <span>Bali, Indonesia</span>
+          <span>106°49&apos;00&quot;E</span>
+        </motion.div>
+  
+        {/* BOSON CHROME — ANIMASI DOANG */}
+        <motion.div
+          initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ delay: BOSON_DELAY, duration: 2.3, ease: "easeOut" }}
+          className="absolute inset-0 z-10 flex items-center justify-center"
+        >
+          <div className="boson-chrome-v4" />
+        </motion.div>
+  
+        {/* CHROME CSS — VISUAL ASLI BALIK */}
+        <style jsx>{`
+          .boson-chrome-v4 {
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            width: min(90vw, 1250px);
+            height: min(90vw, 1250px);
+  
+            mask-image: url("/boson-white.png");
+            -webkit-mask-image: url("/boson-white.png");
+            mask-size: contain;
+            mask-position: center;
+            mask-repeat: no-repeat;
+  
+            background: 
           #000000;
           /* 
           linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
@@ -139,12 +144,12 @@ return (
 
         filter: blur(0.6px);
         opacity: 0.3;
-      }
-    `}</style>
-  </div>
-);
-}
-  
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   
   /* ==========================================
    INTRO FRAME OVERLAY (SLIDES + PORTAL)
@@ -321,10 +326,15 @@ function HeroJoin() {
 
 function BosonNarrative() {
   const wrap = useRef(null);
+
   const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
+
   const [isMobile, setIsMobile] = useState(false);
 
+  /* =========================
+     RESPONSIVE CHECK
+  ========================= */
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
     const handleChange = (e) => setIsMobile(e.matches);
@@ -333,6 +343,9 @@ function BosonNarrative() {
     return () => mq.removeEventListener("change", handleChange);
   }, []);
 
+  /* =========================
+     SMOOTH MOUSE FOLLOW
+  ========================= */
   useEffect(() => {
     if (isMobile) {
       setPos({ x: -9999, y: -9999 });
@@ -346,7 +359,10 @@ function BosonNarrative() {
         const dx = targetPos.current.x - prev.x;
         const dy = targetPos.current.y - prev.y;
         const speed = 0.06;
-        return { x: prev.x + dx * speed, y: prev.y + dy * speed };
+        return {
+          x: prev.x + dx * speed,
+          y: prev.y + dy * speed,
+        };
       });
       frame = requestAnimationFrame(animate);
     };
@@ -355,6 +371,9 @@ function BosonNarrative() {
     return () => cancelAnimationFrame(frame);
   }, [isMobile]);
 
+  /* =========================
+     MOUSE MOVE
+  ========================= */
   const handleMove = (e) => {
     if (!wrap.current || isMobile) return;
     const rect = wrap.current.getBoundingClientRect();
@@ -366,6 +385,23 @@ function BosonNarrative() {
 
   const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
 
+  /* =========================
+     SHARED TEXT STYLE
+     (CRITICAL: BASE & MASK IDENTICAL)
+  ========================= */
+  const textStyle = {
+    width: "100%",
+    whiteSpace: "pre-wrap",
+    fontSize: "clamp(28px, 6vw, 74px)",
+    lineHeight: 1.25,
+    wordSpacing: -5,
+    fontWeight: 400,
+    textAlign: "justify",
+    textAlignLast: "left",
+    textIndent: "4rem",
+    hyphens: "auto",
+  };
+
   return (
     <div
       ref={wrap}
@@ -373,21 +409,23 @@ function BosonNarrative() {
       className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
       style={{ padding: "120px 6vw" }}
     >
+      {/* =========================
+          BASE TEXT (DIM)
+      ========================= */}
       <div
         style={{
           position: "relative",
-          width: "100%",
-          whiteSpace: "pre-wrap",
-          fontSize: "clamp(28px, 6vw, 74px)",
-          lineHeight: 1.25,
-          fontWeight: 400,
           color: isMobile
             ? "rgba(255,255,255,0.96)"
             : "rgba(255,255,255,0.085)",
+          ...textStyle,
         }}
       >
-         <span className="mr-32"></span>{text}
+        {text}
 
+        {/* =========================
+            MASKED TEXT (BRIGHT)
+        ========================= */}
         {!isMobile && (
           <div
             style={{
@@ -395,6 +433,7 @@ function BosonNarrative() {
               position: "absolute",
               inset: 0,
               color: "rgba(255,255,255,0.96)",
+              ...textStyle,
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
@@ -415,11 +454,14 @@ function BosonNarrative() {
               `,
             }}
           >
-             <span className="mr-32"></span>{text}
+            {text}
           </div>
         )}
       </div>
 
+      {/* =========================
+          MOBILE FIX
+      ========================= */}
       <style>{`
         @media (max-width: 768px) {
           .boson-narrative-container {
@@ -900,7 +942,17 @@ function VideoSection() {
   const outerRef = useRef(null);
   const holeRef = useRef(null);
   const videoRef = useRef(null);
+  const videoOverlayRef = useRef(null);
   const textRef = useRef(null);
+  const processRef = useRef(null);
+  const hLineRef = useRef(null);
+  const vLineRef = useRef(null);
+
+  const sigilDiscoverRef = useRef(null);
+  const sigilCreateRef = useRef(null);
+  const sigilDeliverRef = useRef(null);
+  const rafRef = useRef(null);
+  const tRef = useRef(0);
 
   const holeBaseW = 300;
   const holeBaseH = 450;
@@ -910,65 +962,111 @@ function VideoSection() {
     const outer = outerRef.current;
     const hole = holeRef.current;
     const video = videoRef.current;
+    const overlay = videoOverlayRef.current;
     const text = textRef.current;
+    const process = processRef.current;
 
-    if (!outer || !hole || !video || !text) return;
+    if (!outer || !hole || !video || !overlay || !text || !process) return;
 
-    // SIZE
     hole.style.width = `${holeBaseW}px`;
     hole.style.height = `${holeBaseH}px`;
 
-    // HOLE + VIDEO
-    gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: outer,
-          start: "top top",
-          end: "+=100%",
-          scrub: true,
-        },
-      })
-      .to(hole, {
-        scale: holeMaxScale,
-        transformOrigin: "50% 50%",
-        ease: "none",
-      })
-      .fromTo(video, { scale: 1.8 }, { scale: 1, ease: "none" }, 0);
+    gsap.set(overlay, { opacity: 0 });
+    gsap.set(text, { opacity: 0 });
 
-    // TEXT FADE (KEEP IT MINIMAL)
-    gsap.fromTo(
-      text,
-      { opacity: 0 },
-      {
-        opacity: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: outer,
-          start: "top+=40% top",
-          end: "top+=60% top",
-          scrub: true,
-        },
+    const master = gsap.timeline({
+      scrollTrigger: {
+        trigger: outer,
+        start: "top top",
+        end: "+=140%",
+        scrub: 0.6,
+      },
+    });
+
+    master
+      .to(hole, { scale: holeMaxScale, ease: "none" }, 0)
+      .fromTo(video, { scale: 1.6 }, { scale: 1, ease: "none" }, 0)
+      .fromTo(overlay, { opacity: 0 }, { opacity: 0.55, ease: "none" }, 0.3)
+      .fromTo(
+        hLineRef.current,
+        { x: "0%", opacity: 0.25 },
+        { x: "18%", opacity: 0.4 },
+        0
+      )
+      .fromTo(
+        vLineRef.current,
+        { y: "0%", opacity: 0.25 },
+        { y: "18%", opacity: 0.4 },
+        0
+      )
+      .fromTo(text, { opacity: 0 }, { opacity: 1 }, 0.4)
+      .fromTo(
+        process.children,
+        { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, stagger: 0.15, ease: "power2.out" },
+        0.65
+      );
+
+    [sigilDiscoverRef, sigilCreateRef, sigilDeliverRef].forEach((ref) => {
+      const svg = ref.current;
+      if (!svg) return;
+
+      svg.querySelectorAll("circle, line, rect, polyline").forEach((el, i) => {
+        try {
+          const L = el.getTotalLength();
+          el.style.strokeDasharray = `${L} ${L}`;
+          el.style.strokeDashoffset = L;
+          el.style.opacity = 0.001;
+          el.style.transition = `stroke-dashoffset 1.4s cubic-bezier(.2,.9,.2,1) ${
+            i * 70
+          }ms, opacity 300ms`;
+          requestAnimationFrame(() => {
+            el.style.strokeDashoffset = 0;
+            el.style.opacity = 0.55;
+          });
+        } catch {}
+      });
+    });
+
+    const loop = () => {
+      tRef.current += 0.01;
+
+      if (sigilDiscoverRef.current) {
+        sigilDiscoverRef.current.style.transform = `rotate(${
+          Math.sin(tRef.current) * 1.2
+        }deg)`;
       }
-    );
+
+      if (sigilCreateRef.current) {
+        const s = 1 + Math.sin(tRef.current * 0.8) * 0.012;
+        sigilCreateRef.current.style.transform = `scale(${s})`;
+      }
+
+      if (sigilDeliverRef.current) {
+        sigilDeliverRef.current.style.transform = `translateY(${
+          Math.sin(tRef.current * 1.2) * 1.2
+        }px)`;
+      }
+
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
+    rafRef.current = requestAnimationFrame(loop);
+
+    return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
   return (
-    <div
-      ref={outerRef}
-      style={{
-        height: "250vh",
-        position: "relative",
-      }}
-    >
+    <div ref={outerRef} style={{ height: "300vh", position: "relative" }}>
       <section
         style={{
           position: "sticky",
           top: 0,
           height: "100vh",
+          background: "black",
           overflow: "hidden",
         }}
       >
-        {/* VIDEO */}
         <video
           ref={videoRef}
           src="https://www.pexels.com/id-id/download/video/3888252/"
@@ -985,69 +1083,284 @@ function VideoSection() {
           }}
         />
 
-        {/* MASK */}
+        <div
+          ref={videoOverlayRef}
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.55))",
+            opacity: 0,
+          }}
+        />
+
+        <div style={{ position: "absolute", inset: 0 }}>
+          <div
+            ref={hLineRef}
+            style={{
+              position: "absolute",
+              top: "34%",
+              left: 0,
+              width: "32%",
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+            }}
+          />
+          <div
+            ref={vLineRef}
+            style={{
+              position: "absolute",
+              left: "56%",
+              top: 0,
+              width: "1px",
+              height: "32%",
+              background:
+                "linear-gradient(180deg, transparent, rgba(255,255,255,0.55), transparent)",
+            }}
+          />
+        </div>
+
         <div
           ref={holeRef}
           style={{
             position: "absolute",
-            top: "50%",
+            top: "52%",
             left: "50%",
-            transform: "translate(-50%, -50%) scale(1)",
+            transform: "translate(-50%, -50%)",
             borderTopLeftRadius: "100rem",
             borderTopRightRadius: "100rem",
-            background: "transparent",
             boxShadow: "0 0 0 9999px black",
-            pointerEvents: "none",
           }}
         />
 
-        {/* TEXT + SYSTEM LINE */}
         <div
           ref={textRef}
           style={{
             position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            paddingLeft: "8vw",
+            left: 0,
+            right: 0,
+            bottom: "10vh",
+            paddingLeft: "14vw",
             color: "white",
-            pointerEvents: "none",
+            opacity: 0,
           }}
         >
-          <div
-            style={{
-              position: "relative",
-              maxWidth: "720px",
-            }}
-          >
-            {/* VERTICAL SYSTEM LINE */}
-            <div
-              style={{
-                position: "absolute",
-                left: "-24px",
-                top: "0.3em",       // anchor near "If"
-                width: "1px",
-                height: "260px",
-                background: "rgba(255,255,255,0.12)",
-              }}
-            />
-
+          <div style={{ maxWidth: "1080px" }}>
             <h2
               style={{
-                fontSize: "clamp(26px, 3.4vw, 40px)",
-                lineHeight: "1.25",
-                fontWeight: 500,
-                margin: 0,
-                letterSpacing: "-0.01em",
+                fontSize: "clamp(26px, 3.2vw, 40px)",
+                lineHeight: "1.22",
+                marginBottom: "72px",
+                maxWidth: "620px",
               }}
             >
-              If your content feels inconsistent,
+              If your content feels inconsistent
               <br />
               it’s not a content problem.
               <br />
-              It’s a system problem.
+              It’s a <span className="italic border-b border-gray-200">system</span> problem.
             </h2>
+
+            <div
+              ref={processRef}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(260px, 1fr))",
+                gap: "56px",
+              }}
+            >
+              {/* DISCOVER */}
+              <div>
+                <svg
+                  ref={sigilDiscoverRef}
+                  width="36"
+                  height="36"
+                  viewBox="0 0 100 100"
+                  style={{ marginBottom: "14px" }}
+                >
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="36"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="6"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="50"
+                    y1="14"
+                    x2="50"
+                    y2="34"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="86"
+                    y1="50"
+                    x2="66"
+                    y2="50"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="50"
+                    y1="86"
+                    x2="50"
+                    y2="66"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="14"
+                    y1="50"
+                    x2="34"
+                    y2="50"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                </svg>
+
+                <div
+                  style={{
+                    height: "1px",
+                    background: "rgba(255,255,255,0.2)",
+                    marginBottom: "20px",
+                  }}
+                />
+                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>
+                  Discover
+                </h3>
+                <p
+                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}
+                >
+                  Every project begins with curiosity. We dive deep into your
+                  brand, audience, and goals to uncover insights that define
+                  direction.
+                </p>
+              </div>
+
+              {/* CREATE */}
+              <div>
+                <svg
+                  ref={sigilCreateRef}
+                  width="36"
+                  height="36"
+                  viewBox="0 0 100 100"
+                  style={{ marginBottom: "14px" }}
+                >
+                  <rect
+                    x="20"
+                    y="20"
+                    width="60"
+                    height="60"
+                    rx="8"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <circle cx="35" cy="35" r="3" fill="white" />
+                  <circle cx="65" cy="35" r="3" fill="white" />
+                  <circle cx="50" cy="65" r="3" fill="white" />
+                  <line
+                    x1="35"
+                    y1="35"
+                    x2="65"
+                    y2="35"
+                    stroke="white"
+                    strokeWidth="0.8"
+                  />
+                  <line
+                    x1="65"
+                    y1="35"
+                    x2="50"
+                    y2="65"
+                    stroke="white"
+                    strokeWidth="0.8"
+                  />
+                  <line
+                    x1="50"
+                    y1="65"
+                    x2="35"
+                    y2="35"
+                    stroke="white"
+                    strokeWidth="0.8"
+                  />
+                </svg>
+
+                <div
+                  style={{
+                    height: "1px",
+                    background: "rgba(255,255,255,0.2)",
+                    marginBottom: "20px",
+                  }}
+                />
+                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>
+                  Create
+                </h3>
+                <p
+                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}
+                >
+                  Strategy transforms into visuals, words, and experiences
+                  crafted to connect, inspire, and elevate presence.
+                </p>
+              </div>
+
+              {/* DELIVER */}
+              <div>
+                <svg
+                  ref={sigilDeliverRef}
+                  width="36"
+                  height="36"
+                  viewBox="0 0 100 100"
+                  style={{ marginBottom: "14px" }}
+                >
+                  <rect
+                    x="26"
+                    y="30"
+                    width="48"
+                    height="36"
+                    rx="4"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="20"
+                    y1="70"
+                    x2="80"
+                    y2="70"
+                    stroke="white"
+                    strokeWidth="1.2"
+                  />
+                </svg>
+
+                <div
+                  style={{
+                    height: "1px",
+                    background: "rgba(255,255,255,0.2)",
+                    marginBottom: "20px",
+                  }}
+                />
+                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>
+                  Deliver
+                </h3>
+                <p
+                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}
+                >
+                  We refine, optimize, and launch across platforms — creating
+                  work that performs, engages, and endures.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1386,10 +1699,11 @@ function Galery() {
 
   const sectionRef = useRef(null);
   const textPinRef = useRef(null);
+  const headlineRef = useRef(null);
   const cursorRef = useRef(null);
 
   // =========================
-  // PARALLAX
+  // PARALLAX + PIN (DITAMBAH onEnter)
   // =========================
   useEffect(() => {
     gsap.utils.toArray(".lane").forEach((lane, i) => {
@@ -1417,12 +1731,38 @@ function Galery() {
       end: "bottom bottom",
       pin: textPinRef.current,
       pinSpacing: false,
+      onEnter: () => playHeadline(), // 🔥 KUNCI
     });
 
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
+
+  // =========================
+  // HEADLINE PLAY (NO SCROLLTRIGGER)
+  // =========================
+  const playHeadline = () => {
+    if (!headlineRef.current) return;
+
+    document.fonts.ready.then(() => {
+      gsap.set(headlineRef.current, { opacity: 1 });
+
+      const split = SplitText.create(headlineRef.current, {
+        type: "lines",
+        linesClass: "line",
+        mask: "lines",
+      });
+
+      gsap.from(split.lines, {
+        yPercent: 40,
+        opacity: 0,
+        duration: 1.2,
+        stagger: 0.12,
+        ease: "power2.out",
+      });
+    });
+  };
 
   // =========================
   // CUSTOM CURSOR DOT
@@ -1495,10 +1835,14 @@ function Galery() {
           className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center z-30 pointer-events-none"
         >
           <div className="text-center max-w-[90vw] px-6">
-            <span className="block text-[11px] tracking-[0.22em] opacity-70 mb-6">
+            <span className="block text-[11px] tracking-[0.22em] opacity-80 mb-6">
               GET STARTED
             </span>
-            <h1 className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)]">
+
+            <h1
+              ref={headlineRef}
+              className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)] opacity-0"
+            >
               Let&apos;s make
               <br />
               things happen.
@@ -1558,7 +1902,7 @@ function BigHeading() {
     <div
       ref={ref}
       className="relative bg-black overflow-hidden w-full big-heading-container"
-      style={{ height: "150vh" }}
+      style={{ height: "130vh" }}
     >
       <div
         className="big-heading-sticky pointer-events-none"
@@ -1806,35 +2150,35 @@ function WorksList() {
     {
       industry: "Fitness",
       name: "Tender Touch",
-      year: "© 2025",
+      year: "2025",
       image1: "/clients/tender-touch/2.jpg",
       image2: "/clients/tender-touch/main.jpg",
     },
     {
       industry: "Real Estate",
       name: "Hidden City Ubud",
-      year: "© 2025",
+      year: "2025",
       image1: "/clients/hidden-city-ubud/main.jpg",
       image2: "/clients/hidden-city-ubud/2.jpg",
     },
     {
       industry: "Real Estate",
       name: "DWM",
-      year: "© 2025",
+      year: "2025",
       image1: "/clients/dwm/5.jpg",
       image2: "/clients/dwm/logo.png",
     },
     {
       industry: "Food & Beverage",
       name: "Marrosh",
-      year: "© 2025",
+      year: "2025",
       image1: "/clients/marrosh/9.jpg",
       image2: "/clients/marrosh/logo.png",
     },
     {
       industry: "Real Estate",
       name: "NOVO",
-      year: "© 2025",
+      year: "2025",
       image1: "/clients/novo-ampang/main.jpg",
       image2: "/clients/novo-ampang/logo.png",
     },
@@ -1851,9 +2195,35 @@ function WorksList() {
         position: "relative",
       }}
     >
-       
+      {/* ===============================
+         SECTION DESCRIPTION (CENTER)
+      =============================== */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          paddingBottom: "5vh",
+          color: "white",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "1.1vw",
+            maxWidth: "42vw",
+            lineHeight: 1.45,
+            opacity: 0.75,
+            textAlign: "center",
+          }}
+        >
+          A selection of work across different industries
+          <br/>
+          each shaped by its own context and way of working 
+        </p>
+      </div>
 
-      
+      {/* ===============================
+         WORK LIST
+      =============================== */}
       {items.map((item, i) => (
         <div
           key={i}
@@ -1942,6 +2312,7 @@ function WorksList() {
     </div>
   );
 }
+
   
 function BosonScrollText() {
   const wrapRef = React.useRef(null);
@@ -2457,7 +2828,7 @@ function Description() {
       document.fonts.ready.then(() => {
 
         /* =========================
-           LEFT — HEADLINE (PAS)
+           LEFT — HEADLINE
         ========================= */
 
         gsap.set(titleRef.current, { opacity: 1 });
@@ -2489,7 +2860,8 @@ function Description() {
            RIGHT — BODY COPY
         ========================= */
 
-        const paragraphs = rightRef.current.querySelectorAll("p[data-animate]");
+        const paragraphs =
+          rightRef.current.querySelectorAll("p[data-animate]");
 
         paragraphs.forEach((p) => {
           const split = SplitText.create(p, {
@@ -2513,6 +2885,72 @@ function Description() {
           });
         });
 
+        /* =========================
+           STATS — OWN TRIGGER (FINAL FIX)
+        ========================= */
+
+        const statsGrid = rightRef.current.querySelector(
+          ".grid.grid-cols-1.sm\\:grid-cols-3"
+        );
+
+        if (!statsGrid) return;
+
+        const stats = Array.from(statsGrid.children);
+
+        stats.forEach((stat) => {
+          const icon = stat.querySelector("svg");
+          const value = stat.querySelector("div");
+          const desc = stat.querySelector("p");
+
+          gsap.set([icon, value, desc], {
+            opacity: 0,
+            y: 12,
+          });
+        });
+
+        ScrollTrigger.create({
+          trigger: statsGrid,
+          start: "top 85%",
+          once: true,
+          onEnter: () => {
+            stats.forEach((stat, i) => {
+              const icon = stat.querySelector("svg");
+              const value = stat.querySelector("div");
+              const desc = stat.querySelector("p");
+
+              const tl = gsap.timeline({
+                delay: i * 0.15,
+              });
+
+              tl.to(icon, {
+                y: 0,
+                opacity: 1,
+                duration: 0.6,
+                ease: "power2.out",
+              })
+                .to(
+                  value,
+                  {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.6,
+                    ease: "power2.out",
+                  },
+                  "-=0.35"
+                )
+                .to(
+                  desc,
+                  {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.5,
+                    ease: "power1.out",
+                  },
+                  "-=0.3"
+                );
+            });
+          },
+        });
       });
     }, sectionRef);
 
@@ -2563,11 +3001,7 @@ function Description() {
             to the table.
           </p>
 
-          {/* =========================
-   STATS — NARRATIVE: SCALE → MARKETS → REACH
-========================= */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-8 border-t border-black/20">
-            {/* STAT 1 — PROJECT SCALE */}
             <div className="flex flex-col gap-2">
               <svg
                 width="28"
@@ -2591,7 +3025,6 @@ function Description() {
               </p>
             </div>
 
-            {/* STAT 2 — MARKETS */}
             <div className="flex flex-col gap-2">
               <svg
                 width="28"
@@ -2615,7 +3048,6 @@ function Description() {
               </p>
             </div>
 
-            {/* STAT 3 — REACH */}
             <div className="flex flex-col gap-2">
               <svg
                 width="28"
@@ -2634,7 +3066,7 @@ function Description() {
               </div>
 
               <p className="text-sm text-neutral-500 leading-snug">
-              Audience reached across digital platforms and brand campaigns.
+                Audience reached across digital platforms and brand campaigns.
               </p>
             </div>
           </div>
@@ -2678,7 +3110,7 @@ function ProjectShowcase() {
       id: "03",
       title: "Lifestyle &\nHospitality",
       image:
-        "https://images.unsplash.com/photo-1583873743670-6d60e445a7e2?q=80&w=987&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1583873743670-6d60e445a7e2?q=80&w=987&auto=format&fit=crop",
       meta: ["EXPERIMENT", "TOKYO", "SONY"],
       desc:
         "An experimental campaign blending digital ritual, motion, and sound design.",
@@ -2687,7 +3119,7 @@ function ProjectShowcase() {
       id: "04",
       title: "Drone &\nAerial Media",
       image:
-        "https://images.unsplash.com/photo-1533358122925-6eb2658855bb?q=80&w=1335&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1533358122925-6eb2658855bb?q=80&w=1335&auto=format&fit=crop",
       meta: ["EXPERIMENT", "TOKYO", "SONY"],
       desc:
         "An experimental campaign blending digital ritual, motion, and sound design.",
@@ -2733,10 +3165,8 @@ function ProjectShowcase() {
       });
 
       // =====================
-      // HORIZONTAL PARALLAX (POLISHED)
+      // PARALLAX LAYERS
       // =====================
-
-      // TITLE — foreground (berat, subtle)
       gsap.utils.toArray(".parallax-title").forEach((el) => {
         gsap.fromTo(
           el,
@@ -2755,7 +3185,6 @@ function ProjectShowcase() {
         );
       });
 
-      // IMAGE — mid depth
       gsap.utils.toArray(".parallax-image").forEach((el) => {
         gsap.fromTo(
           el,
@@ -2774,7 +3203,6 @@ function ProjectShowcase() {
         );
       });
 
-      // META — background
       gsap.utils.toArray(".parallax-meta").forEach((el) => {
         gsap.fromTo(
           el,
@@ -2802,6 +3230,18 @@ function ProjectShowcase() {
       ref={sectionRef}
       className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
+      {/* ===============================
+         STATIC SECTION LABEL (DIAM)
+      =============================== */}
+      <div className="hidden lg:block absolute top-16 left-16 z-40 pointer-events-none">
+        <span className="text-xs tracking-[0.32em] uppercase text-white/50">
+          Industries We Serve
+        </span>
+      </div>
+
+      {/* ===============================
+         HORIZONTAL TRACK
+      =============================== */}
       <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
@@ -2820,7 +3260,7 @@ function ProjectShowcase() {
             >
               <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12">
                 <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
-                  PROJECT {p.id}
+                   {p.id}
                 </span>
 
                 <h1 className="parallax-title lg:absolute lg:left-16 lg:top-[45%] text-[96px] leading-[0.95] font-light whitespace-pre-line z-20">
@@ -2852,6 +3292,9 @@ function ProjectShowcase() {
         </div>
       </div>
 
+      {/* ===============================
+         PROGRESS
+      =============================== */}
       <div className="hidden lg:block absolute bottom-0 left-0 right-0 px-28 pb-6">
         <div className="h-[1px] bg-white/20">
           <div
@@ -2949,9 +3392,8 @@ function Footer() {
 }
 
 
-
-
  
+
 
  
  
@@ -3031,7 +3473,8 @@ function Footer() {
         </div>
   
         {/* <div className="h-screen w-screen bg-white"/> */}
-  
+           
+          
           <div style={{ position: "relative", zIndex: 2, width: "100%" }}>
             <BosonNarrative />
           </div>
@@ -3056,7 +3499,7 @@ function Footer() {
           <ProjectShowcase/>
         
         
-            <div style={{ position: "relative", zIndex: 2 }}>
+          <div style={{ position: "relative", zIndex: 2 }}>
             <BigHeading />
           </div>
         
