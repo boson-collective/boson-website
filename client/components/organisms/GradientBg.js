@@ -666,8 +666,8 @@ class Background extends InteractiveObject {
     this.geometry = null;
     this.material = null;
     this.background = {
-      color1: [0.914, 0.412, 0.349], // Soft bright (#E96959)
-      color2: [0.796, 0.294, 0.243], // Base (#CB4B3E)
+      color1: [0.796, 0.294, 0.243], // Soft bright (#E96959)
+      color2: [0.914, 0.412, 0.349], // Base (#CB4B3E)
       
       color3: [0, 0, 0]
 , // Rich dark navy-black

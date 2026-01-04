@@ -36,10 +36,10 @@ export default function LoaderGate({ children }) {
       <AnimatePresence>
         {!ready && (
           <motion.div
-            className="fixed inset-0 bg-black z-[9999] pointer-events-none"
+            className="fixed inset-0 bg-white z-[9999] pointer-events-none"
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 1 }}
+            transition={{ duration: 0, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* SCAN LIGHT */}
             <motion.div
@@ -55,35 +55,13 @@ export default function LoaderGate({ children }) {
             </motion.div>
 
             {/* BOOT TEXT */}
-            <div className="absolute bottom-10 left-10 text-[12px] tracking-[0.08em] font-light text-white/40">
+            <div className="absolute bottom-10 left-10 text-[12px] tracking-[0.08em] font-light text-black/40">
               {boot === 0 && "Calibrating system..."}
               {boot === 1 && "Initializing structure..."}
               {boot === 2 && "Preparing environment..."}
               {boot >= 3 && "Launching BOSON"}
             </div>
-
-            {/* PANELS */}
-            <motion.div
-              className="absolute inset-y-0 left-0 w-1/2 bg-black"
-              initial={{ x: "0%" }}
-              animate={{ x: "-100%" }}
-              transition={{
-                duration: 1.4,
-                delay: 0.6,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            />
-
-            <motion.div
-              className="absolute inset-y-0 right-0 w-1/2 bg-black"
-              initial={{ x: "0%" }}
-              animate={{ x: "100%" }}
-              transition={{
-                duration: 1.4,
-                delay: 0.6,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            />
+ 
           </motion.div>
         )}
       </AnimatePresence>
@@ -92,7 +70,7 @@ export default function LoaderGate({ children }) {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: ready ? 1 : 0 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0, ease: [0.22, 1, 0.36, 1] }}
       >
         {children}
       </motion.div>
