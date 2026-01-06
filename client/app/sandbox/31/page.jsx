@@ -4,15 +4,18 @@ import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffe
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
 import ScrollTrigger from "gsap/ScrollTrigger"
-import SplitText from "gsap/SplitText";;
+import SplitText from "gsap/SplitText";
+import CustomEase from "gsap/CustomEase";
 import SplitType from "split-type";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
 import * as THREE from "three";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
-gsap.registerPlugin(ScrollTrigger,SplitText);
+gsap.registerPlugin(ScrollTrigger,SplitText,CustomEase);
 
 
 function Webglbg() {
@@ -451,7 +454,7 @@ function BosonNarrative() {
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
+      className="boson-narrative-container bg-black w-full min-h-screen relative overflow-hidden flex items-center"
       style={{ padding: "120px 6vw" }}
     >
       {/* =========================
@@ -1487,24 +1490,15 @@ function Galery() {
       speed: -160,
       items: [
         { src: "/clients/tender-touch/10.jpg", top: "220vh" },
-        {
-          src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg",
-          top: "380vh",
-        },
+        { src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg", top: "380vh" },
       ],
     },
     {
       col: 2,
       speed: 120,
       items: [
-        {
-          src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg",
-          top: "80vh",
-        },
-        {
-          src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg",
-          top: "300vh",
-        },
+        { src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg", top: "80vh" },
+        { src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg", top: "300vh" },
       ],
     },
     {
@@ -1513,38 +1507,23 @@ function Galery() {
       items: [
         { src: "/clients/tender-touch/5.jpg", top: "160vh" },
         { src: "/clients/dwm/2.jpg", top: "280vh" },
-        {
-          src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg",
-          top: "420vh",
-        },
+        { src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg", top: "420vh" },
       ],
     },
     {
       col: 4,
       speed: 100,
       items: [
-        {
-          src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg",
-          top: "120vh",
-        },
-        {
-          src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg",
-          top: "340vh",
-        },
+        { src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg", top: "120vh" },
+        { src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg", top: "340vh" },
       ],
     },
     {
       col: 5,
       speed: -160,
       items: [
-        {
-          src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg",
-          top: "250vh",
-        },
-        {
-          src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg",
-          top: "430vh",
-        },
+        { src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg", top: "250vh" },
+        { src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg", top: "430vh" },
       ],
     },
   ];
@@ -1553,19 +1532,52 @@ function Galery() {
   const textPinRef = useRef(null);
   const headlineRef = useRef(null);
   const cursorRef = useRef(null);
+  const gridRef = useRef(null);
+  const fadeTopRef = useRef(null);
+  const fadeBottomRef = useRef(null);
 
-  // =========================
-  // PARALLAX + PIN (DITAMBAH onEnter)
-  // =========================
+  // 🔒 SINGLE FIRE LOCK
+  const headlinePlayedRef = useRef(false);
+
+  /* =========================
+     BASE
+  ========================= */
+  useEffect(() => {
+    gsap.set(sectionRef.current, {
+      backgroundColor: "#000",
+      color: "#fff",
+      borderBottomLeftRadius: "7vw",
+      borderBottomRightRadius: "7vw",
+    });
+  }, []);
+
+  /* =========================
+     BORDER RADIUS
+  ========================= */
+  useEffect(() => {
+    gsap.to(sectionRef.current, {
+      borderBottomLeftRadius: "0vw",
+      borderBottomRightRadius: "0vw",
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "bottom bottom",
+        end: "top+=35% top",
+        scrub: 2,
+      },
+    });
+  }, []);
+
+  /* =========================
+     PARALLAX LANES
+  ========================= */
   useEffect(() => {
     gsap.utils.toArray(".lane").forEach((lane, i) => {
-      const speed = LANES[i].speed;
-
       gsap.fromTo(
         lane,
-        { y: speed * -0.35 },
+        { y: LANES[i].speed * -0.35 },
         {
-          y: speed,
+          y: LANES[i].speed,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -1576,33 +1588,34 @@ function Galery() {
         }
       );
     });
+  }, []);
 
-    ScrollTrigger.create({
+  /* =========================
+     PIN + HEADLINE
+     (PIN TETAP, HEADLINE SEKALI)
+  ========================= */
+  useEffect(() => {
+    const trigger = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top top",
       end: "bottom bottom",
       pin: textPinRef.current,
       pinSpacing: false,
-      onEnter: () => playHeadline(), // 🔥 KUNCI
+      onEnter: playHeadline,
     });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    return () => trigger.kill();
   }, []);
 
-  // =========================
-  // HEADLINE PLAY (NO SCROLLTRIGGER)
-  // =========================
   const playHeadline = () => {
-    if (!headlineRef.current) return;
+    if (headlinePlayedRef.current) return;
+    headlinePlayedRef.current = true;
 
     document.fonts.ready.then(() => {
       gsap.set(headlineRef.current, { opacity: 1 });
 
       const split = SplitText.create(headlineRef.current, {
         type: "lines",
-        linesClass: "line",
         mask: "lines",
       });
 
@@ -1616,9 +1629,44 @@ function Galery() {
     });
   };
 
-  // =========================
-  // CUSTOM CURSOR DOT
-  // =========================
+  /* =========================
+     DARK → LIGHT
+  ========================= */
+  useEffect(() => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "70% bottom",
+        end: "bottom bottom",
+        scrub: true,
+      },
+    });
+
+    tl.to(sectionRef.current, {
+      backgroundColor: "#f5f5f5",
+      color: "#111",
+      ease: "none",
+    })
+      .to(
+        gridRef.current.querySelectorAll(".grid-line"),
+        { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
+        0
+      )
+      .to(
+        [fadeTopRef.current, fadeBottomRef.current],
+        { opacity: 0, ease: "none" },
+        0
+      )
+      .to(
+        cursorRef.current,
+        { backgroundColor: "#111", ease: "none" },
+        0
+      );
+  }, []);
+
+  /* =========================
+     CURSOR
+  ========================= */
   useEffect(() => {
     const section = sectionRef.current;
     const cursor = cursorRef.current;
@@ -1651,33 +1699,28 @@ function Galery() {
 
   return (
     <>
-      {/* CUSTOM CURSOR DOT */}
+      {/* CURSOR */}
       <div
         ref={cursorRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none opacity-0"
         style={{
-          width: "20px",
-          height: "20px",
+          width: 20,
+          height: 20,
           borderRadius: "50%",
           background: "white",
           transform: "translate(-50%, -50%)",
         }}
       />
 
-      <section
-        ref={sectionRef}
-        className="relative min-h-[480vh] bg-black text-white overflow-hidden"
-      >
+      <section ref={sectionRef} className="relative min-h-[480vh] overflow-hidden">
         {/* GRID */}
         <div
+          ref={gridRef}
           className="absolute inset-0 z-10 pointer-events-none grid"
           style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
         >
           {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
-            <div
-              key={i}
-              className="border-r border-white/20 last:border-r-0"
-            />
+            <div key={i} className="grid-line border-r border-white/20 last:border-r-0" />
           ))}
         </div>
 
@@ -1690,7 +1733,6 @@ function Galery() {
             <span className="block text-[11px] tracking-[0.22em] opacity-80 mb-6">
               GET STARTED
             </span>
-
             <h1
               ref={headlineRef}
               className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)] opacity-0"
@@ -1731,8 +1773,16 @@ function Galery() {
         </div>
 
         {/* FADES */}
-        <div className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40 bg-gradient-to-b from-black via-black/90 to-transparent" />
-        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40 bg-gradient-to-t from-black via-black/90 to-transparent" />
+        <div
+          ref={fadeTopRef}
+          className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40
+                     bg-gradient-to-b from-black via-black/90 to-transparent"
+        />
+        <div
+          ref={fadeBottomRef}
+          className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40
+                     bg-gradient-to-t from-black via-black/90 to-transparent"
+        />
       </section>
     </>
   );
@@ -3469,7 +3519,7 @@ function ProjectShowcase() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full  text-white overflow-hidden lg:h-screen"
+      className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
       {/* ===============================
          HORIZONTAL TRACK
@@ -3563,82 +3613,158 @@ function ProjectShowcase() {
 
 
 function Footer() {
+  const emailRef = useRef(null);
+  const charsRef = useRef([]);
+
+  useEffect(() => {
+    const chars = charsRef.current;
+    if (!chars.length) return;
+
+    // INIT STATE
+    gsap.set(chars, { y: 0, opacity: 1 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl
+      // PHASE 1 — UP & DISAPPEAR
+      .to(chars, {
+        y: -36,
+        opacity: 0,
+        duration: 0.55,
+        ease: "power4.in",
+        stagger: {
+          amount: 0.22,
+        },
+      })
+
+      // PHASE 2 — TELEPORT (INVISIBLE)
+      .set(chars, { y: 36 })
+
+      // PHASE 3 — RETURN
+      .to(chars, {
+        y: 0,
+        opacity: 1,
+        duration: 0.55,
+        ease: "back.out(2.6)",
+        stagger: {
+          amount: 0.22,
+        },
+      });
+
+    const el = emailRef.current;
+    const onEnter = () => tl.restart();
+
+    el.addEventListener("mouseenter", onEnter);
+
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      tl.kill();
+    };
+  }, []);
+
+  const email = "hello@studio.com";
+
   return (
-    <footer className="relative w-full bg-white text-black overflow-hidden">
-      {/* ========================= */}
-      {/* MAIN GRID */}
-      {/* ========================= */}
-      <div className="relative z-[2] px-[80px] py-[140px] max-[900px]:px-6 max-[900px]:py-[100px]">
-        <div className="grid grid-cols-[1.2fr_0.8fr_1fr] gap-20 max-[1100px]:grid-cols-1 max-[1100px]:gap-16">
+    <footer id="top" className="relative bg-neutral-950 text-white overflow-hidden">
+      {/* ==================================================
+        SIGNAL BAR — CONTEXT ONLY
+      ================================================== */}
+      <div className="px-[6vw] py-5 flex flex-wrap items-center justify-between text-[11px] tracking-wide border-b border-white/10">
+        <div className="opacity-50 uppercase">GMT +7 · Operating globally</div>
 
-          {/* LEFT — IDENTITY */}
-          <div className="flex flex-col gap-8">
-            <h2 className="text-[48px] font-light leading-[1.1] tracking-tight max-[900px]:text-[36px]">
-              Let’s build something<br />
-              that actually lasts.
-            </h2>
-
-            <p className="text-sm text-black/75 max-w-[420px] leading-relaxed">
-              Share your ideas with us and we’ll begin turning your vision into
-              something clear, sharp, and executable.
-            </p>
-
+        <div className="flex gap-6">
+          <div className="opacity-80">Our Social</div>
+          {["Instagram", "LinkedIn"].map((item) => (
             <a
-              href="mailto:boson.studio@gmail.com"
-              className="mt-6 inline-flex items-center gap-3 text-sm tracking-wide text-black/80 hover:text-black transition"
+              key={item}
+              href="#"
+              className="opacity-50 hover:opacity-100 transition"
             >
-              Get in touch →
+              {item}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ==================================================
+        DECISION THRESHOLD — CTA
+      ================================================== */}
+      <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-28">
+        <div className="grid grid-cols-12 gap-y-14">
+          {/* LEFT */}
+          <div className="col-span-12 lg:col-span-6">
+            <p className="text-neutral-500 max-w-md leading-relaxed">
+              We work with teams building thoughtful digital products
+              <br />
+              <span className="mr-10"></span>
+              If you have a project in mind, we would{" "}
+              <span className="italic">looove</span> to hear about it
+            </p>
+          </div>
+
+          {/* RIGHT — EMAIL (GSAP CONTROLLED) */}
+          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-end">
+            <a
+              ref={emailRef}
+              href="mailto:hello@studio.com"
+              className="inline-block text-[clamp(28px,3vw,42px)] font-light tracking-tight text-white cursor-pointer"
+            >
+              <span className="inline-flex overflow-hidden">
+                {email.split("").map((char, i) => (
+                  <span
+                    key={i}
+                    ref={(el) => (charsRef.current[i] = el)}
+                    className="inline-block will-change-transform"
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
+              </span>
+
+              <span className="block h-[1px] w-full bg-white/30 mt-1" />
             </a>
           </div>
+        </div>
+      </div>
 
-          {/* CENTER — NAV */}
-          <div className="flex flex-col divide-y divide-black/15 border border-black/15 bg-black/5 backdrop-blur">
-            {[
-              "Home",
-              "Projects",
-              "What We Do",
-              "Latest News",
-              "Get In Touch",
-            ].map((item) => (
-              <a
-                key={item}
-                className="px-8 py-6 flex items-center justify-between text-sm tracking-wide hover:bg-white/10 transition"
-              >
-                <span>{item}</span>
-                <span className="opacity-60">↗</span>
+      {/* ==================================================
+        BRAND MASS — FINAL SIGNATURE
+      ================================================== */}
+      <div className="relative px-6 lg:px-12 pt-12 pb-24 border-t border-neutral-800">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-12 items-end">
+          {/* BRAND */}
+          <div className="col-span-12 lg:col-span-7">
+            <img
+              src="/png/boson-white3.png"
+              alt="Boson"
+              className="w-full max-w-[900px]"
+            />
+          </div>
+
+          {/* META */}
+          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-6 text-xs text-neutral-500">
+            <div className="space-y-1 text-right">
+              <div>+62 812 3456 789</div>
+              <div>Bali · Indonesia</div>
+            </div>
+
+            <span>Copyright © {new Date().getFullYear()}</span>
+
+            <div className="flex gap-8">
+              <a href="/imprint" className="hover:text-white">
+                Imprint
               </a>
-            ))}
-          </div>
-
-          {/* RIGHT — CONTACT */}
-          <div className="flex flex-col gap-6 text-sm text-black/75">
-            <div>
-              <div className="text-black/50 mb-1">Email</div>
-              <div>boson.studio@gmail.com</div>
-            </div>
-
-            <div>
-              <div className="text-black/50 mb-1">Base</div>
-              <div>Bali, Indonesia</div>
-            </div>
-
-            <div>
-              <div className="text-black/50 mb-1">Working</div>
-              <div>Worldwide</div>
-            </div>
-
-            <div className="flex gap-4 mt-4 text-xs text-black/60">
-              <a className="hover:text-black transition">Behance</a>
-              <a className="hover:text-black transition">LinkedIn</a>
-              <a className="hover:text-black transition">Contact</a>
+              <a href="#top" className="hover:text-white">
+                Back to top ↑
+              </a>
             </div>
           </div>
-
         </div>
       </div>
     </footer>
   );
 }
+
 
 
  
@@ -3654,7 +3780,9 @@ function Footer() {
 
    export default function Page() {
     const ready = useContext(LoaderContext);
+  
     const bgRef = useRef(null);
+    const footerRef = useRef(null);
   
     useEffect(() => {
       window.scrollTo(0, 0);
@@ -3663,50 +3791,38 @@ function Footer() {
     useEffect(() => {
       if (!ready) return;
   
-      const el = bgRef.current;
+      const footer = footerRef.current;
+      if (!footer) return;
   
-      // ===== BACKGROUND SCROLL TRANSITION bg-[#F3F4F5]===== 
-      // (versi NON-SCRUB → scroll cuma memicu animasi)
-      // ScrollTrigger.create({
-      //   trigger: ".chayay",
-      //   start: "top top",
-      //   end: "bottom bottom",
-      
-      //   onEnter: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onEnterBack: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onLeave: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onLeaveBack: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      // });
-      
+      const OFFSET = window.innerHeight * 0.5; // footer mulai 50vh di bawah
   
-      return () => ScrollTrigger.getAll().forEach((st) => st.kill());
+      // INIT STATE
+      footer.style.transform = `translateY(${OFFSET}px)`;
+  
+      const onScroll = () => {
+        const scrollY = window.scrollY;
+        const viewportH = window.innerHeight;
+        const docH = document.documentElement.scrollHeight;
+  
+        // titik awal 100vh terakhir
+        const start = docH - viewportH * 2;
+        const end = docH - viewportH;
+  
+        // progress 0 → 1
+        let progress = (scrollY - start) / (end - start);
+        progress = Math.min(Math.max(progress, 0), 1);
+  
+        // interpolasi manual
+        const y = OFFSET * (1 - progress);
+  
+        footer.style.transform = `translateY(${y}px)`;
+      };
+  
+      window.addEventListener("scroll", onScroll, { passive: true });
+  
+      return () => {
+        window.removeEventListener("scroll", onScroll);
+      };
     }, [ready]);
   
     if (!ready) return null;
@@ -3715,94 +3831,108 @@ function Footer() {
       <div
         className="chayay"
         ref={bgRef}
-        style={{ width: "100%", background: "black", position: "relative" }}
+        style={{
+          width: "100%",
+          background: "black",
+          position: "relative",
+        }}
       >
+        {/* ==================================================
+          HERO / TOP
+        ================================================== */}
+  
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
-          <HeroJoin/>
+          <HeroJoin />
         </div>
   
-        {/* <div className="h-screen w-screen bg-white"/> */}
-           
-           <Header/>
-          
-          <div data-theme="dark" style={{ position: "relative", zIndex: 2, width: "100%" }}>
-            <BosonNarrative />
-          </div>
-          
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <Projects />
-          </div>
-          
-          
-       
-        
-        
-        
-         <Description/>
-         
-         
-         
-        <VideoSection/>
-        
-   
-          
-           <ServicesHero/>
-           
-        
-        
-           <div style={{ position: "relative", zIndex: 2 }}>
-            <BigHeading />
-          </div>
-          
-          
-         <ProjectShowcase/>
-         
-        
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <WorksList />
-          </div>
-          
-          
-        
-          
-          
-          {/* <BosonScrollText/>   */}
-        
-       
-         <Galery/>
-       
-        
+        {/* <div className="h-screen w-screen bg-white" /> */}
   
-       
+        <Header />
   
-        
-  
-        {/* <MeetBoson /> */}
-  
-       
-  
-      
-  
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <Carousel />
-          </div> */}
-        
-        {/* <div className="" style={{ position: "relative", zIndex: 2 }}>
-          <IndustriesPage />
-        </div> */}
-        
-     
-        
-          
-        
-        
-        
-
+        <div
+          data-theme="dark"
+          style={{ position: "relative", zIndex: 2, width: "100%" }}
+        >
+          <BosonNarrative />
+        </div>
   
         <div style={{ position: "relative", zIndex: 2 }}>
+          <Projects />
+        </div>
+  
+        {/* ==================================================
+          DESCRIPTION
+        ================================================== */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Description />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <VideoSection />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ServicesHero />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <BigHeading />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ProjectShowcase />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <WorksList />
+        </div>
+  
+        {/* <BosonScrollText /> */}
+  
+        {/* ==================================================
+          GALERY
+        ================================================== */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Galery />
+        </div>
+  
+        {/* ==================================================
+          EXTRA SCROLL DEPTH (BUFFER)
+        ================================================== */}
+        <div className="h-[73vh]" />
+  
+        {/* 
+        <MeetBoson />
+        */}
+  
+        {/* 
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Carousel />
+        </div>
+        */}
+  
+        {/* 
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <IndustriesPage />
+        </div>
+        */}
+  
+        {/* ==================================================
+          FOOTER — FIXED, PURE SCROLL-DRIVEN
+        ================================================== */}
+        <div
+          ref={footerRef}
+          className="fixed bottom-0 left-0 w-full z-0   "
+          style={{
+            willChange: "transform",
+          }}
+        >
           <Footer />
         </div>
   
+        {/* ==================================================
+          GLOBAL STYLE
+        ================================================== */}
         <style jsx global>{`
           body {
             background: #000;
@@ -3812,5 +3942,4 @@ function Footer() {
       </div>
     );
   }
-  
   
