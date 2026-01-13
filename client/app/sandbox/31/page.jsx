@@ -372,155 +372,161 @@ function Webglbg() {
   }
  
 
-function BosonNarrative() {
-  const wrap = useRef(null);
-
-  const [pos, setPos] = useState({ x: -9999, y: -9999 });
-  const targetPos = useRef({ x: -9999, y: -9999 });
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  /* =========================
-     RESPONSIVE CHECK
-  ========================= */
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const handleChange = (e) => setIsMobile(e.matches);
-    handleChange(mq);
-    mq.addEventListener("change", handleChange);
-    return () => mq.removeEventListener("change", handleChange);
-  }, []);
-
-  /* =========================
-     SMOOTH MOUSE FOLLOW
-  ========================= */
-  useEffect(() => {
-    if (isMobile) {
-      setPos({ x: -9999, y: -9999 });
-      targetPos.current = { x: -9999, y: -9999 };
-      return;
-    }
-
-    let frame;
-    const animate = () => {
-      setPos((prev) => {
-        const dx = targetPos.current.x - prev.x;
-        const dy = targetPos.current.y - prev.y;
-        const speed = 0.06;
-        return {
-          x: prev.x + dx * speed,
-          y: prev.y + dy * speed,
-        };
-      });
-      frame = requestAnimationFrame(animate);
+  function BosonNarrative() {
+    const wrap = useRef(null);
+  
+    const [pos, setPos] = useState({ x: -9999, y: -9999 });
+    const targetPos = useRef({ x: -9999, y: -9999 });
+  
+    const [isMobile, setIsMobile] = useState(false);
+  
+    /* =========================
+       RESPONSIVE CHECK
+    ========================= */
+    useEffect(() => {
+      const mq = window.matchMedia("(max-width: 768px)");
+      const handleChange = (e) => setIsMobile(e.matches);
+      handleChange(mq);
+      mq.addEventListener("change", handleChange);
+      return () => mq.removeEventListener("change", handleChange);
+    }, []);
+  
+    /* =========================
+       SMOOTH MOUSE FOLLOW (DESKTOP ONLY)
+    ========================= */
+    useEffect(() => {
+      if (isMobile) {
+        setPos({ x: -9999, y: -9999 });
+        targetPos.current = { x: -9999, y: -9999 };
+        return;
+      }
+  
+      let frame;
+      const animate = () => {
+        setPos((prev) => {
+          const dx = targetPos.current.x - prev.x;
+          const dy = targetPos.current.y - prev.y;
+          const speed = 0.06;
+          return {
+            x: prev.x + dx * speed,
+            y: prev.y + dy * speed,
+          };
+        });
+        frame = requestAnimationFrame(animate);
+      };
+  
+      animate();
+      return () => cancelAnimationFrame(frame);
+    }, [isMobile]);
+  
+    /* =========================
+       MOUSE MOVE (DESKTOP ONLY)
+    ========================= */
+    const handleMove = (e) => {
+      if (!wrap.current || isMobile) return;
+      const rect = wrap.current.getBoundingClientRect();
+      targetPos.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
     };
-
-    animate();
-    return () => cancelAnimationFrame(frame);
-  }, [isMobile]);
-
-  /* =========================
-     MOUSE MOVE
-  ========================= */
-  const handleMove = (e) => {
-    if (!wrap.current || isMobile) return;
-    const rect = wrap.current.getBoundingClientRect();
-    targetPos.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+  
+    const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
+  
+    /* =========================
+       BASE TEXT STYLE
+       (DESKTOP DEFAULT)
+    ========================= */
+    const baseTextStyle = {
+      width: "100%",
+      whiteSpace: "pre-wrap",
+      fontSize: "clamp(28px, 6vw, 74px)",
+      lineHeight: 1.25,
+      wordSpacing: -5,
+      fontWeight: 400,
+      textAlign: "justify",
+      textAlignLast: "left",
+      textIndent: "12rem",
+      hyphens: "auto",
     };
-  };
-
-  const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
-
-  /* =========================
-     SHARED TEXT STYLE
-     (CRITICAL: BASE & MASK IDENTICAL)
-  ========================= */
-  const textStyle = {
-    width: "100%",
-    whiteSpace: "pre-wrap",
-    fontSize: "clamp(28px, 6vw, 74px)",
-    lineHeight: 1.25,
-    wordSpacing: -5,
-    fontWeight: 400,
-    textAlign: "justify",
-    textAlignLast: "left",
-    textIndent: "12rem",
-    hyphens: "auto",
-  };
-
-  return (
-    <div
-      ref={wrap}
-      onMouseMove={handleMove}
-      className="boson-narrative-container bg-black w-full min-h-screen relative overflow-hidden flex items-center"
-      style={{ padding: "120px 6vw" }}
-    >
-      {/* =========================
-          BASE TEXT (DIM)
-      ========================= */}
+  
+    /* =========================
+       MOBILE OVERRIDE (CLEAN)
+    ========================= */
+    const mobileTextOverride = isMobile
+      ? {
+          fontSize: "clamp(20px, 5.5vw, 28px)",
+          lineHeight: 1.45,
+          wordSpacing: 0,
+          textAlign: "left",
+          textIndent: 0,
+          hyphens: "none",
+        }
+      : {};
+  
+    return (
       <div
+        ref={wrap}
+        onMouseMove={handleMove}
+        className="boson-narrative-container bg-black w-full relative overflow-hidden flex items-center"
         style={{
-          position: "relative",
-          color: isMobile
-            ? "rgba(255,255,255,0.96)"
-            : "rgba(255,255,255,0.285)",
-          ...textStyle,
+          minHeight: "100vh",
+          padding: isMobile ? "72px 6vw" : "120px 6vw",
         }}
       >
-        {text}
-
         {/* =========================
-            MASKED TEXT (BRIGHT)
+            BASE TEXT (DIM)
         ========================= */}
-        {!isMobile && (
-          <div
-            style={{
-              pointerEvents: "none",
-              position: "absolute",
-              inset: 0,
-              color: "rgba(255,255,255,0.96)",
-              ...textStyle,
-              WebkitMaskImage: `
-                radial-gradient(
-                  900px circle at ${pos.x}px ${pos.y}px,
-                  rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
-                  rgba(255,255,255,0) 100%
-                )
-              `,
-              maskImage: `
-                radial-gradient(
-                  900px circle at ${pos.x}px ${pos.y}px,
-                  rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
-                  rgba(255,255,255,0) 100%
-                )
-              `,
-            }}
-          >
-            {text}
-          </div>
-        )}
+        <div
+          style={{
+            position: "relative",
+            color: isMobile
+              ? "rgba(255,255,255,0.96)"
+              : "rgba(255,255,255,0.285)",
+            ...baseTextStyle,
+            ...mobileTextOverride,
+          }}
+        >
+          {text}
+  
+          {/* =========================
+              MASKED TEXT (DESKTOP ONLY)
+          ========================= */}
+          {!isMobile && (
+            <div
+              style={{
+                pointerEvents: "none",
+                position: "absolute",
+                inset: 0,
+                color: "rgba(255,255,255,0.96)",
+                ...baseTextStyle,
+                WebkitMaskImage: `
+                  radial-gradient(
+                    900px circle at ${pos.x}px ${pos.y}px,
+                    rgba(255,255,255,1) 0%,
+                    rgba(255,255,255,0.10) 30%,
+                    rgba(255,255,255,0.02) 55%,
+                    rgba(255,255,255,0) 100%
+                  )
+                `,
+                maskImage: `
+                  radial-gradient(
+                    900px circle at ${pos.x}px ${pos.y}px,
+                    rgba(255,255,255,1) 0%,
+                    rgba(255,255,255,0.10) 30%,
+                    rgba(255,255,255,0.02) 55%,
+                    rgba(255,255,255,0) 100%
+                  )
+                `,
+              }}
+            >
+              {text}
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* =========================
-          MOBILE FIX
-      ========================= */}
-      <style>{`
-        @media (max-width: 768px) {
-          .boson-narrative-container {
-            min-height: auto !important;
-            height: auto !important;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
+    );
+  }
 
 
 function IndustryItem({ title, logos }) {
@@ -992,8 +998,7 @@ function VideoSection() {
   const holeRef = useRef(null);
   const videoRef = useRef(null);
   const textRef = useRef(null);
-  const processRef = useRef(null); 
- 
+  const processRef = useRef(null);
 
   const sigilDiscoverRef = useRef(null);
   const sigilCreateRef = useRef(null);
@@ -1016,24 +1021,23 @@ function VideoSection() {
 
     if (!outer || !section || !hole || !video || !text || !process) return;
 
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
     /* =========================
        INITIAL STATE
     ========================= */
 
-    hole.style.width = `${holeBaseW}px`;
-    hole.style.height = `${holeBaseH}px`;
+    hole.style.width = `${isMobile ? 180 : holeBaseW}px`;
+    hole.style.height = `${isMobile ? 260 : holeBaseH}px`;
 
     gsap.set(section, { backgroundColor: "#000" });
-    gsap.set(video, { scale: 1.6 });
+    gsap.set(video, { scale: isMobile ? 1.25 : 1.6 });
     gsap.set(text, { opacity: 0 });
 
     gsap.set(hole, {
       scale: 1,
       boxShadow: "0 0 0 9999px #000",
     });
- 
- 
- 
 
     /* =========================
        TIMELINE
@@ -1043,20 +1047,30 @@ function VideoSection() {
       scrollTrigger: {
         trigger: outer,
         start: "top top",
-        end: "+=140%",
+        end: isMobile ? "+=110%" : "+=140%",
         scrub: 0.8,
       },
     });
 
-    // PHASE 1 — SPATIAL REVEAL
-    tl.to(hole, { scale: holeMaxScale, ease: "none" }, 0)
-      .to(video, { scale: 1, ease: "none" }, 0);
- 
+    tl.to(
+      hole,
+      {
+        scale: isMobile ? holeMaxScale * 0.75 : holeMaxScale,
+        ease: "none",
+      },
+      0
+    ).to(
+      video,
+      {
+        scale: 1,
+        ease: "none",
+      },
+      0
+    );
 
-    // PHASE 3 — TEXT & PROCESS
     tl.to(text, { opacity: 1, ease: "power1.out" }, 0.9).fromTo(
       process.children,
-      { opacity: 0, y: 36 },
+      { opacity: 0, y: isMobile ? 24 : 36 },
       {
         opacity: 1,
         y: 0,
@@ -1098,7 +1112,14 @@ function VideoSection() {
   }, []);
 
   return (
-    <div data-theme="dark" ref={outerRef} style={{ height: "300vh", position: "relative" }}>
+    <div
+      data-theme="dark"
+      ref={outerRef}
+      style={{
+        height: "300vh",
+        position: "relative",
+      }}
+    >
       <section
         ref={sectionRef}
         style={{
@@ -1111,7 +1132,7 @@ function VideoSection() {
         {/* VIDEO */}
         <video
           ref={videoRef}
-          src="https://www.pexels.com/id-id/download/video/3917529/"
+          src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
           autoPlay
           loop
           muted
@@ -1125,8 +1146,6 @@ function VideoSection() {
             zIndex: 1,
           }}
         />
-
- 
 
         {/* HOLE */}
         <div
@@ -1142,7 +1161,7 @@ function VideoSection() {
           }}
         />
 
-        {/* TEXT — FULL ORIGINAL */}
+        {/* TEXT */}
         <div
           ref={textRef}
           style={{
@@ -1151,19 +1170,22 @@ function VideoSection() {
             right: 0,
             bottom: "10vh",
             paddingLeft: "14vw",
+            paddingRight: "6vw",
             color: "white",
             zIndex: 20,
             pointerEvents: "none",
           }}
         >
-          <div style={{ maxWidth: "1080px" }}> 
-
+          <div style={{ maxWidth: "1080px" }}>
             <div
               ref={processRef}
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(260px, 1fr))",
-                gap: "56px",
+                gridTemplateColumns:
+                  window.matchMedia("(max-width: 768px)").matches
+                    ? "1fr"
+                    : "repeat(3, minmax(260px, 1fr))",
+                gap: window.matchMedia("(max-width: 768px)").matches ? "40px" : "56px",
               }}
             >
               {/* DISCOVER */}
@@ -1179,7 +1201,7 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
+                  Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
                 </p>
               </div>
 
@@ -1197,7 +1219,7 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
-                Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
+                  Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
                 </p>
               </div>
 
@@ -1210,18 +1232,17 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                Publishing is only part of the work.
-                We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
+                  Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
                 </p>
               </div>
             </div>
           </div>
         </div>
-        
       </section>
     </div>
   );
 }
+
 
 
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
@@ -1255,230 +1276,247 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 }
 
 function Projects() {
-const scrollRef = useRef(null);
+  const scrollRef = useRef(null);
 
-// ==================================================
-// SECTION SCROLL (UNTUK VISUAL & TRANSISI)
-// ==================================================
-const { scrollYProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start start", "end end"],
-});
+  // ==================================================
+  // SECTION SCROLL
+  // ==================================================
+  const { scrollYProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start start", "end end"],
+  });
 
-// ==================================================
-// GLOBAL SCROLL (UNTUK DOT — NEVER STOPS)
-// ==================================================
-const { scrollY } = useScroll();
+  // ==================================================
+  // GLOBAL SCROLL
+  // ==================================================
+  const { scrollY } = useScroll();
+  const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
-// normalize global scroll → smooth & slow
-const spinBase = useTransform(scrollY, (v) => v * 0.5);
+  const rotate1 = useTransform(spinBase, (v) => v);
+  const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
+  const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-const rotate1 = useTransform(spinBase, (v) => v);
-const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
-const rotate3 = useTransform(spinBase, (v) => v * 0.9);
+  // ==================================================
+  // LIGHT MODE
+  // ==================================================
+  const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
 
-// ==================================================
-// LIGHT MODE TRANSITION
-// ==================================================
-const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
-
-const bgColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(0,0,0)", "#f3f4f5"]
-);
-
-const textColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-const orbitStroke = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
-);
-
-const dotFill = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-// ==================================================
-// INTRO TEXT
-// ==================================================
-const { scrollYProgress: introProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start end", "start start"],
-});
-
-const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-const textFilter = useTransform(introProgress, [0, 1], [
-  "blur(20px)",
-  "blur(0px)",
-]);
-
-// ==================================================
-// ORBIT GEOMETRY
-// ==================================================
-const c1 = { cx: 425, cy: 350, r: 250 };
-const c2 = { cx: 325, cy: 500, r: 250 };
-const c3 = { cx: 525, cy: 500, r: 250 };
-
-const g1Ref = useRef(null);
-const g2Ref = useRef(null);
-const g3Ref = useRef(null);
-
-useEffect(() => {
-  const apply = (g, cx, cy, deg) => {
-    if (!g) return;
-    g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
-  };
-
-  const u1 = rotate1.on("change", (v) =>
-    apply(g1Ref.current, c1.cx, c1.cy, v)
-  );
-  const u2 = rotate2.on("change", (v) =>
-    apply(g2Ref.current, c2.cx, c2.cy, v)
-  );
-  const u3 = rotate3.on("change", (v) =>
-    apply(g3Ref.current, c3.cx, c3.cy, v)
+  const bgColor = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(0,0,0)", "#f3f4f5"]
   );
 
-  return () => {
-    u1();
-    u2();
-    u3();
-  };
-}, [rotate1, rotate2, rotate3]);
+  const textColor = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(255,255,255)", "rgb(0,0,0)"]
+  );
 
-// ==================================================
-// IMAGES
-// ==================================================
-const images = [
-  "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
-  "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
-  "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
-  "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
-  "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
-  "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
-  "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
-  "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
-  "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
-  "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
-  "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
-  "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
-  "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
-  "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-  "/clients/tender-touch/6.jpg",
-];
+  const orbitStroke = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
+  );
 
-const baseStart = 0.15;
-const step = 0.05;
-const windowLen = 0.15;
+  const dotFill = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(255,255,255)", "rgb(0,0,0)"]
+  );
 
-const bursts = images.map((_, i) =>
-  useTransform(
-    scrollYProgress,
-    [baseStart + i * step, baseStart + i * step + windowLen],
-    [0, 1]
-  )
-);
+  // ==================================================
+  // INTRO TEXT
+  // ==================================================
+  const { scrollYProgress: introProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "start start"],
+  });
 
-const motionPropsList = bursts.map((b, i) => {
-  const dir = i % 4;
-  return {
-    x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
-    y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
-    z: useTransform(b, [0, 1], [-2000, 3000]),
-    scale: useTransform(b, [0, 1], [0.4, 1.1]),
-    opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
-  };
-});
+  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+  const textFilter = useTransform(introProgress, [0, 1], [
+    "blur(20px)",
+    "blur(0px)",
+  ]);
 
-// ==================================================
-// RENDER
-// ==================================================
-return (
-  <motion.div
-    ref={scrollRef}
-    style={{
-      width: "100%",
-      height: "500vh",
-      position: "relative",
-      backgroundColor: bgColor,
-    }}
-  >
-    <div
+  // ==================================================
+  // ORBITS
+  // ==================================================
+  const c1 = { cx: 425, cy: 350, r: 250 };
+  const c2 = { cx: 325, cy: 500, r: 250 };
+  const c3 = { cx: 525, cy: 500, r: 250 };
+
+  const g1Ref = useRef(null);
+  const g2Ref = useRef(null);
+  const g3Ref = useRef(null);
+
+  useEffect(() => {
+    const apply = (g, cx, cy, deg) => {
+      if (!g) return;
+      g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
+    };
+
+    const u1 = rotate1.on("change", (v) =>
+      apply(g1Ref.current, c1.cx, c1.cy, v)
+    );
+    const u2 = rotate2.on("change", (v) =>
+      apply(g2Ref.current, c2.cx, c2.cy, v)
+    );
+    const u3 = rotate3.on("change", (v) =>
+      apply(g3Ref.current, c3.cx, c3.cy, v)
+    );
+
+    return () => {
+      u1();
+      u2();
+      u3();
+    };
+  }, [rotate1, rotate2, rotate3]);
+
+  // ==================================================
+  // IMAGES
+  // ==================================================
+  const images = [
+    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
+    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
+    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
+    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
+    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
+    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
+    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
+    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
+    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
+    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
+    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
+    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
+    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
+    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
+    "/clients/tender-touch/6.jpg",
+  ];
+
+  const baseStart = 0.15;
+  const step = 0.05;
+  const windowLen = 0.15;
+
+  const bursts = images.map((_, i) =>
+    useTransform(
+      scrollYProgress,
+      [baseStart + i * step, baseStart + i * step + windowLen],
+      [0, 1]
+    )
+  );
+
+  const motionPropsList = bursts.map((b, i) => {
+    const dir = i % 4;
+    return {
+      x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
+      y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
+      z: useTransform(b, [0, 1], [-2000, 3000]),
+      scale: useTransform(b, [0, 1], [0.4, 1.1]),
+      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
+    };
+  });
+
+  // ==================================================
+  // RENDER
+  // ==================================================
+  return (
+    <motion.div
+      ref={scrollRef}
+      className="projects-root"
       style={{
-        position: "sticky",
-        top: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-        pointerEvents: "none",
-        perspective: "1800px",
-        transformStyle: "preserve-3d",
+        width: "100%",
+        height: "500vh",
+        position: "relative",
+        backgroundColor: bgColor,
       }}
     >
-      {/* ORBITS */}
-      <svg viewBox="0 0 850 850" width="850" height="850">
-        {[c1, c2, c3].map((c, i) => (
-          <motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="none"
-            strokeWidth="0.5"
-            style={{ stroke: orbitStroke }}
-          />
+      <div className="projects-sticky">
+        <svg viewBox="0 0 850 850" className="projects-orbit">
+          {[c1, c2, c3].map((c, i) => (
+            <motion.circle
+              key={i}
+              cx={c.cx}
+              cy={c.cy}
+              r={c.r}
+              fill="none"
+              strokeWidth="0.5"
+              style={{ stroke: orbitStroke }}
+            />
+          ))}
+
+          <motion.g ref={g1Ref}>
+            <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g2Ref}>
+            <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g3Ref}>
+            <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+        </svg>
+
+        <motion.div
+          className="projects-text"
+          style={{
+            opacity: textOpacity,
+            y: textY,
+            filter: textFilter,
+            color: textColor,
+          }}
+        >
+          A world where uncertainty <br />
+          becomes clarity.
+        </motion.div>
+
+        {images.map((src, i) => (
+          <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
+      </div>
 
-        <motion.g ref={g1Ref}>
-          <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g2Ref}>
-          <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g3Ref}>
-          <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-      </svg>
+      {/* RESPONSIVE — CONTAINMENT ONLY */}
+      <style>{`
+        .projects-sticky {
+          position: sticky;
+          top: 0;
+          width: 100vw;
+          height: 100vh;
+          height: 100svh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          pointer-events: none;
+          perspective: 1800px;
+          transform-style: preserve-3d;
+        }
 
-      {/* TEXT */}
-      <motion.div
-        style={{
-          opacity: textOpacity,
-          y: textY,
-          filter: textFilter,
-          color: textColor,
-          position: "absolute",
-          fontSize: "43px",
-          fontWeight: 200,
-          lineHeight: 1,
-          textAlign: "center",
-          whiteSpace: "pre-line",
-          zIndex: 10,
-        }}
-      >
-        A world where uncertainty <br />
-        becomes clarity.
-      </motion.div>
+        .projects-orbit {
+          width: 850px;
+          height: 850px;
+          max-width: 100vw;
+          max-height: 100vw;
+        }
 
-      {/* IMAGES */}
-      {images.map((src, i) => (
-        <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
-      ))}
-    </div>
-  </motion.div>
-);
+        .projects-text {
+          position: absolute;
+          font-size: clamp(24px, 6vw, 43px);
+          font-weight: 200;
+          line-height: 1;
+          text-align: center;
+          white-space: pre-line;
+          z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+          .projects-root {
+            height: 500vh;
+          }
+        }
+      `}</style>
+    </motion.div>
+  );
 }
 
 function Galery() {
@@ -1490,15 +1528,24 @@ function Galery() {
       speed: -160,
       items: [
         { src: "/clients/tender-touch/10.jpg", top: "220vh" },
-        { src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg", top: "380vh" },
+        {
+          src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg",
+          top: "380vh",
+        },
       ],
     },
     {
       col: 2,
       speed: 120,
       items: [
-        { src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg", top: "80vh" },
-        { src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg", top: "300vh" },
+        {
+          src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg",
+          top: "80vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg",
+          top: "300vh",
+        },
       ],
     },
     {
@@ -1507,23 +1554,38 @@ function Galery() {
       items: [
         { src: "/clients/tender-touch/5.jpg", top: "160vh" },
         { src: "/clients/dwm/2.jpg", top: "280vh" },
-        { src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg", top: "420vh" },
+        {
+          src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg",
+          top: "420vh",
+        },
       ],
     },
     {
       col: 4,
       speed: 100,
       items: [
-        { src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg", top: "120vh" },
-        { src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg", top: "340vh" },
+        {
+          src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg",
+          top: "120vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg",
+          top: "340vh",
+        },
       ],
     },
     {
       col: 5,
       speed: -160,
       items: [
-        { src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg", top: "250vh" },
-        { src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg", top: "430vh" },
+        {
+          src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg",
+          top: "250vh",
+        },
+        {
+          src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg",
+          top: "430vh",
+        },
       ],
     },
   ];
@@ -1536,11 +1598,10 @@ function Galery() {
   const fadeTopRef = useRef(null);
   const fadeBottomRef = useRef(null);
 
-  // 🔒 SINGLE FIRE LOCK
   const headlinePlayedRef = useRef(false);
 
   /* =========================
-     BASE
+     BASE STATE (GSAP ONLY)
   ========================= */
   useEffect(() => {
     gsap.set(sectionRef.current, {
@@ -1549,13 +1610,21 @@ function Galery() {
       borderBottomLeftRadius: "7vw",
       borderBottomRightRadius: "7vw",
     });
+
+    gsap.set(".grid-line", {
+      borderColor: "rgba(255,255,255,0.2)",
+    });
+
+    gsap.set(cursorRef.current, {
+      backgroundColor: "#fff",
+    });
   }, []);
 
   /* =========================
      BORDER RADIUS
   ========================= */
   useEffect(() => {
-    gsap.to(sectionRef.current, {
+    const tween = gsap.to(sectionRef.current, {
       borderBottomLeftRadius: "0vw",
       borderBottomRightRadius: "0vw",
       ease: "none",
@@ -1566,14 +1635,18 @@ function Galery() {
         scrub: 2,
       },
     });
+
+    return () => tween.scrollTrigger?.kill();
   }, []);
 
   /* =========================
      PARALLAX LANES
   ========================= */
   useEffect(() => {
+    const triggers = [];
+
     gsap.utils.toArray(".lane").forEach((lane, i) => {
-      gsap.fromTo(
+      const t = gsap.fromTo(
         lane,
         { y: LANES[i].speed * -0.35 },
         {
@@ -1587,12 +1660,15 @@ function Galery() {
           },
         }
       );
+
+      triggers.push(t.scrollTrigger);
     });
+
+    return () => triggers.forEach((t) => t?.kill());
   }, []);
 
   /* =========================
      PIN + HEADLINE
-     (PIN TETAP, HEADLINE SEKALI)
   ========================= */
   useEffect(() => {
     const trigger = ScrollTrigger.create({
@@ -1630,38 +1706,45 @@ function Galery() {
   };
 
   /* =========================
-     DARK → LIGHT
+     DARK → LIGHT (CLEAN)
   ========================= */
   useEffect(() => {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: sectionRef.current,
-        start: "70% bottom",
-        end: "bottom bottom",
+        start: "55% bottom",
+        end: "85% bottom",
         scrub: true,
       },
     });
 
-    tl.to(sectionRef.current, {
-      backgroundColor: "#f5f5f5",
-      color: "#111",
-      ease: "none",
-    })
-      .to(
-        gridRef.current.querySelectorAll(".grid-line"),
+    tl.fromTo(
+      sectionRef.current,
+      { backgroundColor: "#000", color: "#fff" },
+      { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
+    )
+      .fromTo(
+        ".grid-line",
+        { borderColor: "rgba(255,255,255,0.2)" },
         { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
+        0
+      )
+      .fromTo(
+        cursorRef.current,
+        { backgroundColor: "#fff" },
+        { backgroundColor: "#111", ease: "none" },
         0
       )
       .to(
         [fadeTopRef.current, fadeBottomRef.current],
         { opacity: 0, ease: "none" },
         0
-      )
-      .to(
-        cursorRef.current,
-        { backgroundColor: "#111", ease: "none" },
-        0
       );
+
+    return () => {
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
   }, []);
 
   /* =========================
@@ -1670,7 +1753,6 @@ function Galery() {
   useEffect(() => {
     const section = sectionRef.current;
     const cursor = cursorRef.current;
-    if (!section || !cursor) return;
 
     const move = (e) => {
       cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
@@ -1707,12 +1789,14 @@ function Galery() {
           width: 20,
           height: 20,
           borderRadius: "50%",
-          background: "white",
           transform: "translate(-50%, -50%)",
         }}
       />
 
-      <section ref={sectionRef} className="relative min-h-[480vh] overflow-hidden">
+      <section
+        ref={sectionRef}
+        className="relative min-h-[480vh] overflow-hidden"
+      >
         {/* GRID */}
         <div
           ref={gridRef}
@@ -1720,7 +1804,7 @@ function Galery() {
           style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
         >
           {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
-            <div key={i} className="grid-line border-r border-white/20 last:border-r-0" />
+            <div key={i} className="grid-line border-r last:border-r-0" />
           ))}
         </div>
 
@@ -1942,7 +2026,7 @@ function MarqueeOverlay({ item, active }) {
   ========================= */
   const isLogo = (src) => {
     const s = src.toLowerCase();
-    return s.includes("logo") && s.endsWith(".png");
+    return s.endsWith(".png");
   };
 
   /* =========================
@@ -2067,7 +2151,7 @@ function WorksList() {
       name: "Real Estate & Property",
       year: "2025",
       images: [
-        "/clients/novo-ampang/main.jpg",
+        "https://i.imgur.com/MqFOJqk.jpeg",
         "/clients/novo-ampang/logo.png",
         "/clients/hey-yolo/main.jpg",
         "/clients/hey-yolo/logo.png",
@@ -2079,35 +2163,46 @@ function WorksList() {
       industry: "Production",
       name: "Hospitality",
       year: "2025",
-      images: ["/clients/dwm/5.jpg", "/clients/dwm/logo.png"],
+      images: [
+        "/clients/tender-touch/4.jpg",
+        "/clients/tender-touch/logo.png",
+      ],
     },
     {
-      industry: "Branding",
-      name: "Drone & Aerial Media",
+      industry: "Commerce",
+      name: "Food & Beverage",
       year: "2025",
       images: [
-        "/clients/hidden-city-ubud/main.jpg",
-        "/clients/hidden-city-ubud/2.jpg",
+        "https://i.imgur.com/GnY6iYR.jpeg",
+        "/clients/marrosh/logo.png",
+        "https://i.imgur.com/F4vcyc5.jpeg",
+        "/clients/zai-cafe/logo.png",
       ],
     },
     {
       industry: "Branding",
       name: "E-Commerce",
       year: "2025",
-      images: ["/clients/hidden-city-ubud/main.jpg", "/clients/hidden-city-ubud/2.jpg"],
+      images: [
+        "/clients/hidden-city-ubud/logo.png",
+        "/clients/hidden-city-ubud/2.jpg",
+      ],
     },
     {
-      industry: "Commerce",
-      name: "Food & Beverage",
+      industry: "Branding",
+      name: "Drone & Aerial Media",
       year: "2025",
-      images: ["/clients/marrosh/4.jpg", "/clients/marrosh/logo.png"],
+      images: [
+        "/clients/private-jet-villa/logo.png",
+        "https://i.imgur.com/8jhTJv7.jpeg",
+      ],
     },
   ];
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   /* =========================
-     HEADER GSAP
+     GSAP HEADER (UNCHANGED)
   ========================= */
   useLayoutEffect(() => {
     const build = () => {
@@ -2180,9 +2275,10 @@ function WorksList() {
       data-theme="dark"
       style={{ background: "black", padding: "6vh 0" }}
     >
-      {/* HEADER */}
+      {/* ================= HEADER ================= */}
       <div
         ref={headerRef}
+        className="works-header"
         style={{
           display: "grid",
           gridTemplateColumns: "1.15fr 0.5fr",
@@ -2190,21 +2286,30 @@ function WorksList() {
           color: "white",
         }}
       >
-        <h2 className="" ref={leftRef} style={{ fontSize: "2.5vw", margin: 0 }}>
-        Industry Experience
+        <h2
+          ref={leftRef}
+          style={{ fontSize: "2.5vw", margin: 0 }}
+        >
+          Industry Experience
         </h2>
 
-        <p ref={rightRef} style={{ fontSize: "1vw", opacity: 0.7 }}>
-        <span className="mr-10"></span>This selection represents work developed under different business contexts, where constraints, scale, and objectives vary from project to project.
+        <p
+          ref={rightRef}
+          style={{ fontSize: "1vw", opacity: 0.7 }}
+        >
+          This selection represents work developed under different business
+          contexts, where constraints, scale, and objectives vary from project
+          to project.
         </p>
       </div>
 
-      {/* LIST */}
+      {/* ================= LIST ================= */}
       {items.map((item, i) => (
         <div
           key={i}
           onMouseEnter={() => setHoveredIndex(i)}
           onMouseLeave={() => setHoveredIndex(null)}
+          className="works-row"
           style={{
             position: "relative",
             display: "grid",
@@ -2216,8 +2321,9 @@ function WorksList() {
             overflow: "hidden",
           }}
         >
-          {/* WHITE OVERLAY */}
+          {/* WHITE OVERLAY — DESKTOP ONLY */}
           <motion.div
+            className="hover-overlay"
             style={{
               position: "absolute",
               inset: 0,
@@ -2233,16 +2339,50 @@ function WorksList() {
           <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
           <div style={{ zIndex: 2, display: "contents" }}>
-            <div style={{ paddingLeft: "3vw", opacity: 0.7 }}>
-            </div>
-            <div style={{ fontSize: "4.5vw", textAlign: "center" }}>
+            <div />
+            <div
+              className="works-title"
+              style={{ fontSize: "4.5vw", textAlign: "center" }}
+            >
               {item.name}
             </div>
-            <div style={{ paddingRight: "3vw", textAlign: "right", opacity: 0.7 }}>
-            </div>
+            <div />
           </div>
         </div>
       ))}
+
+      {/* ================= MOBILE ONLY ================= */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .works-header {
+            grid-template-columns: 1fr !important;
+            padding: 0 6vw 4vh !important;
+          }
+
+          .works-header h2 {
+            font-size: 32px !important;
+          }
+
+          .works-header p {
+            font-size: 14px !important;
+            max-width: 90%;
+          }
+
+          .works-row {
+            grid-template-columns: 1fr !important;
+            padding: 4vh 6vw !important;
+          }
+
+          .works-title {
+            font-size: 34px !important;
+            text-align: left !important;
+          }
+
+          .hover-overlay {
+            display: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }
@@ -2738,54 +2878,13 @@ function ServicesHero() {
       {/* RIGHT — SUPPORTING BODY */}
       <div className="lg:col-span-4 lg:col-start-9 mt-5">
         <p className="text-[14px] leading-relaxed text-neutral-500 max-w-sm">
-          <span className="mr-10"></span>Most brands come to us when growth starts feeling harder to manage and
+          <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage and
           consistency across platforms begins to break down. We step in to bring
           structure, clarity, and momentum back into their digital work.
         </p>
       </div>
 
-    </div>
- 
-
-
-        
-        {/* ===================== */}
-        {/* TOP BAR */}
-        {/* ===================== */}
-        <div className="hidden relative w-full flex items-start justify-between pt-6">
-          {/* LEFT */}
-          <div className="text-sm text-gray-600 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-black/80 inline-block" />
-            <span className="opacity-80">Our Expertise</span>
-          </div>
-
-          {/* CENTER */}
-          <h2
-            ref={headerRef}
-            className="
-              absolute left-1/2 top-0
-              -translate-x-1/2
-              text-right text-black font-medium leading-tight
-              max-w-[720px]
-              text-[clamp(22px,4vw,40px)]
-            "
-          >
-            Services built to help <br className="hidden sm:block" />
-            brands grow and stay relevant.
-          </h2>
-
-          {/* RIGHT */}
-          <div className="flex flex-col items-end text-right max-w-xs gap-4">
-            <p
-              ref={rightTextRef}
-              className="text-gray-600 text-sm leading-relaxed"
-            >
-              Most brands come to us when growth starts feeling harder to manage
-              and things get less consistent across their digital work
-            </p>
-          </div>
-        </div>
-
+    </div> 
         {/* ===================== */}
         {/* MAIN CONTENT */}
         {/* ===================== */}
@@ -2875,8 +2974,13 @@ function Header() {
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
 
-  const [hidden, setHidden] = useState(true);      // hide on scroll down
-  const [enabled, setEnabled] = useState(false);  // aktif setelah 101vh
+  const [hidden, setHidden] = useState(true);
+  const [enabled, setEnabled] = useState(false);
+
+  // =========================
+  // MOBILE MENU
+  // =========================
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // =========================
   // SCROLL LOGIC
@@ -2890,13 +2994,9 @@ function Header() {
 
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
-          /* =========================
-             ENABLE HEADER AFTER 101vh
-          ========================= */
           if (currentY >= triggerY) {
             setEnabled(true);
           } else {
-            // sebelum 101vh → header dipaksa mati
             setEnabled(false);
             setHidden(true);
             lastScrollY.current = currentY;
@@ -2904,20 +3004,10 @@ function Header() {
             return;
           }
 
-          /* =========================
-             HIDE / SHOW ON SCROLL
-          ========================= */
           const diff = currentY - lastScrollY.current;
 
-          // scroll down → hide
-          if (diff > threshold) {
-            setHidden(true);
-          }
-
-          // scroll up → show
-          if (diff < -threshold) {
-            setHidden(false);
-          }
+          if (diff > threshold) setHidden(true);
+          if (diff < -threshold) setHidden(false);
 
           lastScrollY.current = currentY;
           ticking.current = false;
@@ -2933,7 +3023,6 @@ function Header() {
 
   // =========================
   // INTERSECTION → DATA-THEME
-  // (ONLY WHEN ENABLED)
   // =========================
   useEffect(() => {
     if (!enabled) return;
@@ -2974,9 +3063,7 @@ function Header() {
           bg-transparent
           transition-transform duration-300 ease-out
           ${
-            !enabled
-              ? "-translate-y-full"
-              : hidden
+            !enabled || hidden
               ? "-translate-y-full"
               : "translate-y-0"
           }
@@ -2985,67 +3072,62 @@ function Header() {
         <div
           className="
             relative
-            mx-auto  
-            px-6 md:px-20
-            min-h-[72px]
-            flex items-center 
+            mx-auto
+            px-4 sm:px-6 md:px-20
+            min-h-[64px] md:min-h-[72px]
+            flex items-center
           "
         >
-          {/* LEFT — NAV */}
+          {/* LEFT — NAV (DESKTOP ONLY) */}
           <nav
             aria-label="Primary navigation"
             className="
-              flex items-center gap-6
+              hidden md:flex
+              items-center gap-6
               flex-1 min-w-0
               text-sm font-medium tracking-wide
             "
           >
-            <a
-              href="#work"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Work
-            </a>
-            <a
-              href="#pricing"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Pricing
-            </a>
-            <a
-              href="#services"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Services
-            </a>
-            <a
-              href="#about"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              About
-            </a>
+            {["Work", "Pricing", "Services", "About"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="
+                  transition-colors whitespace-nowrap
+                  group-data-[theme=light]:text-black
+                  group-data-[theme=dark]:text-white
+                "
+              >
+                {item}
+              </a>
+            ))}
           </nav>
+
+          {/* MOBILE — HAMBURGER */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="
+              md:hidden
+              relative z-50
+              w-10 h-10
+              flex items-center justify-center
+              group-data-[theme=light]:text-black
+              group-data-[theme=dark]:text-white
+            "
+            aria-label="Open menu"
+          >
+            <span className="sr-only">Menu</span>
+            <div className="space-y-1.5">
+              <span className="block w-5 h-px bg-current" />
+              <span className="block w-5 h-px bg-current" />
+              <span className="block w-5 h-px bg-current" />
+            </div>
+          </button>
 
           {/* CENTER — LOGO */}
           <div
             className="
-              absolute left-1/2 top-10
+              absolute left-1/2 top-1/2
               -translate-x-1/2 -translate-y-1/2
               pointer-events-none
             "
@@ -3055,7 +3137,8 @@ function Header() {
                 src="/png/boson-black.png"
                 alt="Boson"
                 className="
-                  w-20 md:w-28 h-auto
+                  w-16 sm:w-18 md:w-28
+                  h-auto
                   transition
                   group-data-[theme=dark]:invert
                 "
@@ -3063,8 +3146,8 @@ function Header() {
             </a>
           </div>
 
-          {/* RIGHT — CTA */}
-          <div className="flex items-center justify-end flex-1 min-w-0">
+          {/* RIGHT — CTA (DESKTOP ONLY) */}
+          <div className="hidden md:flex items-center justify-end flex-1">
             <a
               href="#contact"
               className="
@@ -3091,10 +3174,33 @@ function Header() {
             </a>
           </div>
         </div>
-      </header>
 
-      {/* OFFSET — BIAR LAYOUT AMAN */}
-      {/* <div className="h-[72px]" /> */}
+        {/* MOBILE MENU PANEL */}
+        <div
+          className={`
+            md:hidden
+            absolute top-full left-0 w-full
+            bg-white text-black
+            group-data-[theme=dark]:bg-black
+            group-data-[theme=dark]:text-white
+            transition-all duration-300
+            ${menuOpen ? "opacity-100 visible" : "opacity-0 invisible"}
+          `}
+        >
+          <nav className="flex flex-col px-6 py-6 gap-4 text-base">
+            {["Work", "Pricing", "Services", "About", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                onClick={() => setMenuOpen(false)}
+                className="tracking-wide"
+              >
+                {item}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </header>
     </>
   );
 }
@@ -3131,13 +3237,11 @@ function Description() {
         return;
       }
 
-      // TEARDOWN TOTAL
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        // RESET VISIBILITY (ANTI ZOMBIE STATE)
         gsap.set(
           [
             titleRef.current,
@@ -3149,9 +3253,7 @@ function Description() {
           { opacity: 1, clearProps: "transform" }
         );
 
-        /* =========================
-           HEADLINE
-        ========================= */
+        // HEADLINE
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3171,9 +3273,7 @@ function Description() {
           },
         });
 
-        /* =========================
-           DIVIDER
-        ========================= */
+        // DIVIDER
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -3188,9 +3288,7 @@ function Description() {
           }
         );
 
-        /* =========================
-           BODY COPY
-        ========================= */
+        // BODY COPY
         bodyRef.current
           .querySelectorAll("[data-animate]")
           .forEach((p) => {
@@ -3214,27 +3312,20 @@ function Description() {
             });
           });
 
-        /* =========================
-           STATS
-        ========================= */
-        gsap.from(
-          statsRef.current.querySelectorAll("[data-stat]"),
-          {
-            opacity: 0,
-            y: 10,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: "top 85%",
-            },
-          }
-        );
+        // STATS
+        gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
+          opacity: 0,
+          y: 10,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: "top 85%",
+          },
+        });
 
-        /* =========================
-           CTA
-        ========================= */
+        // CTA
         gsap.from(ctaRef.current, {
           opacity: 0,
           y: 10,
@@ -3270,36 +3361,37 @@ function Description() {
     <section
       ref={sectionRef}
       data-theme="light"
-      className="w-full bg-[#F3F4F5] text-black py-12"
+      className="w-full bg-[#F3F4F5] text-black py-12 lg:py-20"
     >
-      <div className="max-w-screen mx-auto px-6 lg:px-12">
-        {/* =========================
-           HEADLINE
-        ========================= */}
-        <div className="max-w-full mb-16">
+      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-12">
+        {/* HEADLINE */}
+        <div className="max-w-full mb-12 lg:mb-16">
           <h1
             ref={titleRef}
-            className="font-sans font-medium leading-[1.15] tracking-tight"
-            style={{ fontSize: "clamp(32px, 4vw, 134px)" }}
+            className="
+              font-sans font-medium tracking-tight leading-[1.15]
+            "
+            style={{
+              fontSize: "clamp(28px, 5vw, 134px)",
+            }}
           >
-            <span className="mr-80"></span>We are a social media agency that helps brands stay consistent
+            <span className="hidden lg:inline mr-80" />
+            We are a social media agency that helps brands stay consistent
             online. We keep everything on track so you can stay focused on
             what <span className="italic">matters</span>
           </h1>
 
           <div
             ref={dividerRef}
-            className="mt-10 h-px w-full bg-neutral-700"
+            className="mt-8 lg:mt-10 h-px w-full bg-neutral-700"
           />
         </div>
 
-        {/* =========================
-           CONTENT
-        ========================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-20">
-          {/* LEFT — STATS */}
-          <div ref={statsRef} className="lg:col-span-5 flex items-end">
-            <div className="grid grid-cols-3 gap-8 text-neutral-500">
+        {/* CONTENT */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
+          {/* STATS */}
+          <div ref={statsRef} className="lg:col-span-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
               <div data-stat className="flex flex-col gap-1">
                 <div className="text-xs uppercase tracking-widest">
                   Projects delivered
@@ -3329,12 +3421,19 @@ function Description() {
             </div>
           </div>
 
-          {/* RIGHT — BODY + CTA */}
+          {/* BODY + CTA */}
           <div
             ref={bodyRef}
-            className="lg:col-span-7 max-w-xl ml-auto text-neutral-800 text-[17px] leading-[1.6]"
+            className="
+              lg:col-span-7
+              max-w-full lg:max-w-xl
+              lg:ml-auto
+              text-neutral-800
+              text-[16px] lg:text-[17px]
+              leading-[1.6]
+            "
           >
-            <p data-animate className="mb-10">
+            <p data-animate className="mb-8 lg:mb-10">
               Boson is a digital agency founded in 2021 and based in Bali,
               working with clients across Qatar, Malaysia, and other regions.
               Our work combines design, development, and brand operations,
@@ -3348,7 +3447,7 @@ function Description() {
               href="#projects"
               className="
                 inline-flex items-center gap-3
-                px-8 py-4
+                px-7 lg:px-8 py-4
                 rounded-full
                 border border-black
                 text-sm font-medium tracking-wide
@@ -3383,147 +3482,119 @@ function ProjectShowcase() {
 
   const projects = [
     {
-      id: "01",
-      title: "DWM",
-      image: "/clients/dwm/main.mp4",
+      title: "Sunny\nVillage",
+      image: "https://i.imgur.com/Gjuxvj5.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A real estate–focused wealth management service in Bali, helping clients manage, grow, and secure property-based assets.",
     },
     {
-      id: "02",
-      title: "Marrosh",
-      image: "/clients/marrosh/main.mp4", // VIDEO
-      meta: ["FOOD & BEVERAGE",  "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      title: "Novo\nAmpang",
+      image: "https://i.imgur.com/UzRs3rO.mp4",
+      meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "A Lebanese café in Canggu, Bali, focused on warm hospitality, communal dining, and a relaxed coastal atmosphere",
+        "A residential development in Kuala Lumpur, characterized by modern architecture and a functional approach to urban housing",
     },
     {
-      id: "03",
+      title: "Shinobi\nSoirée",
+      image: "https://i.imgur.com/WJI4G8F.mp4",
+      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      desc:
+        "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
+    },
+    {
+      title: "Marrosh\n Bali",
+      image: "/clients/marrosh/main.mp4",
+      meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      desc:
+        "A Lebanese café in Canggu, focused on warm hospitality, communal dining, and a relaxed coastal atmosphere",
+    },
+    {
       title: "Tender\nTouch",
       image: "/clients/tender-touch/main.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A relaxation-focused massage service in Bali, designed around calm, care, and a slower pace away from daily pressure",
     },
-   
   ];
 
-  // =====================
-  // HELPERS
-  // =====================
-  const isVideo = (src) => {
-    if (!src) return false;
-    return /\.(mp4|webm|ogg)$/i.test(src);
-  };
+  const isVideo = (src) => /\.(mp4|webm|ogg)$/i.test(src);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useLayoutEffect(() => {
     if (window.innerWidth < 1024) return;
 
     const ctx = gsap.context(() => {
+      const slidesCount = projects.length;
       const track = trackRef.current;
       const progressBar = progressRef.current;
 
-      const totalWidth = track.scrollWidth - window.innerWidth;
+      const getScrollDistance = () =>
+        (slidesCount - 1) * window.innerWidth;
 
-      // =====================
-      // MAIN HORIZONTAL SCROLL
-      // =====================
       const mainTween = gsap.to(track, {
-        x: -totalWidth,
+        x: () => -getScrollDistance(),
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${track.scrollWidth}`,
+          end: () => `+=${getScrollDistance()}`,
           scrub: true,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate(self) {
             gsap.set(progressBar, {
               scaleX: self.progress,
               transformOrigin: "left center",
             });
 
-            setActiveIndex(
-              Math.min(
-                projects.length - 1,
-                Math.floor(self.progress * projects.length)
-              )
+            const index = Math.round(
+              self.progress * (slidesCount - 1)
             );
+            setActiveIndex(index);
           },
         },
       });
 
-      // =====================
-      // PARALLAX
-      // =====================
-      gsap.utils.toArray(".parallax-title").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 40 },
-          {
-            x: -40,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
+      const parallax = (selector, fromX, toX) => {
+        gsap.utils.toArray(selector).forEach((el) => {
+          gsap.fromTo(
+            el,
+            { x: fromX },
+            {
+              x: toX,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                containerAnimation: mainTween,
+                start: "left right",
+                end: "right left",
+                scrub: 0.6,
+              },
+            }
+          );
+        });
+      };
 
-      gsap.utils.toArray(".parallax-image").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 90 },
-          {
-            x: -90,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
-
-      gsap.utils.toArray(".parallax-meta").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 140 },
-          {
-            x: -140,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
+      parallax(".parallax-title", 40, -40);
+      parallax(".parallax-image", 90, -90);
+      parallax(".parallax-meta", 140, -140);
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [projects.length]);
 
   return (
     <section
       ref={sectionRef}
+      data-theme="dark"
       className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
-      {/* ===============================
-         HORIZONTAL TRACK
-      =============================== */}
+      {/* TRACK */}
       <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
@@ -3535,25 +3606,33 @@ function ProjectShowcase() {
                 : "100%",
           }}
         >
-          {projects.map((p) => (
+          {projects.map((p, i) => (
             <div
-              key={p.id}
+              key={i}
               className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
             >
-              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12">
+              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
                 <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
-                  {p.id}
+                  0{i + 1}
                 </span>
 
-                <h1 className="parallax-title lg:absolute lg:left-50 lg:top-[25%] text-[96px] leading-[0.95] font-light whitespace-pre-line z-20">
+                {/* TITLE */}
+                <h1
+                  className="
+                    parallax-title
+                    text-[56px] leading-[1]
+                    font-light whitespace-pre-line
+                    lg:text-[96px] lg:leading-[0.95]
+                    lg:absolute lg:left-50 lg:top-[25%]
+                    z-20
+                  "
+                >
                   {p.title}
                 </h1>
 
-                {/* =====================
-                   IMAGE / VIDEO
-                ===================== */}
+                {/* MEDIA */}
                 <div className="lg:col-span-4 lg:col-start-5 flex justify-center z-10">
-                  <div className="parallax-image relative w-[420px] aspect-[3/4] overflow-hidden">
+                  <div className="parallax-image relative w-full max-w-[420px] lg:w-[420px] aspect-[3/4] overflow-hidden">
                     {isVideo(p.image) ? (
                       <video
                         src={p.image}
@@ -3573,10 +3652,8 @@ function ProjectShowcase() {
                   </div>
                 </div>
 
-                {/* =====================
-                   META
-                ===================== */}
-                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 justify-end">
+                {/* META */}
+                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 lg:justify-end">
                   <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
                       <p key={m} className="underline">
@@ -3584,7 +3661,9 @@ function ProjectShowcase() {
                       </p>
                     ))}
                   </div>
-                  <p className="text-sm text-white/60">{p.desc}</p>
+                  <p className="text-sm text-white/60">
+                    {p.desc}
+                  </p>
                 </div>
               </div>
             </div>
@@ -3592,9 +3671,7 @@ function ProjectShowcase() {
         </div>
       </div>
 
-      {/* ===============================
-         PROGRESS
-      =============================== */}
+      {/* PROGRESS */}
       <div className="hidden lg:block absolute bottom-0 left-0 right-0 px-28 pb-6">
         <div className="h-[1px] bg-white/20">
           <div
@@ -3617,47 +3694,51 @@ function Footer() {
   const charsRef = useRef([]);
 
   useEffect(() => {
-    const chars = charsRef.current;
-    if (!chars.length) return;
+    const el = emailRef.current;
 
-    // INIT STATE
-    gsap.set(chars, { y: 0, opacity: 1 });
+    // safety guards
+    if (!el) return;
+
+    // reset chars (important for React re-render / strict mode)
+    charsRef.current = charsRef.current.filter(Boolean);
+    if (!charsRef.current.length) return;
+
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches;
+
+    // disable GSAP hover animation on touch-first devices
+    if (isTouchDevice) return;
+
+    gsap.set(charsRef.current, { y: 0, opacity: 1 });
 
     const tl = gsap.timeline({ paused: true });
 
-    tl
-      // PHASE 1 — UP & DISAPPEAR
-      .to(chars, {
-        y: -36,
-        opacity: 0,
-        duration: 0.55,
-        ease: "power4.in",
-        stagger: {
-          amount: 0.22,
-        },
-      })
-
-      // PHASE 2 — TELEPORT (INVISIBLE)
-      .set(chars, { y: 36 })
-
-      // PHASE 3 — RETURN
-      .to(chars, {
+    tl.to(charsRef.current, {
+      y: -36,
+      opacity: 0,
+      duration: 0.55,
+      ease: "power4.in",
+      stagger: { amount: 0.22 },
+    })
+      .set(charsRef.current, { y: 36 })
+      .to(charsRef.current, {
         y: 0,
         opacity: 1,
         duration: 0.55,
         ease: "back.out(2.6)",
-        stagger: {
-          amount: 0.22,
-        },
+        stagger: { amount: 0.22 },
       });
 
-    const el = emailRef.current;
-    const onEnter = () => tl.restart();
+    const onPointerEnter = (e) => {
+      if (e.pointerType !== "mouse") return;
+      tl.restart();
+    };
 
-    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("pointerenter", onPointerEnter);
 
     return () => {
-      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("pointerenter", onPointerEnter);
       tl.kill();
     };
   }, []);
@@ -3665,14 +3746,19 @@ function Footer() {
   const email = "hello@studio.com";
 
   return (
-    <footer id="top" className="relative bg-neutral-950 text-white overflow-hidden">
+    <footer
+      id="top"
+      className="relative bg-neutral-950 text-white overflow-hidden"
+    >
       {/* ==================================================
-        SIGNAL BAR — CONTEXT ONLY
+        SIGNAL BAR
       ================================================== */}
-      <div className="px-[6vw] py-5 flex flex-wrap items-center justify-between text-[11px] tracking-wide border-b border-white/10">
-        <div className="opacity-50 uppercase">GMT +7 · Operating globally</div>
+      <div className="px-[6vw] py-4 sm:py-5 flex flex-wrap items-center justify-between text-[10px] sm:text-[11px] tracking-wide border-b border-white/10 gap-y-2">
+        <div className="opacity-50 uppercase">
+          GMT +7 · Operating globally
+        </div>
 
-        <div className="flex gap-6">
+        <div className="flex gap-5 sm:gap-6">
           <div className="opacity-80">Our Social</div>
           {["Instagram", "LinkedIn"].map((item) => (
             <a
@@ -3687,27 +3773,34 @@ function Footer() {
       </div>
 
       {/* ==================================================
-        DECISION THRESHOLD — CTA
+        CTA
       ================================================== */}
-      <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-28">
-        <div className="grid grid-cols-12 gap-y-14">
+      <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-20 sm:py-28">
+        <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
           {/* LEFT */}
           <div className="col-span-12 lg:col-span-6">
-            <p className="text-neutral-500 max-w-md leading-relaxed">
+            <p className="text-neutral-500 max-w-md leading-relaxed text-sm sm:text-base">
               We work with teams building thoughtful digital products
               <br />
-              <span className="mr-10"></span>
+              <span className="hidden sm:inline mr-10"></span>
               If you have a project in mind, we would{" "}
               <span className="italic">looove</span> to hear about it
             </p>
           </div>
 
-          {/* RIGHT — EMAIL (GSAP CONTROLLED) */}
-          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-end">
+          {/* RIGHT — EMAIL */}
+          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
             <a
               ref={emailRef}
               href="mailto:hello@studio.com"
-              className="inline-block text-[clamp(28px,3vw,42px)] font-light tracking-tight text-white cursor-pointer"
+              className="
+                inline-block
+                font-light
+                tracking-tight
+                text-white
+                cursor-pointer
+                text-[clamp(24px,7vw,42px)]
+              "
             >
               <span className="inline-flex overflow-hidden">
                 {email.split("").map((char, i) => (
@@ -3721,6 +3814,7 @@ function Footer() {
                 ))}
               </span>
 
+              {/* underline included in tap area */}
               <span className="block h-[1px] w-full bg-white/30 mt-1" />
             </a>
           </div>
@@ -3728,10 +3822,10 @@ function Footer() {
       </div>
 
       {/* ==================================================
-        BRAND MASS — FINAL SIGNATURE
+        BRAND MASS
       ================================================== */}
-      <div className="relative px-6 lg:px-12 pt-12 pb-24 border-t border-neutral-800">
-        <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-12 items-end">
+      <div className="relative px-6 lg:px-12 pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
           {/* BRAND */}
           <div className="col-span-12 lg:col-span-7">
             <img
@@ -3742,15 +3836,15 @@ function Footer() {
           </div>
 
           {/* META */}
-          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-6 text-xs text-neutral-500">
-            <div className="space-y-1 text-right">
+          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500">
+            <div className="space-y-1 lg:text-right">
               <div>+62 812 3456 789</div>
               <div>Bali · Indonesia</div>
             </div>
 
             <span>Copyright © {new Date().getFullYear()}</span>
 
-            <div className="flex gap-8">
+            <div className="flex gap-6 sm:gap-8">
               <a href="/imprint" className="hover:text-white">
                 Imprint
               </a>
@@ -3778,23 +3872,53 @@ function Footer() {
    PAGE
    ========================================== */
 
-   export default function Page() {
+   export default  function Page() {
     const ready = useContext(LoaderContext);
   
     const bgRef = useRef(null);
     const footerRef = useRef(null);
   
+    const [footerHeight, setFooterHeight] = useState(0);
+  
+    /* ==================================================
+      RESET SCROLL
+    ================================================== */
     useEffect(() => {
       window.scrollTo(0, 0);
     }, []);
   
+    /* ==================================================
+      MEASURE FOOTER HEIGHT (DYNAMIC BUFFER SOURCE)
+    ================================================== */
     useEffect(() => {
       if (!ready) return;
   
       const footer = footerRef.current;
       if (!footer) return;
   
-      const OFFSET = window.innerHeight * 0.5; // footer mulai 50vh di bawah
+      const measure = () => {
+        const rect = footer.getBoundingClientRect();
+        setFooterHeight(rect.height);
+      };
+  
+      measure();
+      window.addEventListener("resize", measure);
+  
+      return () => {
+        window.removeEventListener("resize", measure);
+      };
+    }, [ready]);
+  
+    /* ==================================================
+      SCROLL-DRIVEN FOOTER REVEAL (PURE, MANUAL)
+    ================================================== */
+    useEffect(() => {
+      if (!ready) return;
+  
+      const footer = footerRef.current;
+      if (!footer) return;
+  
+      const OFFSET = window.innerHeight * 0.5;
   
       // INIT STATE
       footer.style.transform = `translateY(${OFFSET}px)`;
@@ -3804,17 +3928,14 @@ function Footer() {
         const viewportH = window.innerHeight;
         const docH = document.documentElement.scrollHeight;
   
-        // titik awal 100vh terakhir
-        const start = docH - viewportH * 2;
+        // trigger zone: last viewport before bottom
+        const start = docH - viewportH - footerHeight;
         const end = docH - viewportH;
   
-        // progress 0 → 1
         let progress = (scrollY - start) / (end - start);
         progress = Math.min(Math.max(progress, 0), 1);
   
-        // interpolasi manual
         const y = OFFSET * (1 - progress);
-  
         footer.style.transform = `translateY(${y}px)`;
       };
   
@@ -3823,7 +3944,7 @@ function Footer() {
       return () => {
         window.removeEventListener("scroll", onScroll);
       };
-    }, [ready]);
+    }, [ready, footerHeight]);
   
     if (!ready) return null;
   
@@ -3897,9 +4018,13 @@ function Footer() {
         </div>
   
         {/* ==================================================
-          EXTRA SCROLL DEPTH (BUFFER)
+          EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
         ================================================== */}
-        <div className="h-[73vh]" />
+        <div
+          style={{
+            height: footerHeight,
+          }}
+        />
   
         {/* 
         <MeetBoson />
@@ -3922,7 +4047,7 @@ function Footer() {
         ================================================== */}
         <div
           ref={footerRef}
-          className="fixed bottom-0 left-0 w-full z-0   "
+          className="fixed bottom-0 left-0 w-full z-0"
           style={{
             willChange: "transform",
           }}
