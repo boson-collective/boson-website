@@ -13,7 +13,11 @@ import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnima
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
 import * as THREE from "three";
-import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import {
+  BriefcaseIcon,
+  GlobeAltIcon,
+  UsersIcon,
+} from "@heroicons/react/24/outline";
 
 gsap.registerPlugin(ScrollTrigger,SplitText,CustomEase);
 
@@ -176,6 +180,24 @@ function Webglbg() {
     );
     const [topIndex, setTopIndex] = useState(0);
   
+    // =========================
+    // RESPONSIVE SCALE CONTROL
+    // =========================
+    const [isMobile, setIsMobile] = useState(false);
+  
+    useEffect(() => {
+      const check = () => {
+        setIsMobile(window.innerWidth < 768);
+      };
+      check();
+      window.addEventListener("resize", check);
+      return () => window.removeEventListener("resize", check);
+    }, []);
+  
+    const scaleExpand = isMobile
+      ? { scaleX: 6, scaleY: 6 } // 📱 portrait
+      : { scaleX: 26, scaleY: 6 }; // 🖥 landscape
+  
     const getDuration = (i) => (i === 0 ? 650 : 250);
     const overlapOffset = 150;
   
@@ -186,9 +208,8 @@ function Webglbg() {
         const duration = getDuration(i);
         const openTime = timeCursor;
         const softTime = i === 0 ? openTime + duration * 0.35 : openTime;
-        const closeTime = softTime + duration; // FIX sebelumnya: close nunggu open selesai
+        const closeTime = softTime + duration;
   
-        // SOFT (khusus image pertama)
         if (i === 0) {
           setTimeout(() => {
             setVisible((prev) => {
@@ -200,7 +221,6 @@ function Webglbg() {
           }, openTime);
         }
   
-        // OPEN
         setTimeout(() => {
           setVisible((prev) => {
             const arr = [...prev];
@@ -210,7 +230,6 @@ function Webglbg() {
           setTopIndex(i);
         }, softTime);
   
-        // CLOSE
         setTimeout(() => {
           setVisible((prev) => {
             const arr = [...prev];
@@ -219,7 +238,6 @@ function Webglbg() {
           });
         }, closeTime);
   
-        // STACK NEXT ABOVE — FIX GLITCH INDEX 0
         setTimeout(() => {
           if (i < IMAGES.length - 1) {
             setTopIndex(i + 1);
@@ -242,7 +260,7 @@ function Webglbg() {
         className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
         animate={
           phase === "expand"
-            ? { scaleX: 26, scaleY: 6 }
+            ? scaleExpand
             : { scaleX: 1, scaleY: 1 }
         }
         transition={{ duration: 1.6, ease: "easeInOut" }}
@@ -276,7 +294,7 @@ function Webglbg() {
             ))}
           </div>
   
-          {/* BOLOONG */}
+          {/* HOLE */}
           <div className="absolute inset-0 spotlight pointer-events-none" />
         </div>
   
@@ -434,8 +452,7 @@ function Webglbg() {
     const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
   
     /* =========================
-       BASE TEXT STYLE
-       (DESKTOP DEFAULT)
+       BASE TEXT STYLE (DESKTOP)
     ========================= */
     const baseTextStyle = {
       width: "100%",
@@ -451,7 +468,7 @@ function Webglbg() {
     };
   
     /* =========================
-       MOBILE OVERRIDE (CLEAN)
+       MOBILE OVERRIDE
     ========================= */
     const mobileTextOverride = isMobile
       ? {
@@ -468,9 +485,17 @@ function Webglbg() {
       <div
         ref={wrap}
         onMouseMove={handleMove}
-        className="boson-narrative-container bg-black w-full relative overflow-hidden flex items-center"
+        className="boson-narrative-container bg-black w-full relative overflow-hidden flex"
         style={{
-          minHeight: "100vh",
+          /* =========================
+             HEIGHT BEHAVIOR
+          ========================= */
+          minHeight: isMobile ? "auto" : "100vh",
+          alignItems: isMobile ? "flex-start" : "center",
+  
+          /* =========================
+             PADDING
+          ========================= */
           padding: isMobile ? "72px 6vw" : "120px 6vw",
         }}
       >
@@ -1023,10 +1048,6 @@ function VideoSection() {
 
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-    /* =========================
-       INITIAL STATE
-    ========================= */
-
     hole.style.width = `${isMobile ? 180 : holeBaseW}px`;
     hole.style.height = `${isMobile ? 260 : holeBaseH}px`;
 
@@ -1038,10 +1059,6 @@ function VideoSection() {
       scale: 1,
       boxShadow: "0 0 0 9999px #000",
     });
-
-    /* =========================
-       TIMELINE
-    ========================= */
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -1080,10 +1097,6 @@ function VideoSection() {
       0.92
     );
 
-    /* =========================
-       MICRO MOTION
-    ========================= */
-
     const loop = () => {
       tRef.current += 0.01;
 
@@ -1111,25 +1124,17 @@ function VideoSection() {
     };
   }, []);
 
+  const isMobile =
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 768px)").matches
+      : false;
+
   return (
-    <div
-      data-theme="dark"
-      ref={outerRef}
-      style={{
-        height: "300vh",
-        position: "relative",
-      }}
-    >
+    <div ref={outerRef} style={{ height: "300vh", position: "relative" }}>
       <section
         ref={sectionRef}
-        style={{
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          overflow: "hidden",
-        }}
+        style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
       >
-        {/* VIDEO */}
         <video
           ref={videoRef}
           src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
@@ -1147,7 +1152,6 @@ function VideoSection() {
           }}
         />
 
-        {/* HOLE */}
         <div
           ref={holeRef}
           style={{
@@ -1161,14 +1165,16 @@ function VideoSection() {
           }}
         />
 
-        {/* TEXT */}
+        {/* TEXT WRAPPER — HANYA POSITION YANG DIUBAH */}
         <div
           ref={textRef}
           style={{
             position: "absolute",
             left: 0,
             right: 0,
-            bottom: "10vh",
+            bottom: isMobile ? "auto" : "10vh",
+            top: isMobile ? "50%" : "auto",
+            transform: isMobile ? "translateY(-50%)" : "none",
             paddingLeft: "14vw",
             paddingRight: "6vw",
             color: "white",
@@ -1181,14 +1187,14 @@ function VideoSection() {
               ref={processRef}
               style={{
                 display: "grid",
-                gridTemplateColumns:
-                  window.matchMedia("(max-width: 768px)").matches
-                    ? "1fr"
-                    : "repeat(3, minmax(260px, 1fr))",
-                gap: window.matchMedia("(max-width: 768px)").matches ? "40px" : "56px",
+                gridTemplateColumns: isMobile
+                  ? "1fr"
+                  : "repeat(3, minmax(260px, 1fr))",
+                gap: isMobile ? "40px" : "56px",
               }}
             >
-              {/* DISCOVER */}
+              {/* === ISI KONTEN ASLI — TIDAK DIUBAH === */}
+
               <div>
                 <svg ref={sigilDiscoverRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
                   <circle cx="50" cy="50" r="36" fill="none" stroke="white" strokeWidth="1" />
@@ -1205,7 +1211,6 @@ function VideoSection() {
                 </p>
               </div>
 
-              {/* CREATE */}
               <div>
                 <svg ref={sigilCreateRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
                   <rect x="20" y="20" width="60" height="60" rx="8" fill="none" stroke="white" strokeWidth="1" />
@@ -1223,7 +1228,6 @@ function VideoSection() {
                 </p>
               </div>
 
-              {/* DELIVER */}
               <div>
                 <svg ref={sigilDeliverRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
                   <rect x="26" y="30" width="48" height="36" rx="4" fill="none" stroke="white" strokeWidth="1" />
@@ -1235,6 +1239,7 @@ function VideoSection() {
                   Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
                 </p>
               </div>
+
             </div>
           </div>
         </div>
@@ -2725,21 +2730,16 @@ function ServicesHero() {
       if (!sectionRef.current || !headerRef.current || !rightTextRef.current)
         return;
 
-      // TOTAL TEARDOWN
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        // RESET VISIBILITY
         gsap.set([headerRef.current, rightTextRef.current], {
           opacity: 1,
           clearProps: "transform",
         });
 
-        /* =========================
-           CENTER HEADER
-        ========================= */
         const headerSplit = SplitText.create(headerRef.current, {
           type: "lines",
           linesClass: "line",
@@ -2748,10 +2748,10 @@ function ServicesHero() {
         splitsRef.current.push(headerSplit);
 
         gsap.from(headerSplit.lines, {
-          yPercent: 40,
+          yPercent: 35,
           opacity: 0,
-          duration: 1.2,
-          stagger: 0.12,
+          duration: 1,
+          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -2759,9 +2759,6 @@ function ServicesHero() {
           },
         });
 
-        /* =========================
-           RIGHT PARAGRAPH
-        ========================= */
         const rightSplit = SplitText.create(rightTextRef.current, {
           type: "lines",
           linesClass: "line",
@@ -2770,10 +2767,10 @@ function ServicesHero() {
         splitsRef.current.push(rightSplit);
 
         gsap.from(rightSplit.lines, {
-          yPercent: 32,
+          yPercent: 25,
           opacity: 0,
-          duration: 1.1,
-          stagger: 0.06,
+          duration: 0.9,
+          stagger: 0.05,
           ease: "power1.out",
           scrollTrigger: {
             trigger: rightTextRef.current,
@@ -2801,9 +2798,6 @@ function ServicesHero() {
     };
   }, []);
 
-  // =====================
-  // DATA
-  // =====================
   const services = [
     {
       label: "Social Media Marketing",
@@ -2832,9 +2826,7 @@ function ServicesHero() {
       ref={sectionRef}
       className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
     >
-      {/* ===================== */}
       {/* CUSTOM CURSOR */}
-      {/* ===================== */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999]"
@@ -2850,45 +2842,52 @@ function ServicesHero() {
           }}
         />
       </div>
-      
-      
 
-      <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 sm:py-12 flex flex-col">
-         
+      <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 flex flex-col">
+        {/* ===================== */}
+        {/* TOP TEXT — RAPAT */}
+        {/* ===================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-6 lg:gap-x-10 items-start">
+          {/* LEFT — HEADLINE */}
+          <div className="lg:col-span-7">
+            <h2
+              ref={headerRef}
+              className="font-sans font-normal tracking-tight"
+            >
+              <span className="block text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
+                Services built to help
+              </span>
 
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-      
-      {/* LEFT — HEADLINE */}
-      <div className="lg:col-span-7">
-        <h2 className="font-sans font-normal tracking-tight leading-[1.05]">
-          <span className="block text-[clamp(32px,5vw,55px)] text-neutral-900">
-            Services built to help
-          </span>
+              <span className="block -mt-1 text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
+                brands grow
+              </span>
 
-          <span className="block text-[clamp(32px,5vw,55px)] text-neutral-900">
-            brands grow
-          </span>
+              <span className="block mt-2 text-[clamp(18px,2vw,26px)] leading-tight text-neutral-400">
+                and stay relevant
+              </span>
+            </h2>
+          </div>
 
-          <span className="block mt-5 text-[clamp(18px,2vw,26px)] text-neutral-400">
-            and stay relevant
-          </span>
-        </h2>
-      </div>
+          {/* RIGHT — SUPPORTING BODY */}
+          <div className="lg:col-span-4 lg:col-start-9 lg:mt-5">
+            <p
+              ref={rightTextRef}
+              className="text-[14px] leading-[1.55] text-neutral-800 max-w-sm"
+            >
+              <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage
+              and consistency across platforms begins to break down. We step in
+              to bring structure, clarity, and momentum back into their digital
+              work.
+            </p>
+          </div>
+           
+          
+        </div>
 
-      {/* RIGHT — SUPPORTING BODY */}
-      <div className="lg:col-span-4 lg:col-start-9 mt-5">
-        <p className="text-[14px] leading-relaxed text-neutral-500 max-w-sm">
-          <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage and
-          consistency across platforms begins to break down. We step in to bring
-          structure, clarity, and momentum back into their digital work.
-        </p>
-      </div>
-
-    </div> 
         {/* ===================== */}
         {/* MAIN CONTENT */}
         {/* ===================== */}
-        <div className="relative flex-1 mt-16 sm:mt-24 lg:mt-32 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-start">
+        <div className="relative flex-1 mt-16 sm:mt-20 lg:mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-start">
           <div className="hidden xl:block xl:col-span-2" />
 
           <div className="col-span-1 lg:col-span-12 xl:col-span-10 flex flex-col">
@@ -3253,7 +3252,6 @@ function Description() {
           { opacity: 1, clearProps: "transform" }
         );
 
-        // HEADLINE
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3273,7 +3271,6 @@ function Description() {
           },
         });
 
-        // DIVIDER
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -3288,7 +3285,6 @@ function Description() {
           }
         );
 
-        // BODY COPY
         bodyRef.current
           .querySelectorAll("[data-animate]")
           .forEach((p) => {
@@ -3312,7 +3308,6 @@ function Description() {
             });
           });
 
-        // STATS
         gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
           opacity: 0,
           y: 10,
@@ -3325,7 +3320,6 @@ function Description() {
           },
         });
 
-        // CTA
         gsap.from(ctaRef.current, {
           opacity: 0,
           y: 10,
@@ -3368,12 +3362,8 @@ function Description() {
         <div className="max-w-full mb-12 lg:mb-16">
           <h1
             ref={titleRef}
-            className="
-              font-sans font-medium tracking-tight leading-[1.15]
-            "
-            style={{
-              fontSize: "clamp(28px, 5vw, 134px)",
-            }}
+            className="font-sans font-medium tracking-tight leading-[1.15]"
+            style={{ fontSize: "clamp(32px, 5vw, 134px)" }}
           >
             <span className="hidden lg:inline mr-80" />
             We are a social media agency that helps brands stay consistent
@@ -3387,35 +3377,55 @@ function Description() {
           />
         </div>
 
-        {/* CONTENT */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
           {/* STATS */}
           <div ref={statsRef} className="lg:col-span-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
-              <div data-stat className="flex flex-col gap-1">
-                <div className="text-xs uppercase tracking-widest">
-                  Projects delivered
-                </div>
-                <div className="text-[22px] font-medium text-neutral-800">
-                  100+
-                </div>
-              </div>
-
-              <div data-stat className="flex flex-col gap-1">
-                <div className="text-xs uppercase tracking-widest">
-                  Countries served
-                </div>
-                <div className="text-[22px] font-medium text-neutral-800">
-                  3
+              {/* STAT 1 */}
+              <div
+                data-stat
+                className="flex items-center sm:items-start gap-4 sm:flex-col"
+              >
+                <BriefcaseIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
+                <div className="flex flex-col gap-1">
+                  <div className="text-xs uppercase tracking-widest">
+                    Projects delivered
+                  </div>
+                  <div className="text-[22px] font-medium text-neutral-800">
+                    100+
+                  </div>
                 </div>
               </div>
 
-              <div data-stat className="flex flex-col gap-1">
-                <div className="text-xs uppercase tracking-widest">
-                  Total audience reach
+              {/* STAT 2 */}
+              <div
+                data-stat
+                className="flex items-center sm:items-start gap-4 sm:flex-col"
+              >
+                <GlobeAltIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
+                <div className="flex flex-col gap-1">
+                  <div className="text-xs uppercase tracking-widest">
+                    Countries served
+                  </div>
+                  <div className="text-[22px] font-medium text-neutral-800">
+                    3
+                  </div>
                 </div>
-                <div className="text-[22px] font-medium text-neutral-800">
-                  2.5m+
+              </div>
+
+              {/* STAT 3 */}
+              <div
+                data-stat
+                className="flex items-center sm:items-start gap-4 sm:flex-col"
+              >
+                <UsersIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
+                <div className="flex flex-col gap-1">
+                  <div className="text-xs uppercase tracking-widest">
+                    Total audience reach
+                  </div>
+                  <div className="text-[22px] font-medium text-neutral-800">
+                    2.5m+
+                  </div>
                 </div>
               </div>
             </div>
@@ -3482,18 +3492,18 @@ function ProjectShowcase() {
 
   const projects = [
     {
-      title: "Sunny\nVillage",
+      title: "Sunny\nDevelopment",
       image: "https://i.imgur.com/Gjuxvj5.mp4",
-      meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
-        "A real estate–focused wealth management service in Bali, helping clients manage, grow, and secure property-based assets.",
+        "A property development group delivering residential and hospitality projects with a focus on design, lifestyle, and long-term value",
     },
     {
       title: "Novo\nAmpang",
       image: "https://i.imgur.com/UzRs3rO.mp4",
-      meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MANAGEMENT"],
+      meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MARKETING"],
       desc:
-        "A residential development in Kuala Lumpur, characterized by modern architecture and a functional approach to urban housing",
+        "A premium residential development in Kuala Lumpur designed for urban living and investment-driven buyers",
     },
     {
       title: "Shinobi\nSoirée",
@@ -3503,18 +3513,18 @@ function ProjectShowcase() {
         "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
     },
     {
-      title: "Marrosh\n Bali",
+      title: "Marrosh\nBali",
       image: "/clients/marrosh/main.mp4",
       meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "A Lebanese café in Canggu, focused on warm hospitality, communal dining, and a relaxed coastal atmosphere",
+        "A Lebanese restaurant in Canggu offering authentic Middle Eastern cuisine in a warm, casual dining setting.",
     },
     {
       title: "Tender\nTouch",
       image: "/clients/tender-touch/main.mp4",
-      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
-        "A relaxation-focused massage service in Bali, designed around calm, care, and a slower pace away from daily pressure",
+        "A wellness and massage brand in Bali offering premium treatments focused on recovery, relaxation, and holistic care",
     },
   ];
 
@@ -3613,7 +3623,7 @@ function ProjectShowcase() {
             >
               <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
                 <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
-                  0{i + 1}
+                  PROJECT 0{i + 1}
                 </span>
 
                 {/* TITLE */}
@@ -3630,9 +3640,19 @@ function ProjectShowcase() {
                   {p.title}
                 </h1>
 
-                {/* MEDIA */}
-                <div className="lg:col-span-4 lg:col-start-5 flex justify-center z-10">
-                  <div className="parallax-image relative w-full max-w-[420px] lg:w-[420px] aspect-[3/4] overflow-hidden">
+                {/* MEDIA — FIXED */}
+                <div className="lg:col-span-4 lg:col-start-5 z-10">
+                  <div
+                    className="
+                      parallax-image
+                      relative
+                      w-full
+                      aspect-[3/4]
+                      overflow-hidden
+                      lg:max-w-[420px]
+                      lg:mx-auto
+                    "
+                  >
                     {isVideo(p.image) ? (
                       <video
                         src={p.image}
@@ -3695,11 +3715,8 @@ function Footer() {
 
   useEffect(() => {
     const el = emailRef.current;
-
-    // safety guards
     if (!el) return;
 
-    // reset chars (important for React re-render / strict mode)
     charsRef.current = charsRef.current.filter(Boolean);
     if (!charsRef.current.length) return;
 
@@ -3707,7 +3724,6 @@ function Footer() {
       typeof window !== "undefined" &&
       window.matchMedia("(hover: none)").matches;
 
-    // disable GSAP hover animation on touch-first devices
     if (isTouchDevice) return;
 
     gsap.set(charsRef.current, { y: 0, opacity: 1 });
@@ -3750,9 +3766,7 @@ function Footer() {
       id="top"
       className="relative bg-neutral-950 text-white overflow-hidden"
     >
-      {/* ==================================================
-        SIGNAL BAR
-      ================================================== */}
+      {/* SIGNAL BAR */}
       <div className="px-[6vw] py-4 sm:py-5 flex flex-wrap items-center justify-between text-[10px] sm:text-[11px] tracking-wide border-b border-white/10 gap-y-2">
         <div className="opacity-50 uppercase">
           GMT +7 · Operating globally
@@ -3772,12 +3786,9 @@ function Footer() {
         </div>
       </div>
 
-      {/* ==================================================
-        CTA
-      ================================================== */}
+      {/* CTA */}
       <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-20 sm:py-28">
         <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
-          {/* LEFT */}
           <div className="col-span-12 lg:col-span-6">
             <p className="text-neutral-500 max-w-md leading-relaxed text-sm sm:text-base">
               We work with teams building thoughtful digital products
@@ -3788,7 +3799,6 @@ function Footer() {
             </p>
           </div>
 
-          {/* RIGHT — EMAIL */}
           <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
             <a
               ref={emailRef}
@@ -3813,30 +3823,18 @@ function Footer() {
                   </span>
                 ))}
               </span>
-
-              {/* underline included in tap area */}
               <span className="block h-[1px] w-full bg-white/30 mt-1" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* ==================================================
-        BRAND MASS
-      ================================================== */}
+      {/* BRAND MASS */}
       <div className="relative px-6 lg:px-12 pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
         <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
-          {/* BRAND */}
-          <div className="col-span-12 lg:col-span-7">
-            <img
-              src="/png/boson-white3.png"
-              alt="Boson"
-              className="w-full max-w-[900px]"
-            />
-          </div>
-
-          {/* META */}
-          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500">
+          
+          {/* META — MOBILE FIRST */}
+          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500 order-1 lg:order-2">
             <div className="space-y-1 lg:text-right">
               <div>+62 812 3456 789</div>
               <div>Bali · Indonesia</div>
@@ -3853,6 +3851,16 @@ function Footer() {
               </a>
             </div>
           </div>
+
+          {/* BRAND LOGO — PINDAH KE PALING BAWAH DI MOBILE */}
+          <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
+            <img
+              src="/png/boson-white3.png"
+              alt="Boson"
+              className="w-full max-w-[900px]"
+            />
+          </div>
+
         </div>
       </div>
     </footer>
@@ -3968,7 +3976,7 @@ function Footer() {
   
         {/* <div className="h-screen w-screen bg-white" /> */}
   
-        <Header />
+        {/* <Header /> */}
   
         <div
           data-theme="dark"
@@ -4017,14 +4025,7 @@ function Footer() {
           <Galery />
         </div>
   
-        {/* ==================================================
-          EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
-        ================================================== */}
-        <div
-          style={{
-            height: footerHeight,
-          }}
-        />
+       
   
         {/* 
         <MeetBoson />
@@ -4036,13 +4037,23 @@ function Footer() {
         </div>
         */}
   
-        {/* 
+{/*         
         <div style={{ position: "relative", zIndex: 2 }}>
           <IndustriesPage />
         </div>
         */}
   
+  
         {/* ==================================================
+          EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
+        ================================================== */}
+        <div
+          style={{
+            height: footerHeight,
+          }}
+        />
+        {
+        /* ==================================================
           FOOTER — FIXED, PURE SCROLL-DRIVEN
         ================================================== */}
         <div

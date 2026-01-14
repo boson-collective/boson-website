@@ -4,15 +4,18 @@ import React, { Fragment, useLayoutEffect, useRef, useContext, useState, useEffe
 import gsap from "gsap";
 import { LoaderContext } from "../../../components/atoms/LoaderGate";
 import ScrollTrigger from "gsap/ScrollTrigger"
-import SplitText from "gsap/SplitText";;
+import SplitText from "gsap/SplitText";
+import CustomEase from "gsap/CustomEase";
 import SplitType from "split-type";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import Carousel from '../1/page';
 import GradientBg from '../../../components/organisms/GradientBg'
 import * as THREE from "three";
+import { FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
-gsap.registerPlugin(ScrollTrigger,SplitText);
+gsap.registerPlugin(ScrollTrigger,SplitText,CustomEase);
 
 
 function Webglbg() {
@@ -369,155 +372,161 @@ function Webglbg() {
   }
  
 
-function BosonNarrative() {
-  const wrap = useRef(null);
-
-  const [pos, setPos] = useState({ x: -9999, y: -9999 });
-  const targetPos = useRef({ x: -9999, y: -9999 });
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  /* =========================
-     RESPONSIVE CHECK
-  ========================= */
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const handleChange = (e) => setIsMobile(e.matches);
-    handleChange(mq);
-    mq.addEventListener("change", handleChange);
-    return () => mq.removeEventListener("change", handleChange);
-  }, []);
-
-  /* =========================
-     SMOOTH MOUSE FOLLOW
-  ========================= */
-  useEffect(() => {
-    if (isMobile) {
-      setPos({ x: -9999, y: -9999 });
-      targetPos.current = { x: -9999, y: -9999 };
-      return;
-    }
-
-    let frame;
-    const animate = () => {
-      setPos((prev) => {
-        const dx = targetPos.current.x - prev.x;
-        const dy = targetPos.current.y - prev.y;
-        const speed = 0.06;
-        return {
-          x: prev.x + dx * speed,
-          y: prev.y + dy * speed,
-        };
-      });
-      frame = requestAnimationFrame(animate);
+  function BosonNarrative() {
+    const wrap = useRef(null);
+  
+    const [pos, setPos] = useState({ x: -9999, y: -9999 });
+    const targetPos = useRef({ x: -9999, y: -9999 });
+  
+    const [isMobile, setIsMobile] = useState(false);
+  
+    /* =========================
+       RESPONSIVE CHECK
+    ========================= */
+    useEffect(() => {
+      const mq = window.matchMedia("(max-width: 768px)");
+      const handleChange = (e) => setIsMobile(e.matches);
+      handleChange(mq);
+      mq.addEventListener("change", handleChange);
+      return () => mq.removeEventListener("change", handleChange);
+    }, []);
+  
+    /* =========================
+       SMOOTH MOUSE FOLLOW (DESKTOP ONLY)
+    ========================= */
+    useEffect(() => {
+      if (isMobile) {
+        setPos({ x: -9999, y: -9999 });
+        targetPos.current = { x: -9999, y: -9999 };
+        return;
+      }
+  
+      let frame;
+      const animate = () => {
+        setPos((prev) => {
+          const dx = targetPos.current.x - prev.x;
+          const dy = targetPos.current.y - prev.y;
+          const speed = 0.06;
+          return {
+            x: prev.x + dx * speed,
+            y: prev.y + dy * speed,
+          };
+        });
+        frame = requestAnimationFrame(animate);
+      };
+  
+      animate();
+      return () => cancelAnimationFrame(frame);
+    }, [isMobile]);
+  
+    /* =========================
+       MOUSE MOVE (DESKTOP ONLY)
+    ========================= */
+    const handleMove = (e) => {
+      if (!wrap.current || isMobile) return;
+      const rect = wrap.current.getBoundingClientRect();
+      targetPos.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
     };
-
-    animate();
-    return () => cancelAnimationFrame(frame);
-  }, [isMobile]);
-
-  /* =========================
-     MOUSE MOVE
-  ========================= */
-  const handleMove = (e) => {
-    if (!wrap.current || isMobile) return;
-    const rect = wrap.current.getBoundingClientRect();
-    targetPos.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+  
+    const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
+  
+    /* =========================
+       BASE TEXT STYLE
+       (DESKTOP DEFAULT)
+    ========================= */
+    const baseTextStyle = {
+      width: "100%",
+      whiteSpace: "pre-wrap",
+      fontSize: "clamp(28px, 6vw, 74px)",
+      lineHeight: 1.25,
+      wordSpacing: -5,
+      fontWeight: 400,
+      textAlign: "justify",
+      textAlignLast: "left",
+      textIndent: "12rem",
+      hyphens: "auto",
     };
-  };
-
-  const text = `In the beginning, there is only possibility — a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
-
-  /* =========================
-     SHARED TEXT STYLE
-     (CRITICAL: BASE & MASK IDENTICAL)
-  ========================= */
-  const textStyle = {
-    width: "100%",
-    whiteSpace: "pre-wrap",
-    fontSize: "clamp(28px, 6vw, 74px)",
-    lineHeight: 1.25,
-    wordSpacing: -5,
-    fontWeight: 400,
-    textAlign: "justify",
-    textAlignLast: "left",
-    textIndent: "4rem",
-    hyphens: "auto",
-  };
-
-  return (
-    <div
-      ref={wrap}
-      onMouseMove={handleMove}
-      className="boson-narrative-container w-full min-h-screen relative overflow-hidden flex items-center"
-      style={{ padding: "120px 6vw" }}
-    >
-      {/* =========================
-          BASE TEXT (DIM)
-      ========================= */}
+  
+    /* =========================
+       MOBILE OVERRIDE (CLEAN)
+    ========================= */
+    const mobileTextOverride = isMobile
+      ? {
+          fontSize: "clamp(20px, 5.5vw, 28px)",
+          lineHeight: 1.45,
+          wordSpacing: 0,
+          textAlign: "left",
+          textIndent: 0,
+          hyphens: "none",
+        }
+      : {};
+  
+    return (
       <div
+        ref={wrap}
+        onMouseMove={handleMove}
+        className="boson-narrative-container bg-black w-full relative overflow-hidden flex items-center"
         style={{
-          position: "relative",
-          color: isMobile
-            ? "rgba(255,255,255,0.96)"
-            : "rgba(255,255,255,0.285)",
-          ...textStyle,
+          minHeight: "100vh",
+          padding: isMobile ? "72px 6vw" : "120px 6vw",
         }}
       >
-        {text}
-
         {/* =========================
-            MASKED TEXT (BRIGHT)
+            BASE TEXT (DIM)
         ========================= */}
-        {!isMobile && (
-          <div
-            style={{
-              pointerEvents: "none",
-              position: "absolute",
-              inset: 0,
-              color: "rgba(255,255,255,0.96)",
-              ...textStyle,
-              WebkitMaskImage: `
-                radial-gradient(
-                  900px circle at ${pos.x}px ${pos.y}px,
-                  rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
-                  rgba(255,255,255,0) 100%
-                )
-              `,
-              maskImage: `
-                radial-gradient(
-                  900px circle at ${pos.x}px ${pos.y}px,
-                  rgba(255,255,255,1) 0%,
-                  rgba(255,255,255,0.10) 30%,
-                  rgba(255,255,255,0.02) 55%,
-                  rgba(255,255,255,0) 100%
-                )
-              `,
-            }}
-          >
-            {text}
-          </div>
-        )}
+        <div
+          style={{
+            position: "relative",
+            color: isMobile
+              ? "rgba(255,255,255,0.96)"
+              : "rgba(255,255,255,0.285)",
+            ...baseTextStyle,
+            ...mobileTextOverride,
+          }}
+        >
+          {text}
+  
+          {/* =========================
+              MASKED TEXT (DESKTOP ONLY)
+          ========================= */}
+          {!isMobile && (
+            <div
+              style={{
+                pointerEvents: "none",
+                position: "absolute",
+                inset: 0,
+                color: "rgba(255,255,255,0.96)",
+                ...baseTextStyle,
+                WebkitMaskImage: `
+                  radial-gradient(
+                    900px circle at ${pos.x}px ${pos.y}px,
+                    rgba(255,255,255,1) 0%,
+                    rgba(255,255,255,0.10) 30%,
+                    rgba(255,255,255,0.02) 55%,
+                    rgba(255,255,255,0) 100%
+                  )
+                `,
+                maskImage: `
+                  radial-gradient(
+                    900px circle at ${pos.x}px ${pos.y}px,
+                    rgba(255,255,255,1) 0%,
+                    rgba(255,255,255,0.10) 30%,
+                    rgba(255,255,255,0.02) 55%,
+                    rgba(255,255,255,0) 100%
+                  )
+                `,
+              }}
+            >
+              {text}
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* =========================
-          MOBILE FIX
-      ========================= */}
-      <style>{`
-        @media (max-width: 768px) {
-          .boson-narrative-container {
-            min-height: auto !important;
-            height: auto !important;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
+    );
+  }
 
 
 function IndustryItem({ title, logos }) {
@@ -989,8 +998,7 @@ function VideoSection() {
   const holeRef = useRef(null);
   const videoRef = useRef(null);
   const textRef = useRef(null);
-  const processRef = useRef(null); 
- 
+  const processRef = useRef(null);
 
   const sigilDiscoverRef = useRef(null);
   const sigilCreateRef = useRef(null);
@@ -1013,24 +1021,23 @@ function VideoSection() {
 
     if (!outer || !section || !hole || !video || !text || !process) return;
 
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
     /* =========================
        INITIAL STATE
     ========================= */
 
-    hole.style.width = `${holeBaseW}px`;
-    hole.style.height = `${holeBaseH}px`;
+    hole.style.width = `${isMobile ? 180 : holeBaseW}px`;
+    hole.style.height = `${isMobile ? 260 : holeBaseH}px`;
 
     gsap.set(section, { backgroundColor: "#000" });
-    gsap.set(video, { scale: 1.6 });
+    gsap.set(video, { scale: isMobile ? 1.25 : 1.6 });
     gsap.set(text, { opacity: 0 });
 
     gsap.set(hole, {
       scale: 1,
       boxShadow: "0 0 0 9999px #000",
     });
- 
- 
- 
 
     /* =========================
        TIMELINE
@@ -1040,20 +1047,30 @@ function VideoSection() {
       scrollTrigger: {
         trigger: outer,
         start: "top top",
-        end: "+=140%",
+        end: isMobile ? "+=110%" : "+=140%",
         scrub: 0.8,
       },
     });
 
-    // PHASE 1 — SPATIAL REVEAL
-    tl.to(hole, { scale: holeMaxScale, ease: "none" }, 0)
-      .to(video, { scale: 1, ease: "none" }, 0);
- 
+    tl.to(
+      hole,
+      {
+        scale: isMobile ? holeMaxScale * 0.75 : holeMaxScale,
+        ease: "none",
+      },
+      0
+    ).to(
+      video,
+      {
+        scale: 1,
+        ease: "none",
+      },
+      0
+    );
 
-    // PHASE 3 — TEXT & PROCESS
     tl.to(text, { opacity: 1, ease: "power1.out" }, 0.9).fromTo(
       process.children,
-      { opacity: 0, y: 36 },
+      { opacity: 0, y: isMobile ? 24 : 36 },
       {
         opacity: 1,
         y: 0,
@@ -1095,7 +1112,14 @@ function VideoSection() {
   }, []);
 
   return (
-    <div data-theme="dark" ref={outerRef} style={{ height: "300vh", position: "relative" }}>
+    <div
+      data-theme="dark"
+      ref={outerRef}
+      style={{
+        height: "300vh",
+        position: "relative",
+      }}
+    >
       <section
         ref={sectionRef}
         style={{
@@ -1108,7 +1132,7 @@ function VideoSection() {
         {/* VIDEO */}
         <video
           ref={videoRef}
-          src="https://www.pexels.com/id-id/download/video/3917529/"
+          src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
           autoPlay
           loop
           muted
@@ -1122,8 +1146,6 @@ function VideoSection() {
             zIndex: 1,
           }}
         />
-
- 
 
         {/* HOLE */}
         <div
@@ -1139,7 +1161,7 @@ function VideoSection() {
           }}
         />
 
-        {/* TEXT — FULL ORIGINAL */}
+        {/* TEXT */}
         <div
           ref={textRef}
           style={{
@@ -1148,33 +1170,22 @@ function VideoSection() {
             right: 0,
             bottom: "10vh",
             paddingLeft: "14vw",
+            paddingRight: "6vw",
             color: "white",
             zIndex: 20,
             pointerEvents: "none",
           }}
         >
           <div style={{ maxWidth: "1080px" }}>
-            <h2
-              style={{
-                fontSize: "clamp(26px, 3.2vw, 40px)",
-                lineHeight: "1.22",
-                marginBottom: "72px",
-                maxWidth: "620px",
-              }}
-            >
-              If your content feels inconsistent <br />
-              it’s not a content problem. <br />
-              It’s a{" "}
-              <span className="italic border-b border-gray-200">system</span>{" "}
-              problem.
-            </h2>
-
             <div
               ref={processRef}
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(260px, 1fr))",
-                gap: "56px",
+                gridTemplateColumns:
+                  window.matchMedia("(max-width: 768px)").matches
+                    ? "1fr"
+                    : "repeat(3, minmax(260px, 1fr))",
+                gap: window.matchMedia("(max-width: 768px)").matches ? "40px" : "56px",
               }}
             >
               {/* DISCOVER */}
@@ -1190,8 +1201,7 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  Every project begins with curiosity. We dive deep into your brand,
-                  audience, and goals to uncover insights that define direction.
+                  Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
                 </p>
               </div>
 
@@ -1209,8 +1219,7 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
-                  Strategy transforms into visuals, words, and experiences crafted
-                  to connect, inspire, and elevate presence.
+                  Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
                 </p>
               </div>
 
@@ -1223,8 +1232,7 @@ function VideoSection() {
                 <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
                 <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
                 <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  We refine, optimize, and launch across platforms — creating work
-                  that performs, engages, and endures.
+                  Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
                 </p>
               </div>
             </div>
@@ -1234,6 +1242,7 @@ function VideoSection() {
     </div>
   );
 }
+
 
 
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
@@ -1267,230 +1276,247 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 }
 
 function Projects() {
-const scrollRef = useRef(null);
+  const scrollRef = useRef(null);
 
-// ==================================================
-// SECTION SCROLL (UNTUK VISUAL & TRANSISI)
-// ==================================================
-const { scrollYProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start start", "end end"],
-});
+  // ==================================================
+  // SECTION SCROLL
+  // ==================================================
+  const { scrollYProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start start", "end end"],
+  });
 
-// ==================================================
-// GLOBAL SCROLL (UNTUK DOT — NEVER STOPS)
-// ==================================================
-const { scrollY } = useScroll();
+  // ==================================================
+  // GLOBAL SCROLL
+  // ==================================================
+  const { scrollY } = useScroll();
+  const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
-// normalize global scroll → smooth & slow
-const spinBase = useTransform(scrollY, (v) => v * 0.5);
+  const rotate1 = useTransform(spinBase, (v) => v);
+  const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
+  const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-const rotate1 = useTransform(spinBase, (v) => v);
-const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
-const rotate3 = useTransform(spinBase, (v) => v * 0.9);
+  // ==================================================
+  // LIGHT MODE
+  // ==================================================
+  const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
 
-// ==================================================
-// LIGHT MODE TRANSITION
-// ==================================================
-const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
-
-const bgColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(0,0,0)", "#f3f4f5"]
-);
-
-const textColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-const orbitStroke = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
-);
-
-const dotFill = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-// ==================================================
-// INTRO TEXT
-// ==================================================
-const { scrollYProgress: introProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start end", "start start"],
-});
-
-const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-const textFilter = useTransform(introProgress, [0, 1], [
-  "blur(20px)",
-  "blur(0px)",
-]);
-
-// ==================================================
-// ORBIT GEOMETRY
-// ==================================================
-const c1 = { cx: 425, cy: 350, r: 250 };
-const c2 = { cx: 325, cy: 500, r: 250 };
-const c3 = { cx: 525, cy: 500, r: 250 };
-
-const g1Ref = useRef(null);
-const g2Ref = useRef(null);
-const g3Ref = useRef(null);
-
-useEffect(() => {
-  const apply = (g, cx, cy, deg) => {
-    if (!g) return;
-    g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
-  };
-
-  const u1 = rotate1.on("change", (v) =>
-    apply(g1Ref.current, c1.cx, c1.cy, v)
-  );
-  const u2 = rotate2.on("change", (v) =>
-    apply(g2Ref.current, c2.cx, c2.cy, v)
-  );
-  const u3 = rotate3.on("change", (v) =>
-    apply(g3Ref.current, c3.cx, c3.cy, v)
+  const bgColor = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(0,0,0)", "#f3f4f5"]
   );
 
-  return () => {
-    u1();
-    u2();
-    u3();
-  };
-}, [rotate1, rotate2, rotate3]);
+  const textColor = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(255,255,255)", "rgb(0,0,0)"]
+  );
 
-// ==================================================
-// IMAGES
-// ==================================================
-const images = [
-  "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
-  "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
-  "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
-  "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
-  "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
-  "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
-  "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
-  "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
-  "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
-  "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
-  "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
-  "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
-  "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
-  "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-  "/clients/tender-touch/6.jpg",
-];
+  const orbitStroke = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
+  );
 
-const baseStart = 0.15;
-const step = 0.05;
-const windowLen = 0.15;
+  const dotFill = useTransform(
+    lightProgress,
+    [0, 1],
+    ["rgb(255,255,255)", "rgb(0,0,0)"]
+  );
 
-const bursts = images.map((_, i) =>
-  useTransform(
-    scrollYProgress,
-    [baseStart + i * step, baseStart + i * step + windowLen],
-    [0, 1]
-  )
-);
+  // ==================================================
+  // INTRO TEXT
+  // ==================================================
+  const { scrollYProgress: introProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "start start"],
+  });
 
-const motionPropsList = bursts.map((b, i) => {
-  const dir = i % 4;
-  return {
-    x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
-    y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
-    z: useTransform(b, [0, 1], [-2000, 3000]),
-    scale: useTransform(b, [0, 1], [0.4, 1.1]),
-    opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
-  };
-});
+  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+  const textFilter = useTransform(introProgress, [0, 1], [
+    "blur(20px)",
+    "blur(0px)",
+  ]);
 
-// ==================================================
-// RENDER
-// ==================================================
-return (
-  <motion.div
-    ref={scrollRef}
-    style={{
-      width: "100%",
-      height: "500vh",
-      position: "relative",
-      backgroundColor: bgColor,
-    }}
-  >
-    <div
+  // ==================================================
+  // ORBITS
+  // ==================================================
+  const c1 = { cx: 425, cy: 350, r: 250 };
+  const c2 = { cx: 325, cy: 500, r: 250 };
+  const c3 = { cx: 525, cy: 500, r: 250 };
+
+  const g1Ref = useRef(null);
+  const g2Ref = useRef(null);
+  const g3Ref = useRef(null);
+
+  useEffect(() => {
+    const apply = (g, cx, cy, deg) => {
+      if (!g) return;
+      g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
+    };
+
+    const u1 = rotate1.on("change", (v) =>
+      apply(g1Ref.current, c1.cx, c1.cy, v)
+    );
+    const u2 = rotate2.on("change", (v) =>
+      apply(g2Ref.current, c2.cx, c2.cy, v)
+    );
+    const u3 = rotate3.on("change", (v) =>
+      apply(g3Ref.current, c3.cx, c3.cy, v)
+    );
+
+    return () => {
+      u1();
+      u2();
+      u3();
+    };
+  }, [rotate1, rotate2, rotate3]);
+
+  // ==================================================
+  // IMAGES
+  // ==================================================
+  const images = [
+    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
+    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
+    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
+    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
+    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
+    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
+    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
+    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
+    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
+    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
+    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
+    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
+    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
+    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
+    "/clients/tender-touch/6.jpg",
+  ];
+
+  const baseStart = 0.15;
+  const step = 0.05;
+  const windowLen = 0.15;
+
+  const bursts = images.map((_, i) =>
+    useTransform(
+      scrollYProgress,
+      [baseStart + i * step, baseStart + i * step + windowLen],
+      [0, 1]
+    )
+  );
+
+  const motionPropsList = bursts.map((b, i) => {
+    const dir = i % 4;
+    return {
+      x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
+      y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
+      z: useTransform(b, [0, 1], [-2000, 3000]),
+      scale: useTransform(b, [0, 1], [0.4, 1.1]),
+      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
+    };
+  });
+
+  // ==================================================
+  // RENDER
+  // ==================================================
+  return (
+    <motion.div
+      ref={scrollRef}
+      className="projects-root"
       style={{
-        position: "sticky",
-        top: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-        pointerEvents: "none",
-        perspective: "1800px",
-        transformStyle: "preserve-3d",
+        width: "100%",
+        height: "500vh",
+        position: "relative",
+        backgroundColor: bgColor,
       }}
     >
-      {/* ORBITS */}
-      <svg viewBox="0 0 850 850" width="850" height="850">
-        {[c1, c2, c3].map((c, i) => (
-          <motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="none"
-            strokeWidth="0.5"
-            style={{ stroke: orbitStroke }}
-          />
+      <div className="projects-sticky">
+        <svg viewBox="0 0 850 850" className="projects-orbit">
+          {[c1, c2, c3].map((c, i) => (
+            <motion.circle
+              key={i}
+              cx={c.cx}
+              cy={c.cy}
+              r={c.r}
+              fill="none"
+              strokeWidth="0.5"
+              style={{ stroke: orbitStroke }}
+            />
+          ))}
+
+          <motion.g ref={g1Ref}>
+            <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g2Ref}>
+            <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g3Ref}>
+            <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+        </svg>
+
+        <motion.div
+          className="projects-text"
+          style={{
+            opacity: textOpacity,
+            y: textY,
+            filter: textFilter,
+            color: textColor,
+          }}
+        >
+          A world where uncertainty <br />
+          becomes clarity.
+        </motion.div>
+
+        {images.map((src, i) => (
+          <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
+      </div>
 
-        <motion.g ref={g1Ref}>
-          <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g2Ref}>
-          <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g3Ref}>
-          <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-      </svg>
+      {/* RESPONSIVE — CONTAINMENT ONLY */}
+      <style>{`
+        .projects-sticky {
+          position: sticky;
+          top: 0;
+          width: 100vw;
+          height: 100vh;
+          height: 100svh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          pointer-events: none;
+          perspective: 1800px;
+          transform-style: preserve-3d;
+        }
 
-      {/* TEXT */}
-      <motion.div
-        style={{
-          opacity: textOpacity,
-          y: textY,
-          filter: textFilter,
-          color: textColor,
-          position: "absolute",
-          fontSize: "43px",
-          fontWeight: 200,
-          lineHeight: 1,
-          textAlign: "center",
-          whiteSpace: "pre-line",
-          zIndex: 10,
-        }}
-      >
-        A world where uncertainty <br />
-        becomes clarity.
-      </motion.div>
+        .projects-orbit {
+          width: 850px;
+          height: 850px;
+          max-width: 100vw;
+          max-height: 100vw;
+        }
 
-      {/* IMAGES */}
-      {images.map((src, i) => (
-        <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
-      ))}
-    </div>
-  </motion.div>
-);
+        .projects-text {
+          position: absolute;
+          font-size: clamp(24px, 6vw, 43px);
+          font-weight: 200;
+          line-height: 1;
+          text-align: center;
+          white-space: pre-line;
+          z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+          .projects-root {
+            height: 500vh;
+          }
+        }
+      `}</style>
+    </motion.div>
+  );
 }
 
 function Galery() {
@@ -1568,19 +1594,63 @@ function Galery() {
   const textPinRef = useRef(null);
   const headlineRef = useRef(null);
   const cursorRef = useRef(null);
+  const gridRef = useRef(null);
+  const fadeTopRef = useRef(null);
+  const fadeBottomRef = useRef(null);
 
-  // =========================
-  // PARALLAX + PIN (DITAMBAH onEnter)
-  // =========================
+  const headlinePlayedRef = useRef(false);
+
+  /* =========================
+     BASE STATE (GSAP ONLY)
+  ========================= */
   useEffect(() => {
-    gsap.utils.toArray(".lane").forEach((lane, i) => {
-      const speed = LANES[i].speed;
+    gsap.set(sectionRef.current, {
+      backgroundColor: "#000",
+      color: "#fff",
+      borderBottomLeftRadius: "7vw",
+      borderBottomRightRadius: "7vw",
+    });
 
-      gsap.fromTo(
+    gsap.set(".grid-line", {
+      borderColor: "rgba(255,255,255,0.2)",
+    });
+
+    gsap.set(cursorRef.current, {
+      backgroundColor: "#fff",
+    });
+  }, []);
+
+  /* =========================
+     BORDER RADIUS
+  ========================= */
+  useEffect(() => {
+    const tween = gsap.to(sectionRef.current, {
+      borderBottomLeftRadius: "0vw",
+      borderBottomRightRadius: "0vw",
+      ease: "none",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "bottom bottom",
+        end: "top+=35% top",
+        scrub: 2,
+      },
+    });
+
+    return () => tween.scrollTrigger?.kill();
+  }, []);
+
+  /* =========================
+     PARALLAX LANES
+  ========================= */
+  useEffect(() => {
+    const triggers = [];
+
+    gsap.utils.toArray(".lane").forEach((lane, i) => {
+      const t = gsap.fromTo(
         lane,
-        { y: speed * -0.35 },
+        { y: LANES[i].speed * -0.35 },
         {
-          y: speed,
+          y: LANES[i].speed,
           ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -1590,34 +1660,38 @@ function Galery() {
           },
         }
       );
+
+      triggers.push(t.scrollTrigger);
     });
 
-    ScrollTrigger.create({
+    return () => triggers.forEach((t) => t?.kill());
+  }, []);
+
+  /* =========================
+     PIN + HEADLINE
+  ========================= */
+  useEffect(() => {
+    const trigger = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top top",
       end: "bottom bottom",
       pin: textPinRef.current,
       pinSpacing: false,
-      onEnter: () => playHeadline(), // 🔥 KUNCI
+      onEnter: playHeadline,
     });
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    return () => trigger.kill();
   }, []);
 
-  // =========================
-  // HEADLINE PLAY (NO SCROLLTRIGGER)
-  // =========================
   const playHeadline = () => {
-    if (!headlineRef.current) return;
+    if (headlinePlayedRef.current) return;
+    headlinePlayedRef.current = true;
 
     document.fonts.ready.then(() => {
       gsap.set(headlineRef.current, { opacity: 1 });
 
       const split = SplitText.create(headlineRef.current, {
         type: "lines",
-        linesClass: "line",
         mask: "lines",
       });
 
@@ -1631,13 +1705,54 @@ function Galery() {
     });
   };
 
-  // =========================
-  // CUSTOM CURSOR DOT
-  // =========================
+  /* =========================
+     DARK → LIGHT (CLEAN)
+  ========================= */
+  useEffect(() => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "55% bottom",
+        end: "85% bottom",
+        scrub: true,
+      },
+    });
+
+    tl.fromTo(
+      sectionRef.current,
+      { backgroundColor: "#000", color: "#fff" },
+      { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
+    )
+      .fromTo(
+        ".grid-line",
+        { borderColor: "rgba(255,255,255,0.2)" },
+        { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
+        0
+      )
+      .fromTo(
+        cursorRef.current,
+        { backgroundColor: "#fff" },
+        { backgroundColor: "#111", ease: "none" },
+        0
+      )
+      .to(
+        [fadeTopRef.current, fadeBottomRef.current],
+        { opacity: 0, ease: "none" },
+        0
+      );
+
+    return () => {
+      tl.scrollTrigger?.kill();
+      tl.kill();
+    };
+  }, []);
+
+  /* =========================
+     CURSOR
+  ========================= */
   useEffect(() => {
     const section = sectionRef.current;
     const cursor = cursorRef.current;
-    if (!section || !cursor) return;
 
     const move = (e) => {
       cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
@@ -1666,33 +1781,30 @@ function Galery() {
 
   return (
     <>
-      {/* CUSTOM CURSOR DOT */}
+      {/* CURSOR */}
       <div
         ref={cursorRef}
         className="fixed top-0 left-0 z-[9999] pointer-events-none opacity-0"
         style={{
-          width: "20px",
-          height: "20px",
+          width: 20,
+          height: 20,
           borderRadius: "50%",
-          background: "white",
           transform: "translate(-50%, -50%)",
         }}
       />
 
       <section
         ref={sectionRef}
-        className="relative min-h-[480vh] bg-black text-white overflow-hidden"
+        className="relative min-h-[480vh] overflow-hidden"
       >
         {/* GRID */}
         <div
+          ref={gridRef}
           className="absolute inset-0 z-10 pointer-events-none grid"
           style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
         >
           {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
-            <div
-              key={i}
-              className="border-r border-white/20 last:border-r-0"
-            />
+            <div key={i} className="grid-line border-r last:border-r-0" />
           ))}
         </div>
 
@@ -1705,14 +1817,13 @@ function Galery() {
             <span className="block text-[11px] tracking-[0.22em] opacity-80 mb-6">
               GET STARTED
             </span>
-
             <h1
               ref={headlineRef}
               className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)] opacity-0"
             >
-              Let&apos;s make
+              Time to
               <br />
-              things happen.
+              Make it happen
             </h1>
           </div>
         </div>
@@ -1746,8 +1857,16 @@ function Galery() {
         </div>
 
         {/* FADES */}
-        <div className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40 bg-gradient-to-b from-black via-black/90 to-transparent" />
-        <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40 bg-gradient-to-t from-black via-black/90 to-transparent" />
+        <div
+          ref={fadeTopRef}
+          className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40
+                     bg-gradient-to-b from-black via-black/90 to-transparent"
+        />
+        <div
+          ref={fadeBottomRef}
+          className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40
+                     bg-gradient-to-t from-black via-black/90 to-transparent"
+        />
       </section>
     </>
   );
@@ -1860,7 +1979,9 @@ function MarqueeOverlay({ item, active }) {
   const x = useMotionValue(0);
   const segmentWidthRef = useRef(0);
 
-  // ====== MEASURE WIDTH ======
+  /* =========================
+     MEASURE WIDTH
+  ========================= */
   useLayoutEffect(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -1876,40 +1997,41 @@ function MarqueeOverlay({ item, active }) {
     const ro = new ResizeObserver(measure);
     ro.observe(el);
 
-    const onResize = () => measure();
-    window.addEventListener("resize", onResize);
-
+    window.addEventListener("resize", measure);
     return () => {
       ro.disconnect();
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", measure);
     };
   }, []);
 
-  // ====== INFINITE SCROLL ======
-  useAnimationFrame((t, delta) => {
+  /* =========================
+     INFINITE SCROLL
+  ========================= */
+  useAnimationFrame((_, delta) => {
     const segmentWidth = segmentWidthRef.current;
     if (!segmentWidth) return;
 
     const speed = active ? 180 : 30;
-    const move = (speed * delta) / 1000;
-
-    let next = x.get() - move;
+    let next = x.get() - (speed * delta) / 1000;
 
     if (next <= -segmentWidth) {
-      const overshoot = next + segmentWidth;
-      next = overshoot;
+      next += segmentWidth;
     }
 
     x.set(next);
   });
 
-  // ============ DETECT LOGO ============
+  /* =========================
+     IMAGE TYPE DETECT
+  ========================= */
   const isLogo = (src) => {
-    const l = src.toLowerCase();
-    return l.includes("logo") || l.endsWith(".png");
+    const s = src.toLowerCase();
+    return s.endsWith(".png");
   };
 
-  // ============ RENDER IMAGE / LOGO ============
+  /* =========================
+     RENDER CARD
+  ========================= */
   const renderImageCard = (src, key) => {
     if (isLogo(src)) {
       return (
@@ -1921,7 +2043,7 @@ function MarqueeOverlay({ item, active }) {
             height: "13vh",
             width: "auto",
             objectFit: "contain",
-            filter: "invert(1) brightness(0)", // jadi hitam
+            filter: "invert(1) brightness(0)",
             flexShrink: 0,
           }}
         />
@@ -1946,11 +2068,13 @@ function MarqueeOverlay({ item, active }) {
     );
   };
 
-  // Base images untuk marquee
-  const baseImages = useMemo(
-    () => [item.image1, item.image2, item.image1, item.image2],
-    [item.image1, item.image2]
-  );
+  /* =========================
+     MARQUEE DATA
+  ========================= */
+  const baseImages = useMemo(() => {
+    if (!Array.isArray(item.images)) return [];
+    return [...item.images, ...item.images];
+  }, [item.images]);
 
   const segmentImages = useMemo(() => {
     const out = [];
@@ -1968,8 +2092,8 @@ function MarqueeOverlay({ item, active }) {
         paddingRight: "4vw",
       }}
     >
-      {segmentImages.map((src, idx) =>
-        renderImageCard(src, `${key}-${idx}`)
+      {segmentImages.map((src, i) =>
+        renderImageCard(src, `${key}-${i}`)
       )}
     </div>
   );
@@ -1987,7 +2111,6 @@ function MarqueeOverlay({ item, active }) {
         zIndex: 2,
         pointerEvents: "none",
         background: active ? "white" : "transparent",
-        opacity: active ? 1 : 0,
         display: "flex",
         alignItems: "center",
         padding: "0 3vw",
@@ -2013,190 +2136,257 @@ function MarqueeOverlay({ item, active }) {
 
 
 function WorksList() {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const leftRef = useRef(null);
+  const rightRef = useRef(null);
+
+  const ctxRef = useRef(null);
+  const splitsRef = useRef([]);
+  const resizeTimer = useRef(null);
+
   const items = [
     {
-      industry: "Fitness",
-      name: "Tender Touch",
-      year: "2025",
-      image1: "/clients/tender-touch/2.jpg",
-      image2: "/clients/tender-touch/main.jpg",
-    },
-    {
       industry: "Real Estate",
-      name: "Hidden City Ubud",
+      name: "Real Estate & Property",
       year: "2025",
-      image1: "/clients/hidden-city-ubud/main.jpg",
-      image2: "/clients/hidden-city-ubud/2.jpg",
+      images: [
+        "https://i.imgur.com/MqFOJqk.jpeg",
+        "/clients/novo-ampang/logo.png",
+        "/clients/hey-yolo/main.jpg",
+        "/clients/hey-yolo/logo.png",
+        "/clients/dwm/5.jpg",
+        "/clients/dwm/logo.png",
+      ],
     },
     {
-      industry: "Real Estate",
-      name: "DWM",
+      industry: "Production",
+      name: "Hospitality",
       year: "2025",
-      image1: "/clients/dwm/5.jpg",
-      image2: "/clients/dwm/logo.png",
+      images: [
+        "/clients/tender-touch/4.jpg",
+        "/clients/tender-touch/logo.png",
+      ],
     },
     {
-      industry: "Food & Beverage",
-      name: "Marrosh",
+      industry: "Commerce",
+      name: "Food & Beverage",
       year: "2025",
-      image1: "/clients/marrosh/9.jpg",
-      image2: "/clients/marrosh/logo.png",
+      images: [
+        "https://i.imgur.com/GnY6iYR.jpeg",
+        "/clients/marrosh/logo.png",
+        "https://i.imgur.com/F4vcyc5.jpeg",
+        "/clients/zai-cafe/logo.png",
+      ],
     },
     {
-      industry: "Real Estate",
-      name: "NOVO",
+      industry: "Branding",
+      name: "E-Commerce",
       year: "2025",
-      image1: "/clients/novo-ampang/main.jpg",
-      image2: "/clients/novo-ampang/logo.png",
+      images: [
+        "/clients/hidden-city-ubud/logo.png",
+        "/clients/hidden-city-ubud/2.jpg",
+      ],
+    },
+    {
+      industry: "Branding",
+      name: "Drone & Aerial Media",
+      year: "2025",
+      images: [
+        "/clients/private-jet-villa/logo.png",
+        "https://i.imgur.com/8jhTJv7.jpeg",
+      ],
     },
   ];
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
+  /* =========================
+     GSAP HEADER (UNCHANGED)
+  ========================= */
+  useLayoutEffect(() => {
+    const build = () => {
+      splitsRef.current.forEach((s) => s.revert());
+      splitsRef.current = [];
+      if (ctxRef.current) ctxRef.current.revert();
+
+      ctxRef.current = gsap.context(() => {
+        const leftSplit = SplitText.create(leftRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
+        splitsRef.current.push(leftSplit);
+
+        gsap.from(leftSplit.lines, {
+          yPercent: 40,
+          opacity: 0,
+          duration: 1.2,
+          stagger: 0.12,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 75%",
+          },
+        });
+
+        const rightSplit = SplitText.create(rightRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
+        splitsRef.current.push(rightSplit);
+
+        gsap.from(rightSplit.lines, {
+          yPercent: 28,
+          opacity: 0,
+          duration: 1,
+          stagger: 0.08,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 75%",
+          },
+        });
+      }, sectionRef);
+
+      ScrollTrigger.refresh();
+    };
+
+    document.fonts.ready.then(build);
+
+    const onResize = () => {
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(build, 200);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      splitsRef.current.forEach((s) => s.revert());
+      if (ctxRef.current) ctxRef.current.revert();
+    };
+  }, []);
+
   return (
-    <div
-      style={{
-        background: "black",
-        width: "100%",
-        padding: "6vh 0",
-        position: "relative",
-      }}
+    <section
+      ref={sectionRef}
+      data-theme="dark"
+      style={{ background: "black", padding: "6vh 0" }}
     >
+      {/* ================= HEADER ================= */}
       <div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "1.15fr 0.5fr",
-    padding: "0 6vw 6vh",
-    color: "white",
-    alignItems: "center",
-  }}
->
-  {/* LEFT */}
-  <div>
-    <h2
-      style={{
-        fontSize: "3vw",
-        lineHeight: 1.08,
-        fontWeight: 300,
-        letterSpacing: "-0.03em",
-        margin: 0,
-      }}
-    >
-      A selection of work
-      <br />
-      across different industries
-    </h2>
-  </div>
+        ref={headerRef}
+        className="works-header"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1.15fr 0.5fr",
+          padding: "0 6vw 6vh",
+          color: "white",
+        }}
+      >
+        <h2
+          ref={leftRef}
+          style={{ fontSize: "2.5vw", margin: 0 }}
+        >
+          Industry Experience
+        </h2>
 
-  {/* RIGHT */}
-  <div>
-    <p
-      style={{
-        fontSize: "1vw",
-        lineHeight: 1.6,
-        opacity: 0.72,
-        maxWidth: "32vw",
-        margin: 0,
-      }}
-    >
-      <span className="mr-10"></span>Projects shaped by distinct industries, clients, and constraints.
-      Each one approached with a tailored process rather than a fixed formula.
-    </p>
-  </div>
-</div>
+        <p
+          ref={rightRef}
+          style={{ fontSize: "1vw", opacity: 0.7 }}
+        >
+          This selection represents work developed under different business
+          contexts, where constraints, scale, and objectives vary from project
+          to project.
+        </p>
+      </div>
 
-
-      {/* ===============================
-         WORK LIST
-      =============================== */}
+      {/* ================= LIST ================= */}
       {items.map((item, i) => (
         <div
           key={i}
           onMouseEnter={() => setHoveredIndex(i)}
           onMouseLeave={() => setHoveredIndex(null)}
+          className="works-row"
           style={{
-            width: "100%",
-            padding: "4.5vh 0",
-            borderBottom: "1px solid rgba(255,255,255,0.1)",
+            position: "relative",
             display: "grid",
             gridTemplateColumns: "1fr 2.2fr 1fr",
-            alignItems: "center",
+            padding: "2.5vh 0",
+            borderBottom: "1px solid rgba(255,255,255,0.25)",
             color: "white",
-            position: "relative",
             cursor: "pointer",
             overflow: "hidden",
           }}
         >
-          {/* WHITE OVERLAY */}
+          {/* WHITE OVERLAY — DESKTOP ONLY */}
           <motion.div
+            className="hover-overlay"
             style={{
               position: "absolute",
               inset: 0,
               background: "white",
-              transformOrigin: "center center",
               zIndex: 1,
-              pointerEvents: "none",
+              transformOrigin: "center",
             }}
             initial={{ scaleY: 0 }}
             animate={{ scaleY: hoveredIndex === i ? 1 : 0 }}
-            transition={{
-              duration: 0.55,
-              ease: [0.16, 1, 0.3, 1],
-            }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           />
 
-          {/* MARQUEE OVERLAY */}
           <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
-          {/* TEXT ROW */}
-          <div
-            style={{
-              position: "relative",
-              zIndex: 3,
-              display: "contents",
-            }}
-          >
+          <div style={{ zIndex: 2, display: "contents" }}>
+            <div />
             <div
-              style={{
-                fontSize: "0.9vw",
-                opacity: 0.7,
-                paddingLeft: "3vw",
-                letterSpacing: "0.03em",
-              }}
-            >
-              {item.industry}
-            </div>
-
-            <div
-              style={{
-                fontSize: "3.8vw",
-                fontWeight: 300,
-                textAlign: "center",
-                lineHeight: 0.95,
-                whiteSpace: "nowrap",
-                letterSpacing: "-0.03em",
-              }}
+              className="works-title"
+              style={{ fontSize: "4.5vw", textAlign: "center" }}
             >
               {item.name}
             </div>
-
-            <div
-              style={{
-                fontSize: "0.9vw",
-                textAlign: "right",
-                paddingRight: "3vw",
-                opacity: 0.7,
-                letterSpacing: "0.03em",
-              }}
-            >
-              {item.year}
-            </div>
+            <div />
           </div>
         </div>
       ))}
-    </div>
+
+      {/* ================= MOBILE ONLY ================= */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .works-header {
+            grid-template-columns: 1fr !important;
+            padding: 0 6vw 4vh !important;
+          }
+
+          .works-header h2 {
+            font-size: 32px !important;
+          }
+
+          .works-header p {
+            font-size: 14px !important;
+            max-width: 90%;
+          }
+
+          .works-row {
+            grid-template-columns: 1fr !important;
+            padding: 4vh 6vw !important;
+          }
+
+          .works-title {
+            font-size: 34px !important;
+            text-align: left !important;
+          }
+
+          .hover-overlay {
+            display: none;
+          }
+        }
+      `}</style>
+    </section>
   );
 }
+
 
   
 function BosonScrollText() {
@@ -2493,12 +2683,18 @@ function BosonScrollText() {
 function ServicesHero() {
   const cursorRef = useRef(null);
   const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const rightTextRef = useRef(null);
+
+  const splitsRef = useRef([]);
+  const ctxRef = useRef(null);
+  const resizeTimer = useRef(null);
+
   const [hoverIndex, setHoverIndex] = useState(null);
   const [inside, setInside] = useState(false);
 
   // =====================
-  // CUSTOM CURSOR FOLLOW (SECTION ONLY)
-  // SCALE REVEAL + SCALE VANISH
+  // CUSTOM CURSOR FOLLOW
   // =====================
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -2507,21 +2703,102 @@ function ServicesHero() {
 
     const move = (e) => {
       const rect = section.getBoundingClientRect();
-
       const isInside =
         e.clientX >= rect.left &&
         e.clientX <= rect.right &&
         e.clientY >= rect.top &&
         e.clientY <= rect.bottom;
 
-      // position always updates
       cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-
       setInside(isInside);
     };
 
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
+  }, []);
+
+  // =====================
+  // GSAP TEXT BUILD
+  // =====================
+  useLayoutEffect(() => {
+    const build = () => {
+      if (!sectionRef.current || !headerRef.current || !rightTextRef.current)
+        return;
+
+      // TOTAL TEARDOWN
+      splitsRef.current.forEach((s) => s.revert());
+      splitsRef.current = [];
+      if (ctxRef.current) ctxRef.current.revert();
+
+      ctxRef.current = gsap.context(() => {
+        // RESET VISIBILITY
+        gsap.set([headerRef.current, rightTextRef.current], {
+          opacity: 1,
+          clearProps: "transform",
+        });
+
+        /* =========================
+           CENTER HEADER
+        ========================= */
+        const headerSplit = SplitText.create(headerRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
+        splitsRef.current.push(headerSplit);
+
+        gsap.from(headerSplit.lines, {
+          yPercent: 40,
+          opacity: 0,
+          duration: 1.2,
+          stagger: 0.12,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+          },
+        });
+
+        /* =========================
+           RIGHT PARAGRAPH
+        ========================= */
+        const rightSplit = SplitText.create(rightTextRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
+        splitsRef.current.push(rightSplit);
+
+        gsap.from(rightSplit.lines, {
+          yPercent: 32,
+          opacity: 0,
+          duration: 1.1,
+          stagger: 0.06,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: rightTextRef.current,
+            start: "top 85%",
+          },
+        });
+      }, sectionRef);
+
+      ScrollTrigger.refresh();
+    };
+
+    document.fonts.ready.then(build);
+
+    const onResize = () => {
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(build, 200);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      splitsRef.current.forEach((s) => s.revert());
+      if (ctxRef.current) ctxRef.current.revert();
+    };
   }, []);
 
   // =====================
@@ -2553,95 +2830,61 @@ function ServicesHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen bg-white text-black overflow-hidden cursor-none"
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
     >
       {/* ===================== */}
-      {/* CUSTOM GREEN CURSOR */}
-      {/* SCALE REVEAL */}
+      {/* CUSTOM CURSOR */}
       {/* ===================== */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999]"
-        style={{
-          transform: "translate3d(-9999px, -9999px, 0)",
-        }}
+        style={{ transform: "translate3d(-9999px, -9999px, 0)" }}
       >
         <div
-          className="w-[70px] h-[70px] rounded-full bg-[#C8FF4D] flex items-center justify-center"
+          className="w-[70px] h-[70px] rounded-full bg-[#C8FF4D]"
           style={{
             transform: inside ? "scale(1)" : "scale(0)",
             opacity: inside ? 1 : 0,
             transition:
               "transform 220ms cubic-bezier(0.22,1,0.36,1), opacity 180ms ease-out",
-            transformOrigin: "center",
           }}
-        >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="black"
-            strokeWidth="2"
-          >
-            <path d="M7 17L17 7" />
-            <path d="M7 7h10v10" />
-          </svg>
-        </div>
+        />
       </div>
+      
+      
 
       <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 sm:py-12 flex flex-col">
-        {/* ===================== */}
-          {/* TOP BAR */}
-          {/* ===================== */}
-          <div className="relative w-full flex items-start justify-between pt-6">
+         
 
-          {/* LEFT */}
-          <div className="text-sm text-gray-600 flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-black/80 inline-block" />
-            <span className="opacity-80">Our Expertise</span>
-          </div>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      
+      {/* LEFT — HEADLINE */}
+      <div className="lg:col-span-7">
+        <h2 className="font-sans font-normal tracking-tight leading-[1.05]">
+          <span className="block text-[clamp(32px,5vw,55px)] text-neutral-900">
+            Services built to help
+          </span>
 
-          {/* CENTER (ABSOLUTE TRUE CENTER) */}
-          <h2
-            className="
-              absolute left-1/2 top-0
-              -translate-x-1/2
-              text-right text-black font-medium leading-tight
-              max-w-[720px]
-              text-[clamp(22px,4vw,40px)]
-            "
-          >
-            How we take your <span className="ml-5"></span> <br className="hidden sm:block" />
-            business to the next level
-          </h2>
+          <span className="block text-[clamp(32px,5vw,55px)] text-neutral-900">
+            brands grow
+          </span>
 
-          {/* RIGHT */}
-          <div className="flex flex-col items-end text-right max-w-xs gap-4">
-            <p className="text-gray-600 text-sm leading-relaxed">
-              We are a digital marketing agency with expertise, and we're on a
-              mission to help you take the next step in your business.
-            </p>
+          <span className="block mt-5 text-[clamp(18px,2vw,26px)] text-neutral-400">
+            and stay relevant
+          </span>
+        </h2>
+      </div>
 
-            <button
-              className="
-                flex items-center gap-2
-                px-5 py-2.5
-                rounded-full
-                bg-[#C8FF4D]
-                text-black text-sm font-medium
-                hover:scale-[1.03]
-                transition-transform
-              "
-            >
-              See all services
-              <span className="inline-block">↗</span>
-            </button>
-          </div>
+      {/* RIGHT — SUPPORTING BODY */}
+      <div className="lg:col-span-4 lg:col-start-9 mt-5">
+        <p className="text-[14px] leading-relaxed text-neutral-500 max-w-sm">
+          <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage and
+          consistency across platforms begins to break down. We step in to bring
+          structure, clarity, and momentum back into their digital work.
+        </p>
+      </div>
 
-          </div>
-
-
+    </div> 
         {/* ===================== */}
         {/* MAIN CONTENT */}
         {/* ===================== */}
@@ -2687,9 +2930,7 @@ function ServicesHero() {
 
                     <h3
                       className={`hidden sm:block font-sans font-semibold tracking-tight leading-[1.05] transition-colors duration-150 ${colorState}`}
-                      style={{
-                        fontSize: "clamp(36px, 7vw, 95px)",
-                      }}
+                      style={{ fontSize: "clamp(36px, 7vw, 95px)" }}
                     >
                       {item.label}
                     </h3>
@@ -2723,6 +2964,7 @@ function ServicesHero() {
 }
 
 
+
 function Header() {
   const headerRef = useRef(null);
 
@@ -2732,8 +2974,13 @@ function Header() {
   const lastScrollY = useRef(0);
   const ticking = useRef(false);
 
-  const [hidden, setHidden] = useState(true);      // hide on scroll down
-  const [enabled, setEnabled] = useState(false);  // aktif setelah 101vh
+  const [hidden, setHidden] = useState(true);
+  const [enabled, setEnabled] = useState(false);
+
+  // =========================
+  // MOBILE MENU
+  // =========================
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // =========================
   // SCROLL LOGIC
@@ -2747,13 +2994,9 @@ function Header() {
 
       if (!ticking.current) {
         window.requestAnimationFrame(() => {
-          /* =========================
-             ENABLE HEADER AFTER 101vh
-          ========================= */
           if (currentY >= triggerY) {
             setEnabled(true);
           } else {
-            // sebelum 101vh → header dipaksa mati
             setEnabled(false);
             setHidden(true);
             lastScrollY.current = currentY;
@@ -2761,20 +3004,10 @@ function Header() {
             return;
           }
 
-          /* =========================
-             HIDE / SHOW ON SCROLL
-          ========================= */
           const diff = currentY - lastScrollY.current;
 
-          // scroll down → hide
-          if (diff > threshold) {
-            setHidden(true);
-          }
-
-          // scroll up → show
-          if (diff < -threshold) {
-            setHidden(false);
-          }
+          if (diff > threshold) setHidden(true);
+          if (diff < -threshold) setHidden(false);
 
           lastScrollY.current = currentY;
           ticking.current = false;
@@ -2790,7 +3023,6 @@ function Header() {
 
   // =========================
   // INTERSECTION → DATA-THEME
-  // (ONLY WHEN ENABLED)
   // =========================
   useEffect(() => {
     if (!enabled) return;
@@ -2831,9 +3063,7 @@ function Header() {
           bg-transparent
           transition-transform duration-300 ease-out
           ${
-            !enabled
-              ? "-translate-y-full"
-              : hidden
+            !enabled || hidden
               ? "-translate-y-full"
               : "translate-y-0"
           }
@@ -2842,67 +3072,62 @@ function Header() {
         <div
           className="
             relative
-            mx-auto  
-            px-6 md:px-20
-            min-h-[72px]
-            flex items-center 
+            mx-auto
+            px-4 sm:px-6 md:px-20
+            min-h-[64px] md:min-h-[72px]
+            flex items-center
           "
         >
-          {/* LEFT — NAV */}
+          {/* LEFT — NAV (DESKTOP ONLY) */}
           <nav
             aria-label="Primary navigation"
             className="
-              flex items-center gap-6
+              hidden md:flex
+              items-center gap-6
               flex-1 min-w-0
               text-sm font-medium tracking-wide
             "
           >
-            <a
-              href="#work"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Work
-            </a>
-            <a
-              href="#pricing"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Pricing
-            </a>
-            <a
-              href="#services"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              Services
-            </a>
-            <a
-              href="#about"
-              className="
-                transition-colors whitespace-nowrap
-                group-data-[theme=light]:text-black
-                group-data-[theme=dark]:text-white
-              "
-            >
-              About
-            </a>
+            {["Work", "Pricing", "Services", "About"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="
+                  transition-colors whitespace-nowrap
+                  group-data-[theme=light]:text-black
+                  group-data-[theme=dark]:text-white
+                "
+              >
+                {item}
+              </a>
+            ))}
           </nav>
+
+          {/* MOBILE — HAMBURGER */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="
+              md:hidden
+              relative z-50
+              w-10 h-10
+              flex items-center justify-center
+              group-data-[theme=light]:text-black
+              group-data-[theme=dark]:text-white
+            "
+            aria-label="Open menu"
+          >
+            <span className="sr-only">Menu</span>
+            <div className="space-y-1.5">
+              <span className="block w-5 h-px bg-current" />
+              <span className="block w-5 h-px bg-current" />
+              <span className="block w-5 h-px bg-current" />
+            </div>
+          </button>
 
           {/* CENTER — LOGO */}
           <div
             className="
-              absolute left-1/2 top-10
+              absolute left-1/2 top-1/2
               -translate-x-1/2 -translate-y-1/2
               pointer-events-none
             "
@@ -2912,7 +3137,8 @@ function Header() {
                 src="/png/boson-black.png"
                 alt="Boson"
                 className="
-                  w-20 md:w-28 h-auto
+                  w-16 sm:w-18 md:w-28
+                  h-auto
                   transition
                   group-data-[theme=dark]:invert
                 "
@@ -2920,8 +3146,8 @@ function Header() {
             </a>
           </div>
 
-          {/* RIGHT — CTA */}
-          <div className="flex items-center justify-end flex-1 min-w-0">
+          {/* RIGHT — CTA (DESKTOP ONLY) */}
+          <div className="hidden md:flex items-center justify-end flex-1">
             <a
               href="#contact"
               className="
@@ -2948,10 +3174,33 @@ function Header() {
             </a>
           </div>
         </div>
-      </header>
 
-      {/* OFFSET — BIAR LAYOUT AMAN */}
-      <div className="h-[72px]" />
+        {/* MOBILE MENU PANEL */}
+        <div
+          className={`
+            md:hidden
+            absolute top-full left-0 w-full
+            bg-white text-black
+            group-data-[theme=dark]:bg-black
+            group-data-[theme=dark]:text-white
+            transition-all duration-300
+            ${menuOpen ? "opacity-100 visible" : "opacity-0 invisible"}
+          `}
+        >
+          <nav className="flex flex-col px-6 py-6 gap-4 text-base">
+            {["Work", "Pricing", "Services", "About", "Contact"].map((item) => (
+              <a
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                onClick={() => setMenuOpen(false)}
+                className="tracking-wide"
+              >
+                {item}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </header>
     </>
   );
 }
@@ -2966,245 +3215,252 @@ function Header() {
 function Description() {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
-  const rightRef = useRef(null);
+  const bodyRef = useRef(null);
   const dividerRef = useRef(null);
+  const statsRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  const splitsRef = useRef([]);
+  const ctxRef = useRef(null);
+  const resizeTimer = useRef(null);
 
   useLayoutEffect(() => {
-    let headlineTween;
+    const build = () => {
+      if (
+        !sectionRef.current ||
+        !titleRef.current ||
+        !bodyRef.current ||
+        !dividerRef.current ||
+        !statsRef.current ||
+        !ctaRef.current
+      ) {
+        return;
+      }
 
-    const ctx = gsap.context(() => {
-      document.fonts.ready.then(() => {
+      splitsRef.current.forEach((s) => s.revert());
+      splitsRef.current = [];
+      if (ctxRef.current) ctxRef.current.revert();
 
-        /* =========================
-           LEFT — HEADLINE
-        ========================= */
+      ctxRef.current = gsap.context(() => {
+        gsap.set(
+          [
+            titleRef.current,
+            dividerRef.current,
+            ctaRef.current,
+            ...statsRef.current.querySelectorAll("[data-stat]"),
+            ...bodyRef.current.querySelectorAll("[data-animate]"),
+          ],
+          { opacity: 1, clearProps: "transform" }
+        );
 
-        gsap.set(titleRef.current, { opacity: 1 });
-
-        SplitText.create(titleRef.current, {
-          type: "lines,words",
+        // HEADLINE
+        const titleSplit = SplitText.create(titleRef.current, {
+          type: "lines",
           linesClass: "line",
-          autoSplit: true,
           mask: "lines",
-          onSplit(self) {
-            headlineTween = gsap.from(self.lines, {
-              yPercent: 40,
-              opacity: 0,
-              duration: 1.2,
-              stagger: 0.12,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 72%",
-                once: true,
-              },
-            });
-            return headlineTween;
-          },
         });
+        splitsRef.current.push(titleSplit);
 
-        /* =========================
-           RIGHT — BODY COPY
-        ========================= */
-
-        const paragraphs =
-          rightRef.current.querySelectorAll("p[data-animate]");
-
-        paragraphs.forEach((p) => {
-          const split = SplitText.create(p, {
-            type: "lines",
-            linesClass: "line",
-            autoSplit: true,
-            mask: "lines",
-          });
-
-          gsap.from(split.lines, {
-            yPercent: 38,
-            opacity: 0,
-            duration: 1.3,
-            stagger: 0.04,
-            ease: "power1.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 72%",
-              once: true,
-            },
-          });
-        });
-
-        /* =========================
-           DIVIDER — GSAP
-        ========================= */
-
-        gsap.set(dividerRef.current, {
-          scaleX: 0,
+        gsap.from(titleSplit.lines, {
+          yPercent: 40,
           opacity: 0,
-          transformOrigin: "left center",
-        });
-
-        gsap.to(dividerRef.current, {
-          scaleX: 1,
-          opacity: 1,
-          duration: 1,
+          duration: 1.2,
+          stagger: 0.12,
           ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 52%",
-            once: true,
+            start: "top 75%",
           },
         });
 
-        /* =========================
-           STATS — OWN TRIGGER
-        ========================= */
-
-        const statsGrid = rightRef.current.querySelector(
-          ".grid.grid-cols-1.sm\\:grid-cols-3"
+        // DIVIDER
+        gsap.fromTo(
+          dividerRef.current,
+          { scaleX: 0, transformOrigin: "left center" },
+          {
+            scaleX: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: dividerRef.current,
+              start: "top 85%",
+            },
+          }
         );
 
-        if (!statsGrid) return;
-
-        const stats = Array.from(statsGrid.children);
-
-        stats.forEach((stat) => {
-          const icon = stat.querySelector("svg");
-          const value = stat.querySelector("div");
-          const desc = stat.querySelector("p");
-
-          gsap.set([icon, value, desc], {
-            opacity: 0,
-            y: 12,
-          });
-        });
-
-        ScrollTrigger.create({
-          trigger: statsGrid,
-          start: "top 85%",
-          once: true,
-          onEnter: () => {
-            stats.forEach((stat, i) => {
-              const icon = stat.querySelector("svg");
-              const value = stat.querySelector("div");
-              const desc = stat.querySelector("p");
-
-              const tl = gsap.timeline({ delay: i * 0.15 });
-
-              tl.to(icon, {
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                ease: "power2.out",
-              })
-                .to(
-                  value,
-                  {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.6,
-                    ease: "power2.out",
-                  },
-                  "-=0.35"
-                )
-                .to(
-                  desc,
-                  {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.5,
-                    ease: "power1.out",
-                  },
-                  "-=0.3"
-                );
+        // BODY COPY
+        bodyRef.current
+          .querySelectorAll("[data-animate]")
+          .forEach((p) => {
+            const split = SplitText.create(p, {
+              type: "lines",
+              linesClass: "line",
+              mask: "lines",
             });
+            splitsRef.current.push(split);
+
+            gsap.from(split.lines, {
+              yPercent: 32,
+              opacity: 0,
+              duration: 1.1,
+              stagger: 0.06,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: p,
+                start: "top 85%",
+              },
+            });
+          });
+
+        // STATS
+        gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
+          opacity: 0,
+          y: 10,
+          duration: 0.6,
+          stagger: 0.15,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: "top 85%",
           },
         });
-      });
-    }, sectionRef);
+
+        // CTA
+        gsap.from(ctaRef.current, {
+          opacity: 0,
+          y: 10,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ctaRef.current,
+            start: "top 90%",
+          },
+        });
+      }, sectionRef);
+
+      ScrollTrigger.refresh();
+    };
+
+    document.fonts.ready.then(build);
+
+    const onResize = () => {
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(build, 200);
+    };
+
+    window.addEventListener("resize", onResize);
 
     return () => {
-      if (headlineTween) headlineTween.kill();
-      ctx.revert();
+      window.removeEventListener("resize", onResize);
+      splitsRef.current.forEach((s) => s.revert());
+      if (ctxRef.current) ctxRef.current.revert();
     };
   }, []);
 
   return (
-    <section data-theme="light" ref={sectionRef} className="w-full bg-[#F3F4F5] text-black py-32">
-      <div className="max-w-screen mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16">
-        {/* LEFT */}
-        <div className="lg:col-span-7">
+    <section
+      ref={sectionRef}
+      data-theme="light"
+      className="w-full bg-[#F3F4F5] text-black py-12 lg:py-20"
+    >
+      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-12">
+        {/* HEADLINE */}
+        <div className="max-w-full mb-12 lg:mb-16">
           <h1
             ref={titleRef}
-            className="font-sans font-medium leading-[1.15] tracking-tight text-black opacity-0"
-            style={{ fontSize: "clamp(32px, 4vw, 54px)" }}
+            className="
+              font-sans font-medium tracking-tight leading-[1.15]
+            "
+            style={{
+              fontSize: "clamp(32px, 5vw, 134px)",
+            }}
           >
-            <span className="mr-24"></span>We are a social media agency that helps brands stay{" "}
-            <span className="italic">consistent</span> online. We keep everything
-            on track so you can stay focused on what{" "}
-            <span className="italic">matters.</span>
+            <span className="hidden lg:inline mr-80" />
+            We are a social media agency that helps brands stay consistent
+            online. We keep everything on track so you can stay focused on
+            what <span className="italic">matters</span>
           </h1>
-        </div>
 
-        {/* RIGHT */}
-        <div
-          ref={rightRef}
-          className="lg:col-span-5 flex flex-col text-neutral-800 text-[17px] leading-relaxed"
-        >
-          <p data-animate className="mb-5">
-            Boson is a digital agency founded in 2021 and based in Bali, working
-            with clients across Qatar, Malaysia, and other regions.
-          </p>
-
-          <p data-animate className="mb-5">
-            Our work combines design, development, and brand operations, giving
-            teams a toolkit that keeps everything consistent.
-          </p>
-
-          <p data-animate className="mb-6">
-            Whether you're refining a brand or building a new digital foundation,
-            Boson brings clarity and long-term stability.
-          </p>
-
-          {/* ANIMATED DIVIDER (REPLACES border-t) */}
           <div
             ref={dividerRef}
-            className="w-full h-px bg-black/20 mb-8"
+            className="mt-8 lg:mt-10 h-px w-full bg-neutral-700"
           />
+        </div>
 
-          {/* STATS — UNCHANGED CONTENT */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            <div className="flex flex-col gap-2">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <path d="M3 9h18M9 21V9" />
-              </svg>
-              <div className="text-[34px] font-semibold tracking-[-0.02em]">100+</div>
-              <p className="text-sm text-neutral-500 leading-snug">
-                Large-scale projects delivered for festivals, agencies, and brands.
-              </p>
-            </div>
+        {/* CONTENT */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
+          {/* STATS */}
+          <div ref={statsRef} className="lg:col-span-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
+              <div data-stat className="flex flex-col gap-1">
+                <div className="text-xs uppercase tracking-widest">
+                  Projects delivered
+                </div>
+                <div className="text-[22px] font-medium text-neutral-800">
+                  100+
+                </div>
+              </div>
 
-            <div className="flex flex-col gap-2">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-              <div className="text-[34px] font-semibold tracking-[-0.02em]">3+</div>
-              <p className="text-sm text-neutral-500 leading-snug">
-                Markets served across Qatar, Indonesia, and Malaysia.
-              </p>
-            </div>
+              <div data-stat className="flex flex-col gap-1">
+                <div className="text-xs uppercase tracking-widest">
+                  Countries served
+                </div>
+                <div className="text-[22px] font-medium text-neutral-800">
+                  3
+                </div>
+              </div>
 
-            <div className="flex flex-col gap-2">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <circle cx="12" cy="7" r="4" />
-                <path d="M5.5 21a6.5 6.5 0 0 1 13 0" />
-              </svg>
-              <div className="text-[34px] font-semibold tracking-[-0.02em]">2.5m</div>
-              <p className="text-sm text-neutral-500 leading-snug">
-                Audience reached across digital platforms and brand campaigns.
-              </p>
+              <div data-stat className="flex flex-col gap-1">
+                <div className="text-xs uppercase tracking-widest">
+                  Total audience reach
+                </div>
+                <div className="text-[22px] font-medium text-neutral-800">
+                  2.5m+
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* BODY + CTA */}
+          <div
+            ref={bodyRef}
+            className="
+              lg:col-span-7
+              max-w-full lg:max-w-xl
+              lg:ml-auto
+              text-neutral-800
+              text-[16px] lg:text-[17px]
+              leading-[1.6]
+            "
+          >
+            <p data-animate className="mb-8 lg:mb-10">
+              Boson is a digital agency founded in 2021 and based in Bali,
+              working with clients across Qatar, Malaysia, and other regions.
+              Our work combines design, development, and brand operations,
+              giving teams a toolkit that keeps everything consistent.
+              Whether you're refining a brand or building a new digital
+              foundation, Boson brings clarity and long-term stability.
+            </p>
+
+            <a
+              ref={ctaRef}
+              href="#projects"
+              className="
+                inline-flex items-center gap-3
+                px-7 lg:px-8 py-4
+                rounded-full
+                border border-black
+                text-sm font-medium tracking-wide
+                transition-all duration-300 ease-out
+                hover:bg-black hover:text-white
+                group
+              "
+            >
+              <span>DISCOVER ALL PROJECTS</span>
+              <span className="inline-block transition-transform duration-300 ease-out group-hover:translate-x-1">
+                →
+              </span>
+            </a>
           </div>
         </div>
       </div>
@@ -3226,159 +3482,119 @@ function ProjectShowcase() {
 
   const projects = [
     {
-      id: "01",
-      title: "Real Estate &\nProperty",
-      image:
-        "https://plus.unsplash.com/premium_photo-1678903964473-1271ecfb0288?w=900&auto=format&fit=crop&q=60",
-      meta: ["PRODUCTION", "LONDON", "EDELMAN", "XBOX"],
+      title: "Sunny\nVillage",
+      image: "https://i.imgur.com/Gjuxvj5.mp4",
+      meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "A 6×3 metre renaissance-style oil painting to support the launch of Xbox’s flagship video game, Halo Infinite.",
+        "A real estate–focused wealth management service in Bali, helping clients manage, grow, and secure property-based assets.",
     },
     {
-      id: "02",
-      title: "Food &\nBeverage",
-      image:
-        "https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1365&auto=format&fit=crop",
-      meta: ["BRANDING", "BERLIN", "NIKE"],
+      title: "Novo\nAmpang",
+      image: "https://i.imgur.com/UzRs3rO.mp4",
+      meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "A visual identity system exploring silence, tension, and modern athletic discipline.",
+        "A residential development in Kuala Lumpur, characterized by modern architecture and a functional approach to urban housing",
     },
     {
-      id: "03",
-      title: "Lifestyle &\nHospitality",
-      image:
-        "https://images.unsplash.com/photo-1583873743670-6d60e445a7e2?q=80&w=987&auto=format&fit=crop",
-      meta: ["EXPERIMENT", "TOKYO", "SONY"],
+      title: "Shinobi\nSoirée",
+      image: "https://i.imgur.com/WJI4G8F.mp4",
+      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "An experimental campaign blending digital ritual, motion, and sound design.",
+        "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
     },
     {
-      id: "04",
-      title: "Drone &\nAerial Media",
-      image:
-        "https://images.unsplash.com/photo-1533358122925-6eb2658855bb?q=80&w=1335&auto=format&fit=crop",
-      meta: ["EXPERIMENT", "TOKYO", "SONY"],
+      title: "Marrosh\n Bali",
+      image: "/clients/marrosh/main.mp4",
+      meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
-        "An experimental campaign blending digital ritual, motion, and sound design.",
+        "A Lebanese café in Canggu, focused on warm hospitality, communal dining, and a relaxed coastal atmosphere",
+    },
+    {
+      title: "Tender\nTouch",
+      image: "/clients/tender-touch/main.mp4",
+      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      desc:
+        "A relaxation-focused massage service in Bali, designed around calm, care, and a slower pace away from daily pressure",
     },
   ];
+
+  const isVideo = (src) => /\.(mp4|webm|ogg)$/i.test(src);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useLayoutEffect(() => {
     if (window.innerWidth < 1024) return;
 
     const ctx = gsap.context(() => {
+      const slidesCount = projects.length;
       const track = trackRef.current;
       const progressBar = progressRef.current;
 
-      const totalWidth = track.scrollWidth - window.innerWidth;
+      const getScrollDistance = () =>
+        (slidesCount - 1) * window.innerWidth;
 
-      // =====================
-      // MAIN HORIZONTAL SCROLL
-      // =====================
       const mainTween = gsap.to(track, {
-        x: -totalWidth,
+        x: () => -getScrollDistance(),
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: () => `+=${track.scrollWidth}`,
+          end: () => `+=${getScrollDistance()}`,
           scrub: true,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate(self) {
             gsap.set(progressBar, {
               scaleX: self.progress,
               transformOrigin: "left center",
             });
 
-            setActiveIndex(
-              Math.min(
-                projects.length - 1,
-                Math.floor(self.progress * projects.length)
-              )
+            const index = Math.round(
+              self.progress * (slidesCount - 1)
             );
+            setActiveIndex(index);
           },
         },
       });
 
-      // =====================
-      // PARALLAX LAYERS
-      // =====================
-      gsap.utils.toArray(".parallax-title").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 40 },
-          {
-            x: -40,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
+      const parallax = (selector, fromX, toX) => {
+        gsap.utils.toArray(selector).forEach((el) => {
+          gsap.fromTo(
+            el,
+            { x: fromX },
+            {
+              x: toX,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                containerAnimation: mainTween,
+                start: "left right",
+                end: "right left",
+                scrub: 0.6,
+              },
+            }
+          );
+        });
+      };
 
-      gsap.utils.toArray(".parallax-image").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 90 },
-          {
-            x: -90,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
-
-      gsap.utils.toArray(".parallax-meta").forEach((el) => {
-        gsap.fromTo(
-          el,
-          { x: 140 },
-          {
-            x: -140,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          }
-        );
-      });
+      parallax(".parallax-title", 40, -40);
+      parallax(".parallax-image", 90, -90);
+      parallax(".parallax-meta", 140, -140);
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [projects.length]);
 
   return (
     <section
       ref={sectionRef}
+      data-theme="dark"
       className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
-      {/* ===============================
-         STATIC SECTION LABEL (DIAM)
-      =============================== */}
-      <div className="hidden lg:block absolute top-16 left-16 z-40 pointer-events-none">
-        <span className="text-xs tracking-[0.32em] uppercase text-white/50">
-          Industries We Serve
-        </span>
-      </div>
-
-      {/* ===============================
-         HORIZONTAL TRACK
-      =============================== */}
+      {/* TRACK */}
       <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
@@ -3390,30 +3606,54 @@ function ProjectShowcase() {
                 : "100%",
           }}
         >
-          {projects.map((p) => (
+          {projects.map((p, i) => (
             <div
-              key={p.id}
+              key={i}
               className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
             >
-              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12">
+              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
                 <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
-                   {p.id}
+                  0{i + 1}
                 </span>
 
-                <h1 className="parallax-title lg:absolute lg:left-16 lg:top-[45%] text-[96px] leading-[0.95] font-light whitespace-pre-line z-20">
+                {/* TITLE */}
+                <h1
+                  className="
+                    parallax-title
+                    text-[56px] leading-[1]
+                    font-light whitespace-pre-line
+                    lg:text-[96px] lg:leading-[0.95]
+                    lg:absolute lg:left-50 lg:top-[25%]
+                    z-20
+                  "
+                >
                   {p.title}
                 </h1>
 
+                {/* MEDIA */}
                 <div className="lg:col-span-4 lg:col-start-5 flex justify-center z-10">
-                  <div className="parallax-image relative w-[420px] aspect-[3/4]">
-                    <img
-                      src={p.image}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
+                  <div className="parallax-image relative w-full max-w-[420px] lg:w-[420px] aspect-[3/4] overflow-hidden">
+                    {isVideo(p.image) ? (
+                      <video
+                        src={p.image}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
+                    ) : (
+                      <img
+                        src={p.image}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        alt=""
+                      />
+                    )}
                   </div>
                 </div>
 
-                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 justify-end">
+                {/* META */}
+                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 lg:justify-end">
                   <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
                       <p key={m} className="underline">
@@ -3421,7 +3661,9 @@ function ProjectShowcase() {
                       </p>
                     ))}
                   </div>
-                  <p className="text-sm text-white/60">{p.desc}</p>
+                  <p className="text-sm text-white/60">
+                    {p.desc}
+                  </p>
                 </div>
               </div>
             </div>
@@ -3429,9 +3671,7 @@ function ProjectShowcase() {
         </div>
       </div>
 
-      {/* ===============================
-         PROGRESS
-      =============================== */}
+      {/* PROGRESS */}
       <div className="hidden lg:block absolute bottom-0 left-0 right-0 px-28 pb-6">
         <div className="h-[1px] bg-white/20">
           <div
@@ -3450,83 +3690,175 @@ function ProjectShowcase() {
 
 
 function Footer() {
+  const emailRef = useRef(null);
+  const charsRef = useRef([]);
+
+  useEffect(() => {
+    const el = emailRef.current;
+
+    // safety guards
+    if (!el) return;
+
+    // reset chars (important for React re-render / strict mode)
+    charsRef.current = charsRef.current.filter(Boolean);
+    if (!charsRef.current.length) return;
+
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches;
+
+    // disable GSAP hover animation on touch-first devices
+    if (isTouchDevice) return;
+
+    gsap.set(charsRef.current, { y: 0, opacity: 1 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to(charsRef.current, {
+      y: -36,
+      opacity: 0,
+      duration: 0.55,
+      ease: "power4.in",
+      stagger: { amount: 0.22 },
+    })
+      .set(charsRef.current, { y: 36 })
+      .to(charsRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 0.55,
+        ease: "back.out(2.6)",
+        stagger: { amount: 0.22 },
+      });
+
+    const onPointerEnter = (e) => {
+      if (e.pointerType !== "mouse") return;
+      tl.restart();
+    };
+
+    el.addEventListener("pointerenter", onPointerEnter);
+
+    return () => {
+      el.removeEventListener("pointerenter", onPointerEnter);
+      tl.kill();
+    };
+  }, []);
+
+  const email = "hello@studio.com";
+
   return (
-    <footer className="relative w-full bg-[#c9574b] text-white overflow-hidden">
-      {/* ========================= */}
-      {/* MAIN GRID */}
-      {/* ========================= */}
-      <div className="relative z-[2] px-[80px] py-[140px] max-[900px]:px-6 max-[900px]:py-[100px]">
-        <div className="grid grid-cols-[1.2fr_0.8fr_1fr] gap-20 max-[1100px]:grid-cols-1 max-[1100px]:gap-16">
+    <footer
+      id="top"
+      className="relative bg-neutral-950 text-white overflow-hidden"
+    >
+      {/* ==================================================
+        SIGNAL BAR
+      ================================================== */}
+      <div className="px-[6vw] py-4 sm:py-5 flex flex-wrap items-center justify-between text-[10px] sm:text-[11px] tracking-wide border-b border-white/10 gap-y-2">
+        <div className="opacity-50 uppercase">
+          GMT +7 · Operating globally
+        </div>
 
-          {/* LEFT — IDENTITY */}
-          <div className="flex flex-col gap-8">
-            <h2 className="text-[48px] font-light leading-[1.1] tracking-tight max-[900px]:text-[36px]">
-              Ready to talk?<br />
-              Let’s build something<br />
-              that actually lasts.
-            </h2>
-
-            <p className="text-sm text-white/75 max-w-[420px] leading-relaxed">
-              Share your ideas with us and we’ll begin turning your vision into
-              something clear, sharp, and executable.
-            </p>
-
+        <div className="flex gap-5 sm:gap-6">
+          <div className="opacity-80">Our Social</div>
+          {["Instagram", "LinkedIn"].map((item) => (
             <a
-              href="mailto:boson.studio@gmail.com"
-              className="mt-6 inline-flex items-center gap-3 text-sm tracking-wide text-white/80 hover:text-white transition"
+              key={item}
+              href="#"
+              className="opacity-50 hover:opacity-100 transition"
             >
-              Get in touch →
+              {item}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      {/* ==================================================
+        CTA
+      ================================================== */}
+      <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-20 sm:py-28">
+        <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
+          {/* LEFT */}
+          <div className="col-span-12 lg:col-span-6">
+            <p className="text-neutral-500 max-w-md leading-relaxed text-sm sm:text-base">
+              We work with teams building thoughtful digital products
+              <br />
+              <span className="hidden sm:inline mr-10"></span>
+              If you have a project in mind, we would{" "}
+              <span className="italic">looove</span> to hear about it
+            </p>
+          </div>
+
+          {/* RIGHT — EMAIL */}
+          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
+            <a
+              ref={emailRef}
+              href="mailto:hello@studio.com"
+              className="
+                inline-block
+                font-light
+                tracking-tight
+                text-white
+                cursor-pointer
+                text-[clamp(24px,7vw,42px)]
+              "
+            >
+              <span className="inline-flex overflow-hidden">
+                {email.split("").map((char, i) => (
+                  <span
+                    key={i}
+                    ref={(el) => (charsRef.current[i] = el)}
+                    className="inline-block will-change-transform"
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
+              </span>
+
+              {/* underline included in tap area */}
+              <span className="block h-[1px] w-full bg-white/30 mt-1" />
             </a>
           </div>
+        </div>
+      </div>
 
-          {/* CENTER — NAV */}
-          <div className="flex flex-col divide-y divide-white/15 border border-white/15 bg-white/5 backdrop-blur">
-            {[
-              "Home",
-              "Projects",
-              "What We Do",
-              "Latest News",
-              "Get In Touch",
-            ].map((item) => (
-              <a
-                key={item}
-                className="px-8 py-6 flex items-center justify-between text-sm tracking-wide hover:bg-white/10 transition"
-              >
-                <span>{item}</span>
-                <span className="opacity-60">↗</span>
+      {/* ==================================================
+        BRAND MASS
+      ================================================== */}
+      <div className="relative px-6 lg:px-12 pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
+          {/* BRAND */}
+          <div className="col-span-12 lg:col-span-7">
+            <img
+              src="/png/boson-white3.png"
+              alt="Boson"
+              className="w-full max-w-[900px]"
+            />
+          </div>
+
+          {/* META */}
+          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500">
+            <div className="space-y-1 lg:text-right">
+              <div>+62 812 3456 789</div>
+              <div>Bali · Indonesia</div>
+            </div>
+
+            <span>Copyright © {new Date().getFullYear()}</span>
+
+            <div className="flex gap-6 sm:gap-8">
+              <a href="/imprint" className="hover:text-white">
+                Imprint
               </a>
-            ))}
-          </div>
-
-          {/* RIGHT — CONTACT */}
-          <div className="flex flex-col gap-6 text-sm text-white/75">
-            <div>
-              <div className="text-white/50 mb-1">Email</div>
-              <div>boson.studio@gmail.com</div>
-            </div>
-
-            <div>
-              <div className="text-white/50 mb-1">Base</div>
-              <div>Bali, Indonesia</div>
-            </div>
-
-            <div>
-              <div className="text-white/50 mb-1">Working</div>
-              <div>Worldwide</div>
-            </div>
-
-            <div className="flex gap-4 mt-4 text-xs text-white/60">
-              <a className="hover:text-white transition">Behance</a>
-              <a className="hover:text-white transition">LinkedIn</a>
-              <a className="hover:text-white transition">Contact</a>
+              <a href="#top" className="hover:text-white">
+                Back to top ↑
+              </a>
             </div>
           </div>
-
         </div>
       </div>
     </footer>
   );
 }
+
 
 
  
@@ -3540,62 +3872,79 @@ function Footer() {
    PAGE
    ========================================== */
 
-   export default function Page() {
+   export default  function Page() {
     const ready = useContext(LoaderContext);
-    const bgRef = useRef(null);
   
+    const bgRef = useRef(null);
+    const footerRef = useRef(null);
+  
+    const [footerHeight, setFooterHeight] = useState(0);
+  
+    /* ==================================================
+      RESET SCROLL
+    ================================================== */
     useEffect(() => {
       window.scrollTo(0, 0);
     }, []);
   
+    /* ==================================================
+      MEASURE FOOTER HEIGHT (DYNAMIC BUFFER SOURCE)
+    ================================================== */
     useEffect(() => {
       if (!ready) return;
   
-      const el = bgRef.current;
+      const footer = footerRef.current;
+      if (!footer) return;
   
-      // ===== BACKGROUND SCROLL TRANSITION bg-[#F3F4F5]===== 
-      // (versi NON-SCRUB → scroll cuma memicu animasi)
-      // ScrollTrigger.create({
-      //   trigger: ".chayay",
-      //   start: "top top",
-      //   end: "bottom bottom",
-      
-      //   onEnter: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onEnterBack: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onLeave: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      
-      //   onLeaveBack: () => {
-      //     gsap.to(el, {
-      //       backgroundColor: "#F3F4F5",
-      //       duration: 1.2,
-      //       ease: "power2.out",
-      //     });
-      //   },
-      // });
-      
+      const measure = () => {
+        const rect = footer.getBoundingClientRect();
+        setFooterHeight(rect.height);
+      };
   
-      return () => ScrollTrigger.getAll().forEach((st) => st.kill());
+      measure();
+      window.addEventListener("resize", measure);
+  
+      return () => {
+        window.removeEventListener("resize", measure);
+      };
     }, [ready]);
+  
+    /* ==================================================
+      SCROLL-DRIVEN FOOTER REVEAL (PURE, MANUAL)
+    ================================================== */
+    useEffect(() => {
+      if (!ready) return;
+  
+      const footer = footerRef.current;
+      if (!footer) return;
+  
+      const OFFSET = window.innerHeight * 0.5;
+  
+      // INIT STATE
+      footer.style.transform = `translateY(${OFFSET}px)`;
+  
+      const onScroll = () => {
+        const scrollY = window.scrollY;
+        const viewportH = window.innerHeight;
+        const docH = document.documentElement.scrollHeight;
+  
+        // trigger zone: last viewport before bottom
+        const start = docH - viewportH - footerHeight;
+        const end = docH - viewportH;
+  
+        let progress = (scrollY - start) / (end - start);
+        progress = Math.min(Math.max(progress, 0), 1);
+  
+        const y = OFFSET * (1 - progress);
+        footer.style.transform = `translateY(${y}px)`;
+      };
+  
+      window.addEventListener("scroll", onScroll, { passive: true });
+  
+      return () => {
+        window.removeEventListener("scroll", onScroll);
+      };
+    }, [ready, footerHeight]);
   
     if (!ready) return null;
   
@@ -3603,89 +3952,112 @@ function Footer() {
       <div
         className="chayay"
         ref={bgRef}
-        style={{ width: "100%", background: "black", position: "relative" }}
+        style={{
+          width: "100%",
+          background: "black",
+          position: "relative",
+        }}
       >
+        {/* ==================================================
+          HERO / TOP
+        ================================================== */}
+  
         <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
-          <HeroJoin/>
+          <HeroJoin />
         </div>
   
-        {/* <div className="h-screen w-screen bg-white"/> */}
-           
-           <Header/>
-          
-          <div data-theme="dark" style={{ position: "relative", zIndex: 2, width: "100%" }}>
-            <BosonNarrative />
-          </div>
-          
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <Projects />
-          </div>
-          
-          
-       
-        
-        
-        
-         <Description/>
-         
-         
-         {/* <ProjectShowcase/> */}
-         
-        <VideoSection/>
-        
-   
-          
-           {/* <ServicesHero/> */}
-           
-        
-        
-          {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <BigHeading />
-          </div> */}
-        
-        
-          {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <WorksList />
-          </div> */}
-          
-          
-          {/* <BosonScrollText/>   */}
-        
-       
-         {/* <Galery/> */}
-       
-        
+        {/* <div className="h-screen w-screen bg-white" /> */}
   
-       
+        <Header />
   
-        
-  
-        {/* <MeetBoson /> */}
-  
-       
-  
-      
+        {/* <div
+          data-theme="dark"
+          style={{ position: "relative", zIndex: 2, width: "100%" }}
+        >
+          <BosonNarrative />
+        </div> */}
   
         {/* <div style={{ position: "relative", zIndex: 2 }}>
-            <Carousel />
-          </div> */}
-        
-        {/* <div className="" style={{ position: "relative", zIndex: 2 }}>
-          <IndustriesPage />
+          <Projects />
         </div> */}
-        
-     
-        
-          
-        
-        
-        
-
+  
+        {/* ==================================================
+          DESCRIPTION
+        ================================================== */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Description />
+        </div>
   
         <div style={{ position: "relative", zIndex: 2 }}>
+          <VideoSection />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ServicesHero />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <BigHeading />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ProjectShowcase />
+        </div>
+  
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <WorksList />
+        </div>
+  
+        {/* <BosonScrollText /> */}
+  
+        {/* ==================================================
+          GALERY
+        ================================================== */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Galery />
+        </div>
+  
+        {/* ==================================================
+          EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
+        ================================================== */}
+        <div
+          style={{
+            height: footerHeight,
+          }}
+        />
+  
+        {/* 
+        <MeetBoson />
+        */}
+  
+        {/* 
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Carousel />
+        </div>
+        */}
+  
+        {/* 
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <IndustriesPage />
+        </div>
+        */}
+  
+        {/* ==================================================
+          FOOTER — FIXED, PURE SCROLL-DRIVEN
+        ================================================== */}
+        <div
+          ref={footerRef}
+          className="fixed bottom-0 left-0 w-full z-0"
+          style={{
+            willChange: "transform",
+          }}
+        >
           <Footer />
         </div>
   
+        {/* ==================================================
+          GLOBAL STYLE
+        ================================================== */}
         <style jsx global>{`
           body {
             background: #000;
@@ -3695,5 +4067,4 @@ function Footer() {
       </div>
     );
   }
-  
   
