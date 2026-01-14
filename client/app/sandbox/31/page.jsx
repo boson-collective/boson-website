@@ -3224,6 +3224,8 @@ function Description() {
   const resizeTimer = useRef(null);
 
   useLayoutEffect(() => {
+    const isTouch = ScrollTrigger.isTouch === 1;
+
     const build = () => {
       if (
         !sectionRef.current ||
@@ -3236,6 +3238,7 @@ function Description() {
         return;
       }
 
+      // cleanup
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
@@ -3252,6 +3255,9 @@ function Description() {
           { opacity: 1, clearProps: "transform" }
         );
 
+        /* =====================
+           TITLE
+        ===================== */
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3268,9 +3274,13 @@ function Description() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 75%",
+            once: true,
           },
         });
 
+        /* =====================
+           DIVIDER
+        ===================== */
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -3281,10 +3291,14 @@ function Description() {
             scrollTrigger: {
               trigger: dividerRef.current,
               start: "top 85%",
+              once: true,
             },
           }
         );
 
+        /* =====================
+           BODY PARAGRAPHS
+        ===================== */
         bodyRef.current
           .querySelectorAll("[data-animate]")
           .forEach((p) => {
@@ -3304,10 +3318,14 @@ function Description() {
               scrollTrigger: {
                 trigger: p,
                 start: "top 85%",
+                once: true,
               },
             });
           });
 
+        /* =====================
+           STATS
+        ===================== */
         gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
           opacity: 0,
           y: 10,
@@ -3317,9 +3335,13 @@ function Description() {
           scrollTrigger: {
             trigger: statsRef.current,
             start: "top 85%",
+            once: true,
           },
         });
 
+        /* =====================
+           CTA
+        ===================== */
         gsap.from(ctaRef.current, {
           opacity: 0,
           y: 10,
@@ -3328,18 +3350,24 @@ function Description() {
           scrollTrigger: {
             trigger: ctaRef.current,
             start: "top 90%",
+            once: true,
           },
         });
       }, sectionRef);
 
-      ScrollTrigger.refresh();
+      // refresh ONLY desktop
+      if (!isTouch) {
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+      }
     };
 
     document.fonts.ready.then(build);
 
     const onResize = () => {
       clearTimeout(resizeTimer.current);
-      resizeTimer.current = setTimeout(build, 200);
+      resizeTimer.current = setTimeout(() => {
+        if (!isTouch) build();
+      }, 200);
     };
 
     window.addEventListener("resize", onResize);
@@ -3381,13 +3409,9 @@ function Description() {
           {/* STATS */}
           <div ref={statsRef} className="lg:col-span-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
-              {/* STAT 1 */}
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <BriefcaseIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
-                <div className="flex flex-col gap-1">
+              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+                <BriefcaseIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+                <div>
                   <div className="text-xs uppercase tracking-widest">
                     Projects delivered
                   </div>
@@ -3397,13 +3421,9 @@ function Description() {
                 </div>
               </div>
 
-              {/* STAT 2 */}
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <GlobeAltIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
-                <div className="flex flex-col gap-1">
+              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+                <GlobeAltIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+                <div>
                   <div className="text-xs uppercase tracking-widest">
                     Countries served
                   </div>
@@ -3413,13 +3433,9 @@ function Description() {
                 </div>
               </div>
 
-              {/* STAT 3 */}
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <UsersIcon className="w-6 h-6 text-neutral-700 flex-shrink-0 block sm:hidden" />
-                <div className="flex flex-col gap-1">
+              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+                <UsersIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+                <div>
                   <div className="text-xs uppercase tracking-widest">
                     Total audience reach
                   </div>
@@ -3434,42 +3450,21 @@ function Description() {
           {/* BODY + CTA */}
           <div
             ref={bodyRef}
-            className="
-              lg:col-span-7
-              max-w-full lg:max-w-xl
-              lg:ml-auto
-              text-neutral-800
-              text-[16px] lg:text-[17px]
-              leading-[1.6]
-            "
+            className="lg:col-span-7 max-w-full lg:max-w-xl lg:ml-auto text-neutral-800 text-[16px] lg:text-[17px] leading-[1.6]"
           >
             <p data-animate className="mb-8 lg:mb-10">
               Boson is a digital agency founded in 2021 and based in Bali,
               working with clients across Qatar, Malaysia, and other regions.
               Our work combines design, development, and brand operations,
               giving teams a toolkit that keeps everything consistent.
-              Whether you're refining a brand or building a new digital
-              foundation, Boson brings clarity and long-term stability.
             </p>
 
             <a
               ref={ctaRef}
               href="#projects"
-              className="
-                inline-flex items-center gap-3
-                px-7 lg:px-8 py-4
-                rounded-full
-                border border-black
-                text-sm font-medium tracking-wide
-                transition-all duration-300 ease-out
-                hover:bg-black hover:text-white
-                group
-              "
+              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black text-sm font-medium tracking-wide transition-all duration-300 hover:bg-black hover:text-white"
             >
-              <span>DISCOVER ALL PROJECTS</span>
-              <span className="inline-block transition-transform duration-300 ease-out group-hover:translate-x-1">
-                →
-              </span>
+              DISCOVER ALL PROJECTS →
             </a>
           </div>
         </div>
@@ -3477,6 +3472,7 @@ function Description() {
     </section>
   );
 }
+
 
 
 
