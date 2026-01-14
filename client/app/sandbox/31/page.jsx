@@ -54,6 +54,41 @@ function Webglbg() {
     const BOSON_DELAY = 2.8;
     const TEXT_DELAY = BOSON_DELAY + 1.5;
   
+    // BASE COORDINATES
+    const BASE_LAT = { deg: 6, min: 10, sec: 0, dir: "S" };
+    const BASE_LON = { deg: 106, min: 49, sec: 0, dir: "E" };
+  
+    const [latText, setLatText] = useState(`06°10'00"S`);
+    const [lonText, setLonText] = useState(`106°49'00"E`);
+  
+    useEffect(() => {
+      function updateCoordinatesFromPointer(e) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+  
+        const nx = e.clientX / w; // 0–1
+        const ny = e.clientY / h; // 0–1
+  
+        // offset seconds (beda sumbu)
+        let lonSec = (nx - 0.5) * 60;
+        let latSec = (ny - 0.5) * 60;
+  
+        // clamp
+        lonSec = Math.min(Math.max(lonSec, -59), 59);
+        latSec = Math.min(Math.max(latSec, -59), 59);
+  
+        const lonS = Math.abs(Math.round(lonSec)).toString().padStart(2, "0");
+        const latS = Math.abs(Math.round(latSec)).toString().padStart(2, "0");
+  
+        setLonText(`${BASE_LON.deg}°${BASE_LON.min}'${lonS}"${BASE_LON.dir}`);
+        setLatText(`${BASE_LAT.deg}°${BASE_LAT.min}'${latS}"${BASE_LAT.dir}`);
+      }
+  
+      window.addEventListener("mousemove", updateCoordinatesFromPointer);
+      return () =>
+        window.removeEventListener("mousemove", updateCoordinatesFromPointer);
+    }, []);
+  
     return (
       <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
         <Webglbg />
@@ -63,7 +98,7 @@ function Webglbg() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 0.75, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute top-6 text-white sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide"
+          className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide text-white"
         >
           <div className="flex gap-4 sm:gap-8">
             <span>About</span>
@@ -80,9 +115,9 @@ function Webglbg() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 0.6, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[28%] text-white sm:bottom-[22%] left-1/2 sm:left-20 
+          className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 
           -translate-x-1/2 sm:translate-x-0 text-[11px] sm:text-sm leading-relaxed 
-          max-w-[240px] text-center sm:text-start z-20"
+          max-w-[240px] text-center sm:text-left z-20 text-white"
         >
           A system-driven studio
           <br />
@@ -94,29 +129,29 @@ function Webglbg() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 0.6, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[20%] text-white sm:bottom-[22%] right-1/2 sm:right-20 
+          className="absolute bottom-[20%] sm:bottom-[22%] right-1/2 sm:right-20 
           translate-x-1/2 sm:translate-x-0 text-[11px] sm:text-sm leading-relaxed 
-          max-w-[240px] text-center sm:text-right z-20"
+          max-w-[240px] text-center sm:text-right z-20 text-white"
         >
           Focused on how to shape
           <br />
           the future, driving it forward
         </motion.div>
   
-        {/* FOOTER */}
+        {/* FOOTER — COORDINATES */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 0.55, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-6 text-white sm:bottom-10 w-full px-6 sm:px-20 
-          flex justify-between text-[10px] sm:text-xs tracking-wide z-20"
+          className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 
+          flex justify-between text-[10px] sm:text-xs tracking-wide z-20 text-white"
         >
-          <span>06°10&apos;00&quot;S</span>
+          <span>{latText}</span>
           <span>Bali, Indonesia</span>
-          <span>106°49&apos;00&quot;E</span>
+          <span>{lonText}</span>
         </motion.div>
   
-        {/* BOSON CHROME — ANIMASI DOANG */}
+        {/* BOSON */}
         <motion.div
           initial={{ opacity: 0, scale: 1.9, filter: "blur(100px)" }}
           animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -126,7 +161,6 @@ function Webglbg() {
           <div className="boson-chrome-v4" />
         </motion.div>
   
-        {/* CHROME CSS — VISUAL ASLI BALIK */}
         <style jsx>{`
           .boson-chrome-v4 {
             position: absolute;
@@ -134,23 +168,14 @@ function Webglbg() {
             margin: auto;
             width: min(90vw, 1250px);
             height: min(90vw, 1250px);
-  
             mask-image: url("/boson-white.png");
             -webkit-mask-image: url("/boson-white.png");
             mask-size: contain;
             mask-position: center;
             mask-repeat: no-repeat;
-  
-            background: 
-          #000000;
-          /* 
-          linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 40%, rgba(0, 0, 0, 0.2) 90%, rgba(0, 0, 0, 0.4) 100%),
-          radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 45%, rgba(0, 0, 0, 0.35) 80%, rgba(0, 0, 0, 0.55) 100%), */
-
-        background-blend-mode: screen, multiply;
-
-        filter: blur(0.6px);
-        opacity: 0.3;
+            background: #000;
+            filter: blur(0.6px);
+            opacity: 0.3;
           }
         `}</style>
       </div>
@@ -196,7 +221,7 @@ function Webglbg() {
   
     const scaleExpand = isMobile
       ? { scaleX: 6, scaleY: 6 } // 📱 portrait
-      : { scaleX: 26, scaleY: 6 }; // 🖥 landscape
+      : { scaleX: 16, scaleY: 4 }; // 🖥 landscape
   
     const getDuration = (i) => (i === 0 ? 650 : 250);
     const overlapOffset = 150;
@@ -458,7 +483,7 @@ function Webglbg() {
       width: "100%",
       whiteSpace: "pre-wrap",
       fontSize: "clamp(28px, 6vw, 74px)",
-      lineHeight: 1.25,
+      lineHeight: 1.1,
       wordSpacing: -5,
       fontWeight: 400,
       textAlign: "justify",
@@ -1130,7 +1155,7 @@ function VideoSection() {
       : false;
 
   return (
-    <div ref={outerRef} style={{ height: "300vh", position: "relative" }}>
+    <div ref={outerRef} data-theme="dark" style={{ height: "300vh", position: "relative" }}>
       <section
         ref={sectionRef}
         style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
@@ -1282,18 +1307,19 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 
 function Projects() {
   const scrollRef = useRef(null);
+  const isMobile = window.innerWidth <= 768;
 
-  // ==================================================
-  // SECTION SCROLL
-  // ==================================================
+  /* =========================
+     SECTION SCROLL
+  ========================= */
   const { scrollYProgress } = useScroll({
     target: scrollRef,
     offset: ["start start", "end end"],
   });
 
-  // ==================================================
-  // GLOBAL SCROLL
-  // ==================================================
+  /* =========================
+     GLOBAL ROTATION
+  ========================= */
   const { scrollY } = useScroll();
   const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
@@ -1301,53 +1327,85 @@ function Projects() {
   const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
   const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-  // ==================================================
-  // LIGHT MODE
-  // ==================================================
-  const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
+  /* =========================
+     IMAGES
+  ========================= */
+  const images = [
+    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
+    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
+    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
+    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
+    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
+    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
+    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
+    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
+    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
+    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
+    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
+    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
+    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
+    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
+    "/clients/tender-touch/6.jpg",
+  ];
 
-  const bgColor = useTransform(
-    lightProgress,
-    [0, 1],
-    ["rgb(0,0,0)", "#f3f4f5"]
+  /* =========================
+     IMAGE BURST
+  ========================= */
+  const baseStart = 0.1;
+  const step = 0.045;
+  const windowLen = 0.27;
+
+  const bursts = images.map((_, i) =>
+    useTransform(
+      scrollYProgress,
+      [baseStart + i * step, baseStart + i * step + windowLen],
+      [0, 1]
+    )
   );
 
-  const textColor = useTransform(
-    lightProgress,
-    [0, 1],
-    ["rgb(255,255,255)", "rgb(0,0,0)"]
-  );
-
-  const orbitStroke = useTransform(
-    lightProgress,
-    [0, 1],
-    ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
-  );
-
-  const dotFill = useTransform(
-    lightProgress,
-    [0, 1],
-    ["rgb(255,255,255)", "rgb(0,0,0)"]
-  );
-
-  // ==================================================
-  // INTRO TEXT
-  // ==================================================
-  const { scrollYProgress: introProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start end", "start start"],
+  const motionPropsList = bursts.map((b, i) => {
+    const dir = i % 4;
+    return {
+      x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
+      y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
+      z: useTransform(b, [0, 1], [-2000, 3000]),
+      scale: useTransform(b, [0, 1], [0.4, 1.1]),
+      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
+    };
   });
 
-  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-  const textFilter = useTransform(introProgress, [0, 1], [
-    "blur(20px)",
-    "blur(0px)",
+  /* =========================
+     LIGHT MODE (MOBILE NEVER)
+  ========================= */
+  const lightProgress = useTransform(
+    scrollYProgress,
+    isMobile ? [2, 3] : [1 - windowLen, 1],
+    [0, 1]
+  );
+
+  const bgColor = useTransform(lightProgress, [0, 1], [
+    "rgb(0,0,0)",
+    "#f3f4f5",
   ]);
 
-  // ==================================================
-  // ORBITS
-  // ==================================================
+  const textColor = useTransform(lightProgress, [0, 1], [
+    "rgb(255,255,255)",
+    "rgb(0,0,0)",
+  ]);
+
+  const orbitStroke = useTransform(lightProgress, [0, 1], [
+    "rgba(255,255,255,0.15)",
+    "rgba(0,0,0,0.15)",
+  ]);
+
+  const dotFill = useTransform(lightProgress, [0, 1], [
+    "rgb(255,255,255)",
+    "rgb(0,0,0)",
+  ]);
+
+  /* =========================
+     ORBITS DATA
+  ========================= */
   const c1 = { cx: 425, cy: 350, r: 250 };
   const c2 = { cx: 325, cy: 500, r: 250 };
   const c3 = { cx: 525, cy: 500, r: 250 };
@@ -1379,57 +1437,28 @@ function Projects() {
     };
   }, [rotate1, rotate2, rotate3]);
 
-  // ==================================================
-  // IMAGES
-  // ==================================================
-  const images = [
-    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
-    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
-    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
-    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
-    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
-    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
-    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
-    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
-    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
-    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
-    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
-    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
-    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
-    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-    "/clients/tender-touch/6.jpg",
-  ];
-
-  const baseStart = 0.15;
-  const step = 0.05;
-  const windowLen = 0.15;
-
-  const bursts = images.map((_, i) =>
-    useTransform(
-      scrollYProgress,
-      [baseStart + i * step, baseStart + i * step + windowLen],
-      [0, 1]
-    )
-  );
-
-  const motionPropsList = bursts.map((b, i) => {
-    const dir = i % 4;
-    return {
-      x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
-      y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
-      z: useTransform(b, [0, 1], [-2000, 3000]),
-      scale: useTransform(b, [0, 1], [0.4, 1.1]),
-      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
-    };
+  /* =========================
+     INTRO TEXT
+  ========================= */
+  const { scrollYProgress: introProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "start start"],
   });
 
-  // ==================================================
-  // RENDER
-  // ==================================================
+  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+  const textFilter = useTransform(introProgress, [0, 1], [
+    "blur(20px)",
+    "blur(0px)",
+  ]);
+
+  /* =========================
+     RENDER (UTUH)
+  ========================= */
   return (
     <motion.div
+    data-theme="dark"
       ref={scrollRef}
-      className="projects-root"
       style={{
         width: "100%",
         height: "500vh",
@@ -1446,7 +1475,7 @@ function Projects() {
               cy={c.cy}
               r={c.r}
               fill="none"
-              strokeWidth="0.5"
+              strokeWidth="1.0"
               style={{ stroke: orbitStroke }}
             />
           ))}
@@ -1469,6 +1498,7 @@ function Projects() {
             y: textY,
             filter: textFilter,
             color: textColor,
+            mixBlendMode: "difference",
           }}
         >
           A world where uncertainty <br />
@@ -1480,14 +1510,12 @@ function Projects() {
         ))}
       </div>
 
-      {/* RESPONSIVE — CONTAINMENT ONLY */}
       <style>{`
         .projects-sticky {
           position: sticky;
           top: 0;
           width: 100vw;
           height: 100vh;
-          height: 100svh;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -1498,6 +1526,7 @@ function Projects() {
         }
 
         .projects-orbit {
+          position: absolute;
           width: 850px;
           height: 850px;
           max-width: 100vw;
@@ -1512,17 +1541,13 @@ function Projects() {
           text-align: center;
           white-space: pre-line;
           z-index: 10;
-        }
-
-        @media (max-width: 768px) {
-          .projects-root {
-            height: 500vh;
-          }
+          mix-blend-mode: difference;
         }
       `}</style>
     </motion.div>
   );
 }
+
 
 function Galery() {
   const GRID_COLUMNS = 5;
@@ -2823,6 +2848,7 @@ function ServicesHero() {
 
   return (
     <section
+    data-theme="light"
       ref={sectionRef}
       className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
     >
@@ -3390,7 +3416,7 @@ function Description() {
         <div className="max-w-full mb-12 lg:mb-16">
           <h1
             ref={titleRef}
-            className="font-sans font-medium tracking-tight leading-[1.15]"
+            className="font-sans font-medium tracking-tight leading-[1.05]"
             style={{ fontSize: "clamp(32px, 5vw, 134px)" }}
           >
             <span className="hidden lg:inline mr-80" />
@@ -3408,44 +3434,35 @@ function Description() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
           {/* STATS */}
           <div ref={statsRef} className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
-              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-                <BriefcaseIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-                <div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Projects delivered
-                  </div>
-                  <div className="text-[22px] font-medium text-neutral-800">
-                    100+
-                  </div>
-                </div>
-              </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
+    
+    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+      <BriefcaseIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+      <div>
+        <div className="text-[22px] font-medium text-neutral-800">100+</div>
+        <div className="text-xs uppercase tracking-widest">Projects delivered</div>
+      </div>
+    </div>
 
-              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-                <GlobeAltIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-                <div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Countries served
-                  </div>
-                  <div className="text-[22px] font-medium text-neutral-800">
-                    3
-                  </div>
-                </div>
-              </div>
+    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+      <GlobeAltIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+      <div>
+        <div className="text-[22px] font-medium text-neutral-800">3</div>
+        <div className="text-xs uppercase tracking-widest">Countries served</div>
+      </div>
+    </div>
 
-              <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-                <UsersIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-                <div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Total audience reach
-                  </div>
-                  <div className="text-[22px] font-medium text-neutral-800">
-                    2.5m+
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
+      <UsersIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+      <div>
+        <div className="text-[22px] font-medium text-neutral-800">2.5m+</div>
+        <div className="text-xs uppercase tracking-widest">Total audience reach</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
           {/* BODY + CTA */}
           <div
@@ -3459,11 +3476,7 @@ function Description() {
               giving teams a toolkit that keeps everything consistent.
             </p>
 
-            <a
-              ref={ctaRef}
-              href="#projects"
-              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black text-sm font-medium tracking-wide transition-all duration-300 hover:bg-black hover:text-white"
-            >
+            <a ref={ctaRef} href="#projects" className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black">
               DISCOVER ALL PROJECTS →
             </a>
           </div>
@@ -3622,7 +3635,7 @@ function ProjectShowcase() {
                   PROJECT 0{i + 1}
                 </span>
 
-                {/* TITLE */}
+                {/* TITLE — MIX BLEND MODE */}
                 <h1
                   className="
                     parallax-title
@@ -3630,13 +3643,16 @@ function ProjectShowcase() {
                     font-light whitespace-pre-line
                     lg:text-[96px] lg:leading-[0.95]
                     lg:absolute lg:left-50 lg:top-[25%]
-                    z-20
+                    z-30
+                    mix-blend-difference
+                    pointer-events-none
+                    select-none
                   "
                 >
                   {p.title}
                 </h1>
 
-                {/* MEDIA — FIXED */}
+                {/* MEDIA */}
                 <div className="lg:col-span-4 lg:col-start-5 z-10">
                   <div
                     className="
@@ -3702,6 +3718,7 @@ function ProjectShowcase() {
     </section>
   );
 }
+
 
 
 
@@ -3876,7 +3893,7 @@ function Footer() {
    PAGE
    ========================================== */
 
-   export default  function Page() {
+   export default function Page() {
     const ready = useContext(LoaderContext);
   
     const bgRef = useRef(null);
@@ -3892,9 +3909,9 @@ function Footer() {
     }, []);
   
     /* ==================================================
-      MEASURE FOOTER HEIGHT (DYNAMIC BUFFER SOURCE)
+      MEASURE FOOTER HEIGHT (ROBUST + DETERMINISTIC)
     ================================================== */
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!ready) return;
   
       const footer = footerRef.current;
@@ -3905,10 +3922,21 @@ function Footer() {
         setFooterHeight(rect.height);
       };
   
-      measure();
+      // initial sync (post layout)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(measure);
+      });
+  
+      const observer = new ResizeObserver(() => {
+        measure();
+      });
+  
+      observer.observe(footer);
+  
       window.addEventListener("resize", measure);
   
       return () => {
+        observer.disconnect();
         window.removeEventListener("resize", measure);
       };
     }, [ready]);
@@ -3918,6 +3946,7 @@ function Footer() {
     ================================================== */
     useEffect(() => {
       if (!ready) return;
+      if (!footerHeight) return;
   
       const footer = footerRef.current;
       if (!footer) return;
@@ -3932,7 +3961,7 @@ function Footer() {
         const viewportH = window.innerHeight;
         const docH = document.documentElement.scrollHeight;
   
-        // trigger zone: last viewport before bottom
+        // trigger zone
         const start = docH - viewportH - footerHeight;
         const end = docH - viewportH;
   
@@ -3944,6 +3973,7 @@ function Footer() {
       };
   
       window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
   
       return () => {
         window.removeEventListener("scroll", onScroll);
@@ -3966,13 +3996,20 @@ function Footer() {
           HERO / TOP
         ================================================== */}
   
-        <div style={{ position: "relative", zIndex: 2, width: "100%", background: "#000" }}>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 2,
+            width: "100%",
+            background: "#000",
+          }}
+        >
           <HeroJoin />
         </div>
   
         {/* <div className="h-screen w-screen bg-white" /> */}
   
-        {/* <Header /> */}
+        <Header />
   
         <div
           data-theme="dark"
@@ -4021,24 +4058,21 @@ function Footer() {
           <Galery />
         </div>
   
-       
-  
-        {/* 
-        <MeetBoson />
+        {/*
+          <MeetBoson />
         */}
   
-        {/* 
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <Carousel />
-        </div>
+        {/*
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <Carousel />
+          </div>
         */}
   
-{/*         
-        <div style={{ position: "relative", zIndex: 2 }}>
-          <IndustriesPage />
-        </div>
+        {/*
+          <div style={{ position: "relative", zIndex: 2 }}>
+            <IndustriesPage />
+          </div>
         */}
-  
   
         {/* ==================================================
           EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
@@ -4048,8 +4082,8 @@ function Footer() {
             height: footerHeight,
           }}
         />
-        {
-        /* ==================================================
+  
+        {/* ==================================================
           FOOTER — FIXED, PURE SCROLL-DRIVEN
         ================================================== */}
         <div
