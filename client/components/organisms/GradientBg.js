@@ -8,6 +8,20 @@ import { gsap } from 'gsap';
 import GUI from 'lil-gui';
 
 
+const DEFAULT_BACKGROUND = { 
+  color1: [163 / 255, 189 / 255, 230 / 255],
+  color2: [54 / 255, 211 / 255, 211 / 255],
+  color3: [0 / 255, 1 / 255, 109 / 255],
+  colorAccent: new THREE.Color(0.0, 0.0, 0.0),
+  uLinesBlur: 0.25,
+  uNoise: 0.075,
+  uOffsetX: 0.34,
+  uOffsetY: 0.0,
+  uLinesAmount: 5.0,
+};
+
+
+
 
 
 // ===== utils/lerp.js =====
@@ -57,9 +71,9 @@ class MouseMove extends THREE.EventDispatcher {
     return MouseMove.instance;
   }
 
-  // 各種プロパティの初期化と、イベントハンドラの登録、_addEventsメソッドの呼び出しを行います。
   constructor() {
     super();
+
     this.mouseLast = { x: 0, y: 0 };
     this.isTouching = false;
     this.clickStart = { x: 0, y: 0 };
@@ -67,61 +81,17 @@ class MouseMove extends THREE.EventDispatcher {
     this.strength = 0;
     this.isInit = false;
 
-    this.onTouchDown = (event) => {
-      this.isInit = true;
-      this.isTouching = true;
-      this.mouseLast.x = 'touches' in event ? event.touches[0].clientX : event.clientX;
-      this.mouseLast.y = 'touches' in event ? event.touches[0].clientY : event.clientY;
+    // ===== bind once =====
+    this.onTouchDown = this.onTouchDown.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onTouchUp = this.onTouchUp.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
+    this.onClick = this.onClick.bind(this);
 
-      this.mouse.x = this.mouseLast.x;
-      this.mouse.y = this.mouseLast.y;
-
-      this.clickStart.x = this.mouse.x;
-      this.clickStart.y = this.mouse.y;
-
-      this.dispatchEvent({ type: 'down' });
-    }
-
-
-    this.onTouchMove = (event) => {
-      this.isInit = true;
-
-      const touchX = 'touches' in event ? event.touches[0].clientX : event.clientX;
-      const touchY = 'touches' in event ? event.touches[0].clientY : event.clientY;
-
-      const deltaX = touchX - this.mouseLast.x;
-      const deltaY = touchY - this.mouseLast.y;
-      this.strength = deltaX * deltaY + deltaY * deltaY;
-
-      this.mouseLast.x = touchX;
-      this.mouseLast.y = touchY;
-
-      this.mouse.x += deltaX;
-      this.mouse.y += deltaY;
-    }
-
-    this.onTouchUp = () => {
-      this.isTouching = false;
-      this.dispatchEvent({ type: 'up' });
-    }
-
-    this.onMouseLeave = () => {
-      this.dispatchEvent({ type: 'left' });
-    }
-
-    this.onClick = () => {
-      this.isInit = true;
-      const clickBounds = 10;
-      const xDiff = Math.abs(this.clickStart.x - this.mouse.x);
-      const yDiff = Math.abs(this.clickStart.y - this.mouse.y);
-      if(xDiff <= clickBounds && yDiff <= clickBounds) {
-        this.dispatchEvent({ type: 'click' });
-      }
-    };
-
-    if( MouseMove.instance || !MouseMove.canCreate ) {
+    if (MouseMove.instance || !MouseMove.canCreate) {
       throw new Error('Use MouseMove.getInstance()');
-    };
+    }
+
     this.addEvents();
     MouseMove.instance = this;
   }
@@ -137,18 +107,90 @@ class MouseMove extends THREE.EventDispatcher {
     window.addEventListener('mouseout', this.onMouseLeave);
   }
 
+  removeEvents() {
+    window.removeEventListener('mousedown', this.onTouchDown);
+    window.removeEventListener('mousemove', this.onTouchMove);
+    window.removeEventListener('mouseup', this.onTouchUp);
+    window.removeEventListener('click', this.onClick);
+    window.removeEventListener('touchstart', this.onTouchDown);
+    window.removeEventListener('touchmove', this.onTouchMove);
+    window.removeEventListener('touchend', this.onTouchUp);
+    window.removeEventListener('mouseout', this.onMouseLeave);
+  }
+
+  onTouchDown(event) {
+    this.isInit = true;
+    this.isTouching = true;
+
+    const x = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    const y = 'touches' in event ? event.touches[0].clientY : event.clientY;
+
+    this.mouseLast.x = x;
+    this.mouseLast.y = y;
+    this.mouse.x = x;
+    this.mouse.y = y;
+
+    this.clickStart.x = x;
+    this.clickStart.y = y;
+
+    this.dispatchEvent({ type: 'down' });
+  }
+
+  onTouchMove(event) {
+    this.isInit = true;
+
+    const x = 'touches' in event ? event.touches[0].clientX : event.clientX;
+    const y = 'touches' in event ? event.touches[0].clientY : event.clientY;
+
+    const dx = x - this.mouseLast.x;
+    const dy = y - this.mouseLast.y;
+
+    // ===== FIX strength =====
+    this.strength = Math.sqrt(dx * dx + dy * dy);
+
+    this.mouseLast.x = x;
+    this.mouseLast.y = y;
+
+    this.mouse.x += dx;
+    this.mouse.y += dy;
+  }
+
+  onTouchUp() {
+    this.isTouching = false;
+    this.dispatchEvent({ type: 'up' });
+  }
+
+  onMouseLeave() {
+    this.dispatchEvent({ type: 'left' });
+  }
+
+  onClick() {
+    const clickBounds = 10;
+    const dx = Math.abs(this.clickStart.x - this.mouse.x);
+    const dy = Math.abs(this.clickStart.y - this.mouse.y);
+
+    if (dx <= clickBounds && dy <= clickBounds) {
+      this.dispatchEvent({ type: 'click' });
+    }
+  }
+
   update() {
-    if(this.isInit) {
+    if (this.isInit) {
       this.dispatchEvent({ type: 'mousemove' });
     }
+    this.mouseLast.x = this.mouse.x;
+    this.mouseLast.y = this.mouse.y;
+  }
 
-    const { mouse, mouseLast } = this;
-    mouseLast.x = mouse.x;
-    mouseLast.y = mouse.y;
+  // ===== NEW: lifecycle safe =====
+  destroy() {
+    this.removeEvents();
+    MouseMove.instance = null;
   }
 }
 
 MouseMove.canCreate = false;
+ 
 
 // ===== utils/Preloader.js =====
 class Preloader extends THREE.EventDispatcher {
@@ -336,27 +378,57 @@ class Preloader extends THREE.EventDispatcher {
   }
 
   destroy() {
-    Object.entries(this.loadedAssets).forEach(el => {
-      switch(el[1].type) {
-        case AssetType.IMAGE:
-          el[1].asset.dispose();
+    Object.entries(this.loadedAssets).forEach(([key, item]) => {
+      if (!item) return;
+  
+      switch (item.type) {
+        case AssetType.IMAGE: {
+          if (item.asset && item.asset.dispose) {
+            item.asset.dispose();
+          }
           break;
-        case AssetType.VIDEO:
-          el[1].asset.dispose();
+        }
+  
+        case AssetType.VIDEO: {
+          const texture = item.asset;
+          const video = texture?.image;
+  
+          if (video) {
+            video.pause();
+            video.src = '';
+            video.load();
+          }
+  
+          if (texture && texture.dispose) {
+            texture.dispose();
+          }
           break;
-        case AssetType.MODEL3D:
-          el[1].asset.scenes.forEach(scene => {
-            disposeModel(scene);
-          });
+        }
+  
+        case AssetType.MODEL3D: {
+          const gltf = item.asset;
+          if (gltf && gltf.scene) {
+            disposeModel(gltf.scene);
+          }
           break;
-        case AssetType.CUBE_TEXTURE:
-          el[1].asset.dispose();
+        }
+  
+        case AssetType.CUBE_TEXTURE: {
+          if (item.asset && item.asset.dispose) {
+            item.asset.dispose();
+          }
           break;
+        }
+  
         default:
           break;
       }
     });
+  
+    this.loadedAssets = {};
+    this.assetsToPreload = [];
   }
+  
 
 }
 
@@ -391,8 +463,10 @@ class InteractiveObject extends THREE.Object3D {
   }
 
   destroy() {
-    
+    this.removeFromParent();
+    this.clear();
   }
+  
 
 }
 
@@ -433,26 +507,23 @@ class TextTexture extends THREE.EventDispatcher {
   }
 
   animateShow(destination) {
-    if(this.showTween) {
-      this.showTween.kill();
+    if (this.showTimeline) {
+      this.showTimeline.kill();
     }
-
+  
     this.showTimeline = gsap.timeline({
       onUpdate: () => {
         this.texture.needsUpdate = true;
       },
     });
-    
+  
     this.showTimeline.to(this, {
       duration: 1.6,
-      // progress: destination,
       show: destination,
       ease: 'power3.inOut',
     });
-    
-    // this.showTimeline.progress(destination);
-    this.showTimeline.play();
   }
+  
 
   animateIn() {
     this.animateShow(1);
@@ -494,11 +565,16 @@ class TextTexture extends THREE.EventDispatcher {
   }
 
   destroy() {
-    if(this.showTween) {
-      this.showTween.stop();
+    if (this.showTimeline) {
+      this.showTimeline.kill();
+      this.showTimeline = null;
     }
-    this.texture.dispose();
+  
+    if (this.texture) {
+      this.texture.dispose();
+    }
   }
+  
 }
 
 // ===== components/MediaPlane.js =====
@@ -560,9 +636,19 @@ class MediaPlane extends InteractiveObject {
 
   destroy() {
     super.destroy();
-    this.material.dispose();
-    this.remove(this.mesh);
+  
+    if (this.mesh) {
+      // geometry DIANGGAP shared → jangan dispose di sini
+      if (this.mesh.material) {
+        this.mesh.material.dispose();
+      }
+  
+      this.remove(this.mesh);
+      this.mesh = null;
+    }
   }
+  
+  
 }
 
 // ===== components/Lense.js =====
@@ -652,31 +738,25 @@ class TextPlane extends MediaPlane {
 
   destroy() {
     super.destroy();
-    if(this.textTextur) {
+  
+    if (this.textTexture) {
       this.textTexture.destroy();
+      this.textTexture = null;
     }
   }
+  
 }
 
 // ===== components/Background.js =====
 class Background extends InteractiveObject {
-  constructor({ gui }) {
+  constructor({ gui, backgroundConfig = {} }) {
     super();
     this.mesh = null;
     this.geometry = null;
     this.material = null;
     this.background = {
-      color1: [0.796, 0.294, 0.243], // Soft bright (#E96959)
-      color2: [0.914, 0.412, 0.349], // Base (#CB4B3E)
-      
-      color3: [0, 0, 0]
-, // Rich dark navy-black
-      colorAccent: new THREE.Color(0.0, 0.0, 0.0),
-      uLinesBlur: 0.33,   // was 0.25 → lebih blur
-      uNoise: 0.03,       // noise lebih halus
-      uOffsetX: 0.05,
-      uOffsetY: 0.0,
-      uLinesAmount: 1.36, // 1.36 3.8
+      ...DEFAULT_BACKGROUND,
+      ...backgroundConfig,
     };
 
     
@@ -691,6 +771,7 @@ class Background extends InteractiveObject {
 
   setBackgroundObject() {
     this.geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
+  
     this.material = new THREE.ShaderMaterial({
       vertexShader: shader_background_vertex,
       fragmentShader: shader_background_fragment,
@@ -698,9 +779,30 @@ class Background extends InteractiveObject {
       wireframe: false,
       uniforms: {
         uTime: { value: 0 },
-        uColor1: { value: this.background.color1 },
-        uColor2: { value: this.background.color2 },
-        uColor3: { value: this.background.color3 },
+  
+        // ===== PATCH: vec3 hygiene =====
+        uColor1: {
+          value: new THREE.Color(
+            this.background.color1[0],
+            this.background.color1[1],
+            this.background.color1[2]
+          ),
+        },
+        uColor2: {
+          value: new THREE.Color(
+            this.background.color2[0],
+            this.background.color2[1],
+            this.background.color2[2]
+          ),
+        },
+        uColor3: {
+          value: new THREE.Color(
+            this.background.color3[0],
+            this.background.color3[1],
+            this.background.color3[2]
+          ),
+        },
+  
         uColorAccent: { value: this.background.colorAccent },
         uLinesBlur: { value: this.background.uLinesBlur },
         uNoise: { value: this.background.uNoise },
@@ -710,12 +812,14 @@ class Background extends InteractiveObject {
         uPlaneRes: { value: new THREE.Vector2(1.0, 1.0) },
         uMouse2D: { value: new THREE.Vector2(1.0, 1.0) },
         uBackgroundScale: { value: 1.0 },
-      }
+      },
     });
+  
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.renderOrder = -1;
     this.add(this.mesh);
   }
+  
 
   setGui() {
     const background = this.gui.addFolder('Background');
@@ -768,6 +872,7 @@ class Background extends InteractiveObject {
       if(this.planeBounds.width < breakpoints.tablet) {
         this.mesh.material.uniforms.uBackgroundScale.value = this.planeBounds.width * 0.001 * 1.45;
       } else {
+        // TWEAKABLE
         this.mesh.material.uniforms.uBackgroundScale.value = 1.0;
       }
 
@@ -790,12 +895,15 @@ class Background extends InteractiveObject {
 
   destroy() {
     super.destroy();
-    this.geometry?.dispose();
-    this.material?.dispose();
-    if(this.mesh) {
+  
+    if (this.mesh) {
+      this.mesh.geometry?.dispose();
+      this.mesh.material?.dispose();
       this.remove(this.mesh);
+      this.mesh = null;
     }
   }
+  
 
 }
 
@@ -803,34 +911,42 @@ class Background extends InteractiveObject {
 class InteractiveScene extends THREE.Scene {
   constructor({ mouseMove, camera, gui }) {
     super();
+  
     this.raycaster = new THREE.Raycaster();
     this.rendererBounds = { width: 100, height: 100 };
     this.pixelRatio = 1;
+  
     this.mouse2D = {
       current: { x: 0, y: 0 },
       target: { x: 0, y: 0 },
     };
+  
     this.mouseStrength = {
       current: 0,
-      target: 0
+      target: 0,
     };
+  
     this.hoveredObject = null;
     this.canHoverObject = true;
     this.ease = 0.07 * 1.2;
-
+  
     this.onMouseMove = (e) => {
-      this.mouseStrength.target = e.target.strength;
+      this.mouseStrength.target = e.target.strength || 0;
+  
       const mouseX = e.target.mouse.x;
       const mouseY = e.target.mouse.y;
+  
       this.mouse2D.target.x = (mouseX / this.rendererBounds.width) * 2 - 1;
-      this.mouse2D.target.y = - (mouseY / this.rendererBounds.height) * 2 + 1;
+      this.mouse2D.target.y = -(mouseY / this.rendererBounds.height) * 2 + 1;
     };
-
+  
     this.camera = camera;
     this.mouseMove = mouseMove;
     this.gui = gui;
+  
     this.addListeners();
   }
+  
 
   addListeners() {
     this.mouseMove.addEventListener('mousemove', this.onMouseMove);
@@ -850,19 +966,26 @@ class InteractiveScene extends THREE.Scene {
       this.mouseStrength.target,
       this.ease * updateInfo.slowDownFactor
     );
-
+  
     this.mouse2D.current.x = lerp(
       this.mouse2D.current.x,
       this.mouse2D.target.x,
       this.ease * updateInfo.slowDownFactor
     );
-
+  
     this.mouse2D.current.y = lerp(
       this.mouse2D.current.y,
       this.mouse2D.target.y,
       this.ease * updateInfo.slowDownFactor
     );
+  
+    // ===== PATCH: reset hover jika interaksi dimatikan =====
+    if (!this.canHoverObject && this.hoveredObject) {
+      this.hoveredObject.onMouseLeave?.();
+      this.hoveredObject = null;
+    }
   }
+  
 
   setPixelRatio(ratio) {
     this.pixelRatio = ratio;
@@ -870,19 +993,28 @@ class InteractiveScene extends THREE.Scene {
 
   destroy() {
     this.removeListeners();
+  
+    if (this.hoveredObject) {
+      this.hoveredObject.onMouseLeave?.();
+      this.hoveredObject = null;
+    }
   }
+  
 
 }
 
 // ===== scenes/ExperienceScene.js =====
 class ExperienceScene extends InteractiveScene {
-  constructor({ gui, controls, camera, mouseMove }) {
+  constructor({ gui, controls, camera, mouseMove, background }) {
     super({ camera, mouseMove, gui });
     this.loadedAssets = null;
     this.planeGeometry = new THREE.PlaneGeometry(1, 1, 32, 32);
     this.controls = controls;
 
-    this.background = new Background({ gui });
+    this.background = new Background({
+      gui,
+      backgroundConfig: background,
+    });
     this.add(this.background);
   }
 
@@ -921,136 +1053,184 @@ class ExperienceScene extends InteractiveScene {
 
 // ===== webgl/index.js =====
 export default class WebGL extends THREE.EventDispatcher {
-  constructor({ rendererEl, setShouldReveal, setProgressValue }) {
+  constructor({ rendererEl, setShouldReveal, setProgressValue, background }) {
     super();
+  
     this.rafId = null;
     this.isResumed = true;
+    this.lastFrameTime = null;
+  
     this.mouseMove = MouseMove.getInstance();
     this.preloader = new Preloader();
+  
     this.gui = new GUI();
-    this.gui.hide(); // GUI hilang tanpa hapus kode 
+    this.gui.hide();
     this.pixelRatio = 1;
-
+  
     this.rendererEl = rendererEl;
     this.canvas = document.createElement('canvas');
     this.rendererEl.appendChild(this.canvas);
+  
     this.camera = new THREE.PerspectiveCamera();
     this.setShouldReveal = setShouldReveal;
     this.setProgressValue = setProgressValue;
+  
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
       alpha: true,
-      powerPreference: 'default'
+      powerPreference: 'default',
     });
-
+  
     this.orbitControls = new OrbitControls(this.camera, this.rendererEl);
     this.orbitControls.enableDamping = true;
     this.orbitControls.enablePan = false;
     this.orbitControls.enableRotate = false;
     this.orbitControls.enableZoom = false;
     this.orbitControls.update();
+  
     this.gui.title('Scene aettings');
-
+  
     this.experienceScene = new ExperienceScene({
       camera: this.camera,
       mouseMove: this.mouseMove,
       controls: this.orbitControls,
-      gui: this.gui
+      gui: this.gui,
+      background
     });
-
+  
+    // ===== KEEP AS ARROW FUNCTION (AUTO-BIND) =====
     this.onVisibilityChange = () => {
-      if(document.hidden) {
+      if (document.hidden) {
         this.stopAppFrame();
       } else {
         this.resumeAppFrame();
       }
     };
-
-    this.onAssetLoaded = () => {
-    }
-
-    this.onPreloaderProgress = (e) => {
-
-    }
-
+  
+    // ===== PATCH: render loop (arrow, safe) =====
     this.renderOnFrame = (time) => {
       this.rafId = window.requestAnimationFrame(this.renderOnFrame);
-      if(this.isResumed || !this.lastFrameTime) {
-        this.lastFrameTime = window.performance.now();
+    
+      // guard pertama setelah resume / init
+      if (this.isResumed || this.lastFrameTime === null) {
+        this.lastFrameTime = time;
         this.isResumed = false;
         return;
       }
-      const delta = time - this.lastFrameTime;
-      let slowDownFactor = delta / (1000 / 60);
-      const slowDownFactorRounded = Math.round(slowDownFactor);
-      if(slowDownFactor >= 1) {
-        slowDownFactor = slowDownFactorRounded;
-      }
+    
+      // delta berbasis RAF timestamp (konsisten)
+      let delta = time - this.lastFrameTime;
       this.lastFrameTime = time;
-      // マウスを動かす
+    
+      // clamp ekstrem (tab sleep / hitch berat)
+      if (delta > 1000) delta = 1000;
+    
+      // slowdown factor tetap integer & stabil
+      const slowDownFactor = Math.max(
+        1,
+        Math.round(delta / (1000 / 60))
+      );
+    
       this.mouseMove.update();
       this.experienceScene.update({ delta, slowDownFactor, time });
       this.renderer.render(this.experienceScene, this.camera);
     };
-
+    
+  
+    // ===== ONLY bind METHOD (onResize is method) =====
+    this.onResize = this.onResize.bind(this);
+  
     this.onResize();
     this.addListeners();
-    this.resumeAppFrame(); 
+    this.resumeAppFrame();
   }
+  
+  
 
   onResize() {
     const rendererBounds = this.rendererEl.getBoundingClientRect();
+    if (!rendererBounds.width || !rendererBounds.height) return;
+  
     const aspectRatio = rendererBounds.width / rendererBounds.height;
+  
     this.camera.aspect = aspectRatio;
     this.camera.position.z = 1000;
-    this.camera.fov = 2 * Math.atan(rendererBounds.height / 2 / this.camera.position.z) * (180 / Math.PI);
+    this.camera.fov =
+      (2 * Math.atan(rendererBounds.height / 2 / this.camera.position.z) * 180) /
+      Math.PI;
+  
     this.renderer.setSize(rendererBounds.width, rendererBounds.height);
     this.pixelRatio = Math.min(window.devicePixelRatio, 2);
     this.renderer.setPixelRatio(this.pixelRatio);
     this.camera.updateProjectionMatrix();
+  
     this.experienceScene.setPixelRatio(this.pixelRatio);
     this.experienceScene.setRendererBounds(rendererBounds);
   }
+  
 
   addListeners() {
-    window.addEventListener('resize', this.onResize.bind(this));
+    if (this._listenersAdded) return;
+    this._listenersAdded = true;
+  
+    window.addEventListener('resize', this.onResize);
     window.addEventListener('visibilitychange', this.onVisibilityChange);
     this.preloader.addEventListener('loaded', this.onAssetLoaded);
     this.preloader.addEventListener('progress', this.onPreloaderProgress);
   }
+  
+  
 
   removeListeners() {
-    window.removeEventListener('resize', this.onResize.bind(this));
+    if (!this._listenersAdded) return;
+    this._listenersAdded = false;
+  
+    window.removeEventListener('resize', this.onResize);
     window.removeEventListener('visibilitychange', this.onVisibilityChange);
     this.preloader.removeEventListener('loaded', this.onAssetLoaded);
     this.preloader.removeEventListener('progress', this.onPreloaderProgress);
   }
+  
+  
 
   resumeAppFrame() {
     this.isResumed = true;
-    if(!this.rafId) {
+    if (!this.rafId) {
+      this.lastFrameTime = null;
       this.rafId = window.requestAnimationFrame(this.renderOnFrame);
     }
   }
+  
 
   stopAppFrame() {
-    if(this.rafId) {
+    if (this.rafId) {
       window.cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
   }
+  
 
   destroy() {
-    if(this.canvas.parentNode) {
-      this.canvas.parentNode.removeChild(this.canvas);
-    }
+    if (this._destroyed) return;
+    this._destroyed = true;
+  
     this.stopAppFrame();
     this.removeListeners();
+  
+    this.mouseMove.destroy();
     this.experienceScene.destroy();
     this.preloader.destroy();
     this.gui.destroy();
+  
+    if (this.canvas?.parentNode) {
+      this.canvas.parentNode.removeChild(this.canvas);
+    }
+  
+    this.renderer.dispose();
   }
+  
+  
 }
 
 
@@ -1096,6 +1276,400 @@ float cnoise2(vec2 P){
   return 2.3 * n_xy;
 }
 `;
+
+// ===== shader/background/fragment.glsl =====
+const shader_background_fragment = `
+${shader_inc_classic2d}
+
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+uniform vec3 uColorAccent;
+uniform vec2 uPlaneRes;
+uniform vec2 uMouse2D;
+uniform float uLinesBlur;
+uniform float uNoise;
+uniform float uOffsetX;
+uniform float uOffsetY;
+uniform float uLinesAmount;
+uniform float uBackgroundScale;
+uniform float uTime;
+
+varying vec2 vUv;
+
+#define PI 3.14159265359;
+
+float lines(vec2 uv, float offset) {
+  float a = abs(0.5 * sin(uv.y * uLinesAmount) + offset * uLinesBlur);
+  return smoothstep(0.0, uLinesBlur + offset * uLinesBlur, a);
+}
+
+mat2 rotate2d(float angle) {
+  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+}
+
+float random(vec2 p) {
+  vec2 k1 = vec2(23.14069263277926, 2.665144142690225);
+  return fract( cos(dot(p, k1)) * 12345.6789 );
+}
+
+vec3 fadeLine(vec2 uv, vec2 mouse2D, vec3 col1, vec3 col2, vec3 col3, vec3 col4) {
+  mouse2D = (mouse2D + 1.0) * 0.5;
+  float n1 = cnoise2(uv);
+  float n2 = cnoise2(uv + uOffsetX * 20.0);
+  float n3 = cnoise2(uv * 0.3 + uOffsetY * 10.0);
+  float nFinal = mix(mix(n1, n2, mouse2D.x), n3, mouse2D.y);
+  vec2 baseUv = vec2(nFinal + 2.05) * uBackgroundScale;
+
+  float basePattern = lines(baseUv, .1);
+  float secondPattern = lines(baseUv, 1.0);
+
+  vec3 baseColor = mix(col1, col2, basePattern);
+  // baseColor = mix(baseColor, col3, basePattern);
+  vec3 secondBaseColor = mix(baseColor, col3, secondPattern);
+  
+  return secondBaseColor;
+}
+
+void main() {
+  vec2 mouse2D = uMouse2D;
+
+  vec2 uv = vUv;
+  uv.y += uOffsetY;
+  uv.x += uOffsetX;
+  uv.x *= uPlaneRes.x / uPlaneRes.y;
+
+  // vec3 col1 = fadeLine(uv, mouse2D, uColor3, uColor2, uColor1);
+  vec3 col1 = fadeLine(uv, mouse2D, uColor1, uColor2, uColor3, uColorAccent);
+  vec3 finalCol = col1;
+
+  vec2 uvRandom = vUv;
+  uvRandom.y *= random(vec2(uvRandom.y, 0.5));
+  finalCol.rgb += random(uvRandom) * uNoise;
+
+  gl_FragColor = vec4(finalCol, 1.0);
+}
+`;
+
+// ===== shader/background/vertex.glsl =====
+const shader_background_vertex = `
+float PI = 3.1415926535897932384626433832795;
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+
+// ===== shader/mediaPlane/fragment.glsl =====
+const shader_mediaPlane_fragment = `
+uniform vec2 uPlaneRes;
+uniform vec2 uImageRes;
+uniform sampler2D tMap;
+uniform float uTime;
+
+varying vec2 vUv;
+
+#define PI 3.14159265359;
+
+void main() {
+  vec2 ratio = vec2(
+    min((uPlaneRes.x / uPlaneRes.y) / (uImageRes.x / uImageRes.y), 1.0),
+    min((uPlaneRes.y / uPlaneRes.x) / (uImageRes.y / uImageRes.x), 1.0)
+  );
+
+  vec2 uv = vec2(
+    vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
+    vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
+  );
+
+  gl_FragColor = texture2D(tMap, uv);
+}
+`;
+
+// ===== shader/mediaPlane/vertex.glsl =====
+const shader_mediaPlane_vertex = `
+varying vec2 vUv;
+
+uniform vec2 uPlaneRes;
+uniform vec2 uCanvasRes;
+uniform vec2 uMouse2D;
+
+void main() {
+  vUv = uv;
+  vec3 pos = position;
+
+  // マウスの2D座標に応じて、頂点の位置を変更します。これにより、マウスの位置に応じて頂点が移動します。
+  // pos.x += uMouse2D.x * uCanvasRes.x / uPlaneRes.x * 0.5;
+  // pos.y += uMouse2D.y * uCanvasRes.y / uPlaneRes.y * 0.5;
+  
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+}
+`;
+
+// ===== shader/lense/fragment.glsl =====
+const shader_lense_fragment = `
+uniform sampler2D tMap;
+varying vec2 vUv;
+
+void main() {
+  gl_FragColor = texture2D(tMap, vUv);
+}
+`;
+
+// ===== shader/lense/vertex.glsl =====
+const shader_lense_vertex = `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix *  vec4(position, 1.0);
+}
+`;
+
+
+// ===== shader/text/fragmentEn.glsl =====
+const shader_text_fragmentEn = `
+uniform vec2 uPlaneRes;
+uniform vec2 uImageRes;
+uniform sampler2D tMap;
+uniform float uTime;
+uniform vec2 uMouse2D;
+uniform vec2 uCanvasRes;
+uniform float uLenseSize;
+
+varying vec2 vUv;
+
+#define S(a,t) smoothstep(a*0.975, a, t);
+
+void main() {
+  vec2 mouse2D = uMouse2D;
+
+  mouse2D.x = (mouse2D.x + 1.0) * 0.5;
+  mouse2D.y = 1.0 - (mouse2D.y - 1.0) * -0.5;
+
+  vec2 aspect = vec2(uCanvasRes.x / uCanvasRes.y, 1.0);
+
+  float radius = 0.5 * uLenseSize / uPlaneRes.y;
+  float dist = distance(mouse2D * aspect, vUv * aspect);
+  float d = 1.0 - S(radius, dist);
+
+  vec2 sub = mouse2D - vUv;
+  sub *= aspect;
+
+  vec4 tex = texture2D(tMap, vUv);
+
+  tex.a = mix(tex.a, 0.0, d);
+
+  gl_FragColor = tex;
+}
+`;
+
+// ===== shader/text/fragmentJp.glsl =====
+const shader_text_fragmentJp = `
+uniform vec2 uPlaneRes;
+uniform vec2 uImageRes;
+uniform sampler2D tMap;
+uniform float uTime;
+uniform vec2 uMouse2D;
+uniform vec2 uCanvasRes;
+uniform float uLenseSize;
+
+varying vec2 vUv;
+
+#define S(a,t) smoothstep(a*0.975, a, t);
+
+vec3 hueShift(vec3 color, float hue) {
+  const vec3 k = vec3(0.57735, 0.57735, 0.57735);
+  float cosAngle = cos(hue);
+  return vec3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
+}
+
+void main() {
+  vec2 mouse2D = uMouse2D;
+  mouse2D.x = (mouse2D.x + 1.0) * 0.5;
+  mouse2D.y = 1.0 - (mouse2D.y - 1.0) * -0.5;
+
+  vec2 aspect = vec2(uCanvasRes.x / uCanvasRes.y, 1.0);
+
+  float radius = 0.5 * uLenseSize / uPlaneRes.y;
+  float dist = distance(mouse2D * aspect, vUv * aspect);
+
+  float refractionOffset = 0.036;
+  float refractionPower = 0.007;
+
+  float d1 = S(radius, dist);
+  float d2 = S(radius * (1.0 - refractionOffset), dist) - d1;
+
+  vec2 sub = mouse2D - vUv;
+  sub *= aspect;
+
+  vec2 uv = vUv - sub * pow(dist * 0.7, 0.7) + d2 * refractionPower;
+  vec4 tex_r = texture2D(tMap, uv - sub * 0.01);
+  vec4 tex_g = texture2D(tMap, uv + sub * 0.02);
+  vec4 tex_b = texture2D(tMap, uv + sub * 0.02);
+  float a = max(max(tex_r.a, tex_g.a), tex_b.a);
+  vec4 tex = vec4(tex_r.r, tex_g.g, tex_b.b, a);
+
+  tex.a = mix(tex.a, 0.0, d1);
+
+  tex.rgb = hueShift(tex.rgb, 3.292);
+
+  gl_FragColor = tex;
+}
+`;
+
+// ===== shader/enFragmentShader.glsl =====
+const shader_enFragmentShader = `
+uniform sampler2D uTexture;
+uniform vec2 uMouse;
+uniform float uAspect;
+uniform bool uEnable;
+
+varying vec2 vUv;
+
+void main() {
+  vec4 tex = texture2D(uTexture, vUv);
+
+  vec2 aspect = vec2(uAspect, 1.0);
+  float radius = 0.19;
+  float dist = distance(uMouse * aspect, vUv * aspect);
+  float d = 1.0 - smoothstep(radius, radius + 0.005, dist);
+
+  if(uEnable) {
+    tex.a = mix(tex.a, 0.0, d);
+  }
+
+  gl_FragColor = tex;
+}
+`;
+
+// ===== shader/enVertexShader.glsl =====
+const shader_enVertexShader = `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+// ===== shader/fragment.glsl =====
+const shader_fragment = `
+uniform vec2 uMouse;
+uniform vec3 uBlack;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+uniform float uUvScale;
+uniform float uMouseLine;
+uniform float uLengthLine;
+uniform float uNoiseAmount;
+
+varying vec2 vUv;
+
+#include './_inc/classic2d.glsl';
+
+float random(vec2 p) {
+  vec2 k1 = vec2(
+    23.14069263277926, // e^pi (Gelfond's constant)
+    2.665144142690225 // 2^sqrt(2) (Gelfond–Schneider constant)
+  );
+  return fract(
+    cos(dot(p, k1)) * 12345.6789
+  );
+}
+
+void main() {
+  vec2 seed = vUv * uUvScale * ( uMouse + uMouseLine * (length(uMouse) + uLengthLine));
+  float noise = cnoise2(seed) + length(uMouse) * uNoiseAmount;
+
+  float ml = pow(length(uMouse), 2.5) * 0.15;
+
+  float n1 = smoothstep( 0.0, 0.0 + 0.2, noise );
+  vec3 color = mix( uBlack, uColor1, n1 );
+
+  float n2 = smoothstep(0.1 + ml, 0.1 + ml + 0.2, noise);
+  color = mix(color, uColor2, n2);
+
+  float n3 = smoothstep(0.2 + ml, 0.2 + ml + 0.2, noise);
+  color = mix(color, uColor3, n3);
+
+  float n4 = smoothstep(0.3 + ml, 0.3 + ml + 0.2, noise);
+  color = mix(color, uBlack, n4);
+
+  vec2 uvrandom = vUv;
+  uvrandom.y *= random( vec2( uvrandom.y, 0.4 ) );
+  color.rgb += random(uvrandom) * 0.05;
+
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+// ===== shader/jpFragmentShader.glsl =====
+const shader_jpFragmentShader = `
+uniform sampler2D uTexture;
+uniform vec2 uMouse;
+uniform float uAspect;
+uniform bool uEnable;
+
+varying vec2 vUv;
+
+void main() {
+  vec2 aspect = vec2(uAspect, 1.0);
+  float radius = 0.19;
+  float dist = distance(uMouse * aspect, vUv * aspect);
+  float d = smoothstep(radius, radius + 0.005, dist);
+
+  vec2 sub = uMouse - vUv;
+  sub *= aspect;
+
+  vec2 uv = vUv - sub * pow(dist * 0.7, 0.7);
+  vec4 tex_r = texture2D(uTexture, uv);
+  vec4 tex_g = texture2D(uTexture, uv + sub * 0.03);
+  vec4 tex_b = texture2D(uTexture, uv + sub * 0.01);
+  float a = max(max(tex_r.a, tex_g.a), tex_b.a);
+  vec4 tex = vec4(tex_r.r, tex_g.g, tex_b.b, a);
+
+  tex.a = mix(tex.a, 0.0, d);
+
+  if(!uEnable) {
+    tex.a = 0.0;
+  }
+
+  gl_FragColor = tex;
+}
+`;
+
+// ===== shader/jpVertexShader.glsl =====
+const shader_jpVertexShader = `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+// ===== shader/vertex.glsl =====
+const shader_vertex = `
+varying vec2 vUv;
+varying vec2 vPosition;
+
+float PI = 3.1415926535897932384626433832795;
+
+void main() {
+  vUv = uv;
+
+  vec2 vPosition = position.xy;
+
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+ 
 
 // ===== shader/_inc/simplex2d.glsl =====
 const shader_inc_simplex2d = `
@@ -1374,395 +1948,3 @@ vec3 gradientDerivativesNoise3DHash( vec3 p )
       }
     ")
 `;
-
-// ===== shader/background/fragment.glsl =====
-const shader_background_fragment = `
-${shader_inc_classic2d}
-
-uniform vec3 uColor1;
-uniform vec3 uColor2;
-uniform vec3 uColor3;
-uniform vec3 uColorAccent;
-uniform vec2 uPlaneRes;
-uniform vec2 uMouse2D;
-uniform float uLinesBlur;
-uniform float uNoise;
-uniform float uOffsetX;
-uniform float uOffsetY;
-uniform float uLinesAmount;
-uniform float uBackgroundScale;
-uniform float uTime;
-
-varying vec2 vUv;
-
-#define PI 3.14159265359;
-
-float lines(vec2 uv, float offset) {
-  float a = abs(0.5 * sin(uv.y * uLinesAmount) + offset * uLinesBlur);
-  return smoothstep(0.0, uLinesBlur + offset * uLinesBlur, a);
-}
-
-mat2 rotate2d(float angle) {
-  return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-}
-
-float random(vec2 p) {
-  vec2 k1 = vec2(23.14069263277926, 2.665144142690225);
-  return fract( cos(dot(p, k1)) * 12345.6789 );
-}
-
-vec3 fadeLine(vec2 uv, vec2 mouse2D, vec3 col1, vec3 col2, vec3 col3, vec3 col4) {
-  mouse2D = (mouse2D + 1.0) * 0.5;
-  float n1 = cnoise2(uv);
-  float n2 = cnoise2(uv + uOffsetX * 20.0);
-  float n3 = cnoise2(uv * 0.3 + uOffsetY * 10.0);
-  float nFinal = mix(mix(n1, n2, mouse2D.x), n3, mouse2D.y);
-  vec2 baseUv = vec2(nFinal + 2.05) * uBackgroundScale;
-
-  float basePattern = lines(baseUv, .1);
-  float secondPattern = lines(baseUv, 1.0);
-
-  vec3 baseColor = mix(col1, col2, basePattern);
-  // baseColor = mix(baseColor, col3, basePattern);
-  vec3 secondBaseColor = mix(baseColor, col3, secondPattern);
-  
-  return secondBaseColor;
-}
-
-void main() {
-  vec2 mouse2D = uMouse2D;
-
-  vec2 uv = vUv;
-  uv.y += uOffsetY;
-  uv.x += uOffsetX;
-  uv.x *= uPlaneRes.x / uPlaneRes.y;
-
-  // vec3 col1 = fadeLine(uv, mouse2D, uColor3, uColor2, uColor1);
-  vec3 col1 = fadeLine(uv, mouse2D, uColor1, uColor2, uColor3, uColorAccent);
-  vec3 finalCol = col1;
-
-  vec2 uvRandom = vUv;
-  uvRandom.y *= random(vec2(uvRandom.y, 0.5));
-  finalCol.rgb += random(uvRandom) * uNoise;
-
-  gl_FragColor = vec4(finalCol, 1.0);
-}
-`;
-
-// ===== shader/background/vertex.glsl =====
-const shader_background_vertex = `
-float PI = 3.1415926535897932384626433832795;
-varying vec2 vUv;
-
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-// ===== shader/lense/fragment.glsl =====
-const shader_lense_fragment = `
-uniform sampler2D tMap;
-varying vec2 vUv;
-
-void main() {
-  gl_FragColor = texture2D(tMap, vUv);
-}
-`;
-
-// ===== shader/lense/vertex.glsl =====
-const shader_lense_vertex = `
-varying vec2 vUv;
-
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix *  vec4(position, 1.0);
-}
-`;
-
-// ===== shader/mediaPlane/fragment.glsl =====
-const shader_mediaPlane_fragment = `
-uniform vec2 uPlaneRes;
-uniform vec2 uImageRes;
-uniform sampler2D tMap;
-uniform float uTime;
-
-varying vec2 vUv;
-
-#define PI 3.14159265359;
-
-void main() {
-  vec2 ratio = vec2(
-    min((uPlaneRes.x / uPlaneRes.y) / (uImageRes.x / uImageRes.y), 1.0),
-    min((uPlaneRes.y / uPlaneRes.x) / (uImageRes.y / uImageRes.x), 1.0)
-  );
-
-  vec2 uv = vec2(
-    vUv.x * ratio.x + (1.0 - ratio.x) * 0.5,
-    vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
-  );
-
-  gl_FragColor = texture2D(tMap, uv);
-}
-`;
-
-// ===== shader/mediaPlane/vertex.glsl =====
-const shader_mediaPlane_vertex = `
-varying vec2 vUv;
-
-uniform vec2 uPlaneRes;
-uniform vec2 uCanvasRes;
-uniform vec2 uMouse2D;
-
-void main() {
-  vUv = uv;
-  vec3 pos = position;
-
-  // マウスの2D座標に応じて、頂点の位置を変更します。これにより、マウスの位置に応じて頂点が移動します。
-  // pos.x += uMouse2D.x * uCanvasRes.x / uPlaneRes.x * 0.5;
-  // pos.y += uMouse2D.y * uCanvasRes.y / uPlaneRes.y * 0.5;
-  
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-}
-`;
-
-// ===== shader/text/fragmentEn.glsl =====
-const shader_text_fragmentEn = `
-uniform vec2 uPlaneRes;
-uniform vec2 uImageRes;
-uniform sampler2D tMap;
-uniform float uTime;
-uniform vec2 uMouse2D;
-uniform vec2 uCanvasRes;
-uniform float uLenseSize;
-
-varying vec2 vUv;
-
-#define S(a,t) smoothstep(a*0.975, a, t);
-
-void main() {
-  vec2 mouse2D = uMouse2D;
-
-  mouse2D.x = (mouse2D.x + 1.0) * 0.5;
-  mouse2D.y = 1.0 - (mouse2D.y - 1.0) * -0.5;
-
-  vec2 aspect = vec2(uCanvasRes.x / uCanvasRes.y, 1.0);
-
-  float radius = 0.5 * uLenseSize / uPlaneRes.y;
-  float dist = distance(mouse2D * aspect, vUv * aspect);
-  float d = 1.0 - S(radius, dist);
-
-  vec2 sub = mouse2D - vUv;
-  sub *= aspect;
-
-  vec4 tex = texture2D(tMap, vUv);
-
-  tex.a = mix(tex.a, 0.0, d);
-
-  gl_FragColor = tex;
-}
-`;
-
-// ===== shader/text/fragmentJp.glsl =====
-const shader_text_fragmentJp = `
-uniform vec2 uPlaneRes;
-uniform vec2 uImageRes;
-uniform sampler2D tMap;
-uniform float uTime;
-uniform vec2 uMouse2D;
-uniform vec2 uCanvasRes;
-uniform float uLenseSize;
-
-varying vec2 vUv;
-
-#define S(a,t) smoothstep(a*0.975, a, t);
-
-vec3 hueShift(vec3 color, float hue) {
-  const vec3 k = vec3(0.57735, 0.57735, 0.57735);
-  float cosAngle = cos(hue);
-  return vec3(color * cosAngle + cross(k, color) * sin(hue) + k * dot(k, color) * (1.0 - cosAngle));
-}
-
-void main() {
-  vec2 mouse2D = uMouse2D;
-  mouse2D.x = (mouse2D.x + 1.0) * 0.5;
-  mouse2D.y = 1.0 - (mouse2D.y - 1.0) * -0.5;
-
-  vec2 aspect = vec2(uCanvasRes.x / uCanvasRes.y, 1.0);
-
-  float radius = 0.5 * uLenseSize / uPlaneRes.y;
-  float dist = distance(mouse2D * aspect, vUv * aspect);
-
-  float refractionOffset = 0.036;
-  float refractionPower = 0.007;
-
-  float d1 = S(radius, dist);
-  float d2 = S(radius * (1.0 - refractionOffset), dist) - d1;
-
-  vec2 sub = mouse2D - vUv;
-  sub *= aspect;
-
-  vec2 uv = vUv - sub * pow(dist * 0.7, 0.7) + d2 * refractionPower;
-  vec4 tex_r = texture2D(tMap, uv - sub * 0.01);
-  vec4 tex_g = texture2D(tMap, uv + sub * 0.02);
-  vec4 tex_b = texture2D(tMap, uv + sub * 0.02);
-  float a = max(max(tex_r.a, tex_g.a), tex_b.a);
-  vec4 tex = vec4(tex_r.r, tex_g.g, tex_b.b, a);
-
-  tex.a = mix(tex.a, 0.0, d1);
-
-  tex.rgb = hueShift(tex.rgb, 3.292);
-
-  gl_FragColor = tex;
-}
-`;
-
-// ===== shader/enFragmentShader.glsl =====
-const shader_enFragmentShader = `
-uniform sampler2D uTexture;
-uniform vec2 uMouse;
-uniform float uAspect;
-uniform bool uEnable;
-
-varying vec2 vUv;
-
-void main() {
-  vec4 tex = texture2D(uTexture, vUv);
-
-  vec2 aspect = vec2(uAspect, 1.0);
-  float radius = 0.19;
-  float dist = distance(uMouse * aspect, vUv * aspect);
-  float d = 1.0 - smoothstep(radius, radius + 0.005, dist);
-
-  if(uEnable) {
-    tex.a = mix(tex.a, 0.0, d);
-  }
-
-  gl_FragColor = tex;
-}
-`;
-
-// ===== shader/enVertexShader.glsl =====
-const shader_enVertexShader = `
-varying vec2 vUv;
-
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-// ===== shader/fragment.glsl =====
-const shader_fragment = `
-uniform vec2 uMouse;
-uniform vec3 uBlack;
-uniform vec3 uColor1;
-uniform vec3 uColor2;
-uniform vec3 uColor3;
-uniform float uUvScale;
-uniform float uMouseLine;
-uniform float uLengthLine;
-uniform float uNoiseAmount;
-
-varying vec2 vUv;
-
-#include './_inc/classic2d.glsl';
-
-float random(vec2 p) {
-  vec2 k1 = vec2(
-    23.14069263277926, // e^pi (Gelfond's constant)
-    2.665144142690225 // 2^sqrt(2) (Gelfond–Schneider constant)
-  );
-  return fract(
-    cos(dot(p, k1)) * 12345.6789
-  );
-}
-
-void main() {
-  vec2 seed = vUv * uUvScale * ( uMouse + uMouseLine * (length(uMouse) + uLengthLine));
-  float noise = cnoise2(seed) + length(uMouse) * uNoiseAmount;
-
-  float ml = pow(length(uMouse), 2.5) * 0.15;
-
-  float n1 = smoothstep( 0.0, 0.0 + 0.2, noise );
-  vec3 color = mix( uBlack, uColor1, n1 );
-
-  float n2 = smoothstep(0.1 + ml, 0.1 + ml + 0.2, noise);
-  color = mix(color, uColor2, n2);
-
-  float n3 = smoothstep(0.2 + ml, 0.2 + ml + 0.2, noise);
-  color = mix(color, uColor3, n3);
-
-  float n4 = smoothstep(0.3 + ml, 0.3 + ml + 0.2, noise);
-  color = mix(color, uBlack, n4);
-
-  vec2 uvrandom = vUv;
-  uvrandom.y *= random( vec2( uvrandom.y, 0.4 ) );
-  color.rgb += random(uvrandom) * 0.05;
-
-  gl_FragColor = vec4(color, 1.0);
-}
-`;
-
-// ===== shader/jpFragmentShader.glsl =====
-const shader_jpFragmentShader = `
-uniform sampler2D uTexture;
-uniform vec2 uMouse;
-uniform float uAspect;
-uniform bool uEnable;
-
-varying vec2 vUv;
-
-void main() {
-  vec2 aspect = vec2(uAspect, 1.0);
-  float radius = 0.19;
-  float dist = distance(uMouse * aspect, vUv * aspect);
-  float d = smoothstep(radius, radius + 0.005, dist);
-
-  vec2 sub = uMouse - vUv;
-  sub *= aspect;
-
-  vec2 uv = vUv - sub * pow(dist * 0.7, 0.7);
-  vec4 tex_r = texture2D(uTexture, uv);
-  vec4 tex_g = texture2D(uTexture, uv + sub * 0.03);
-  vec4 tex_b = texture2D(uTexture, uv + sub * 0.01);
-  float a = max(max(tex_r.a, tex_g.a), tex_b.a);
-  vec4 tex = vec4(tex_r.r, tex_g.g, tex_b.b, a);
-
-  tex.a = mix(tex.a, 0.0, d);
-
-  if(!uEnable) {
-    tex.a = 0.0;
-  }
-
-  gl_FragColor = tex;
-}
-`;
-
-// ===== shader/jpVertexShader.glsl =====
-const shader_jpVertexShader = `
-varying vec2 vUv;
-
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-// ===== shader/vertex.glsl =====
-const shader_vertex = `
-varying vec2 vUv;
-varying vec2 vPosition;
-
-float PI = 3.1415926535897932384626433832795;
-
-void main() {
-  vUv = uv;
-
-  vec2 vPosition = position.xy;
-
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
- 

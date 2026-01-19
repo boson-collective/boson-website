@@ -31,7 +31,22 @@ function Webglbg() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const webgl = new GradientBg({ rendererEl: containerRef.current });
+
+    const webgl = new GradientBg({
+      rendererEl: containerRef.current,
+      background: {
+        color1: [0.796, 0.294, 0.243],
+        color2: [0.914, 0.412, 0.349],
+        color3: [0, 0, 0],
+        colorAccent: new THREE.Color(0, 0, 0),
+        uLinesBlur: 0.33,
+        uNoise: 0.03,
+        uOffsetX: 0.05,
+        uOffsetY: -2.46,
+        uLinesAmount: 1.36,      
+      }
+    });
+
     return () => webgl.destroy();
   }, []);
 
@@ -46,6 +61,7 @@ function Webglbg() {
     />
   );
 }
+
 
 /* ==========================================
    HERO (PERSIS PUNYA LO)
@@ -1272,40 +1288,14 @@ function Projects() {
   });
 
   /* =========================
-     LIGHT MODE (MOBILE NEVER)
+     ORBITS — HORIZONTAL, BESAR, AMAN
   ========================= */
-  const lightProgress = useTransform(
-    scrollYProgress,
-    isMobile ? [2, 3] : [1 - windowLen, 1],
-    [0, 1]
-  );
+  const r = 250;
+  const cy = 425;
 
-  const bgColor = useTransform(lightProgress, [0, 1], [
-    "rgb(0,0,0)",
-    "#f3f4f5",
-  ]);
-
-  const textColor = useTransform(lightProgress, [0, 1], [
-    "rgb(255,255,255)",
-    "rgb(0,0,0)",
-  ]);
-
-  const orbitStroke = useTransform(lightProgress, [0, 1], [
-    "rgba(255,255,255,0.15)",
-    "rgba(0,0,0,0.15)",
-  ]);
-
-  const dotFill = useTransform(lightProgress, [0, 1], [
-    "rgb(255,255,255)",
-    "rgb(0,0,0)",
-  ]);
-
-  /* =========================
-     ORBITS DATA
-  ========================= */
-  const c1 = { cx: 425, cy: 350, r: 250 };
-  const c2 = { cx: 325, cy: 500, r: 250 };
-  const c3 = { cx: 525, cy: 500, r: 250 };
+  const c1 = { cx: 250, cy, r };
+  const c2 = { cx: 425, cy, r };
+  const c3 = { cx: 600, cy, r };
 
   const g1Ref = useRef(null);
   const g2Ref = useRef(null);
@@ -1335,22 +1325,7 @@ function Projects() {
   }, [rotate1, rotate2, rotate3]);
 
   /* =========================
-     INTRO TEXT
-  ========================= */
-  const { scrollYProgress: introProgress } = useScroll({
-    target: scrollRef,
-    offset: ["start end", "start start"],
-  });
-
-  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-  const textFilter = useTransform(introProgress, [0, 1], [
-    "blur(20px)",
-    "blur(0px)",
-  ]);
-
-  /* =========================
-     RENDER (UTUH)
+     RENDER
   ========================= */
   return (
     <motion.div
@@ -1360,7 +1335,7 @@ function Projects() {
         width: "100%",
         height: "500vh",
         position: "relative",
-        backgroundColor: bgColor,
+        backgroundColor: "rgb(10,10,10)",
       }}
     >
       <div className="projects-sticky">
@@ -1372,33 +1347,21 @@ function Projects() {
               cy={c.cy}
               r={c.r}
               fill="none"
-              strokeWidth="1.0"
-              style={{ stroke: orbitStroke }}
+              stroke="rgba(255,255,255,0.15)"
+              strokeWidth="1"
             />
           ))}
 
           <motion.g ref={g1Ref}>
-            <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
+            <motion.circle cx={r} cy={0} r={3} fill="white" />
           </motion.g>
           <motion.g ref={g2Ref}>
-            <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
+            <motion.circle cx={r} cy={0} r={3} fill="white" />
           </motion.g>
           <motion.g ref={g3Ref}>
-            <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
+            <motion.circle cx={r} cy={0} r={3} fill="white" />
           </motion.g>
         </svg>
-
-        <motion.div
-          className="projects-text"
-          style={{
-            opacity: textOpacity,
-            y: textY,
-            filter: textFilter,
-            color: textColor,
-            mixBlendMode: "difference",
-          }}
-        > 
-        </motion.div>
 
         {images.map((src, i) => (
           <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
@@ -1426,17 +1389,6 @@ function Projects() {
           height: 850px;
           max-width: 100vw;
           max-height: 100vw;
-        }
-
-        .projects-text {
-          position: absolute;
-          font-size: clamp(24px, 6vw, 43px);
-          font-weight: 200;
-          line-height: 1;
-          text-align: center;
-          white-space: pre-line;
-          z-index: 10;
-          mix-blend-mode: difference;
         }
       `}</style>
     </motion.div>
@@ -2131,6 +2083,7 @@ function WorksList() {
       className="bg-black"
       style={{ padding: "6vh 0" }}
     >
+      
       {/* ================= HEADER ================= */}
       <div
         ref={headerRef}
@@ -2565,19 +2518,13 @@ function BosonScrollText() {
 function ServicesHero() {
   const cursorRef = useRef(null);
   const sectionRef = useRef(null);
-  const headerRef = useRef(null);
-  const rightTextRef = useRef(null);
-
-  const splitsRef = useRef([]);
-  const ctxRef = useRef(null);
-  const resizeTimer = useRef(null);
 
   const [hoverIndex, setHoverIndex] = useState(null);
   const [inside, setInside] = useState(false);
 
-  // =====================
-  // CUSTOM CURSOR FOLLOW
-  // =====================
+  /* =====================
+     CUSTOM CURSOR
+  ===================== */
   useEffect(() => {
     const cursor = cursorRef.current;
     const section = sectionRef.current;
@@ -2599,82 +2546,6 @@ function ServicesHero() {
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
-  // =====================
-  // GSAP TEXT BUILD
-  // =====================
-  useLayoutEffect(() => {
-    const build = () => {
-      if (!sectionRef.current || !headerRef.current || !rightTextRef.current)
-        return;
-
-      splitsRef.current.forEach((s) => s.revert());
-      splitsRef.current = [];
-      if (ctxRef.current) ctxRef.current.revert();
-
-      ctxRef.current = gsap.context(() => {
-        gsap.set([headerRef.current, rightTextRef.current], {
-          opacity: 1,
-          clearProps: "transform",
-        });
-
-        const headerSplit = SplitText.create(headerRef.current, {
-          type: "lines",
-          linesClass: "line",
-          mask: "lines",
-        });
-        splitsRef.current.push(headerSplit);
-
-        gsap.from(headerSplit.lines, {
-          yPercent: 35,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-        });
-
-        const rightSplit = SplitText.create(rightTextRef.current, {
-          type: "lines",
-          linesClass: "line",
-          mask: "lines",
-        });
-        splitsRef.current.push(rightSplit);
-
-        gsap.from(rightSplit.lines, {
-          yPercent: 25,
-          opacity: 0,
-          duration: 0.9,
-          stagger: 0.05,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: rightTextRef.current,
-            start: "top 85%",
-          },
-        });
-      }, sectionRef);
-
-      ScrollTrigger.refresh();
-    };
-
-    document.fonts.ready.then(build);
-
-    const onResize = () => {
-      clearTimeout(resizeTimer.current);
-      resizeTimer.current = setTimeout(build, 200);
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      splitsRef.current.forEach((s) => s.revert());
-      if (ctxRef.current) ctxRef.current.revert();
-    };
-  }, []);
-
   const services = [
     {
       label: "Social Media Marketing",
@@ -2687,7 +2558,7 @@ function ServicesHero() {
         "https://i.pinimg.com/736x/2e/14/bd/2e14bda3c06055b6345f718e2ea23620.jpg",
     },
     {
-      label: "Branding",
+      label: "Brand Strategy",
       image:
         "https://i.pinimg.com/1200x/f7/91/37/f79137ca724f78b5e0dd7e4820ad13f2.jpg",
     },
@@ -2700,18 +2571,17 @@ function ServicesHero() {
 
   return (
     <section
-    data-theme="light"
       ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900 cursor-none"
     >
-      {/* CUSTOM CURSOR */}
+      {/* CURSOR */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999]"
-        style={{ transform: "translate3d(-9999px, -9999px, 0)" }}
+        style={{ transform: "translate3d(-9999px,-9999px,0)" }}
       >
         <div
-          className="w-[70px] h-[70px] rounded-full bg-[#C8FF4D]"
+          className="w-[64px] h-[64px] rounded-full bg-black"
           style={{
             transform: inside ? "scale(1)" : "scale(0)",
             opacity: inside ? 1 : 0,
@@ -2721,124 +2591,108 @@ function ServicesHero() {
         />
       </div>
 
-      <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 flex flex-col">
-        {/* ===================== */}
-        {/* TOP TEXT — RAPAT */}
-        {/* ===================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-6 lg:gap-x-10 items-start">
-          {/* LEFT — HEADLINE */}
-          <div className="lg:col-span-7">
-            <h2
-              ref={headerRef}
-              className="font-sans font-normal tracking-tight"
-            >
-              <span className="block text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
-                Services built to help
-              </span>
+      <div className="w-full px-6 sm:px-10 lg:px-20 py-24">
+        {/* TOP GRID */}
+        <div className="grid grid-cols-12 items-start mb-32">
+          {/* LEFT */}
+          <div className="col-span-12 lg:col-span-3 text-sm text-neutral-500 mb-6 lg:mb-0">
+            Our Services
+          </div>
 
-              <span className="block -mt-1 text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
-                brands grow
-              </span>
-
-              <span className="block mt-2 text-[clamp(18px,2vw,26px)] leading-tight text-neutral-400">
-                and stay relevant
-              </span>
+          {/* CENTER BLOCK — LEFT ALIGNED */}
+          <div className="col-span-12 lg:col-span-5 lg:col-start-5 mb-10 lg:mb-0">
+            {/* TEXT CENTERED INSIDE */}
+            <h2 className="text-start text-[clamp(28px,4vw,42px)] font-medium leading-[1.02]">
+              How we make your 
+              <br />
+              brands grow and  relevant
             </h2>
           </div>
 
-          {/* RIGHT — SUPPORTING BODY */}
-          <div className="lg:col-span-4 lg:col-start-9 lg:mt-5">
-            <p
-              ref={rightTextRef}
-              className="text-[14px] leading-[1.55] text-neutral-800 max-w-sm"
-            >
-              <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage
-              and consistency across platforms begins to break down. We step in
-              to bring structure, clarity, and momentum back into their digital
-              work.
+          {/* RIGHT */}
+          <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm text-neutral-600">
+            <p className="max-w-[260px] lg:text-right">
+              We are a digital marketing agency with expertise, and we're on a
+              mission to help you take the next step in your business.
             </p>
+            <button className="inline-flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full text-xs font-medium w-fit">
+              See all services ↗
+            </button>
           </div>
-           
-          
         </div>
 
-        {/* ===================== */}
-        {/* MAIN CONTENT */}
-        {/* ===================== */}
-        <div className="relative flex-1 mt-16 sm:mt-20 lg:mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-start">
-          <div className="hidden xl:block xl:col-span-2" />
-
-          <div className="col-span-1 lg:col-span-12 xl:col-span-10 flex flex-col">
+        {/* SERVICES — SAME LEFT EDGE AS HEADER BLOCK */}
+        <div className="grid grid-cols-12">
+          <div className="col-span-12 lg:col-span-8 lg:col-start-5">
             {services.map((item, i) => {
               const isHovering = hoverIndex !== null;
               const isActive = hoverIndex === i;
-
+              
               const words = item.label.split(" ");
               const lastWord = words.at(-1);
               const firstLine = words.slice(0, -1).join(" ");
 
               const colorState = !isHovering
-                ? "text-black"
+                ? "text-neutral-900"
                 : isActive
-                ? "text-black"
-                : "text-black/30";
+                ? "text-neutral-900"
+                : "text-neutral-400";
 
               return (
                 <div
                   key={item.label}
-                  className="py-6 sm:py-8"
                   onMouseEnter={() => setHoverIndex(i)}
                   onMouseLeave={() => setHoverIndex(null)}
+                  className="relative py-14 border-t border-black/30"
                 >
                   <div className="flex items-center">
+                    {/* IMAGE — FLOW OK SEKARANG */}
                     <div
-                      className={`relative h-[110px] overflow-hidden transition-all duration-300 ease-out w-[160px] mr-6 xl:w-0 xl:mr-0 ${
-                        isActive ? "xl:w-[160px] xl:mr-8" : ""
-                      }`}
+                      className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
+                        w-0 mr-0
+                        ${isActive ? "w-[200px] mr-10" : ""}
+                      `}
                     >
                       <img
                         src={item.image}
                         alt=""
-                        className={`h-full w-full object-cover rounded-md transition-all duration-300 ease-out opacity-100 scale-100 xl:opacity-0 xl:scale-95 ${
-                          isActive ? "xl:opacity-100 xl:scale-100" : ""
-                        }`}
+                        className={`h-[120px] w-full object-cover rounded-md transition-all duration-300
+                          ${
+                            isActive
+                              ? "opacity-100 scale-100"
+                              : "opacity-0 scale-95"
+                          }
+                        `}
                       />
                     </div>
 
+                    {/* TITLE */}
                     <h3
-                      className={`hidden sm:block font-sans font-semibold tracking-tight leading-[1.05] transition-colors duration-150 ${colorState}`}
-                      style={{ fontSize: "clamp(36px, 7vw, 95px)" }}
-                    >
-                      {item.label}
-                    </h3>
-
-                    <h3
-                      className={`block sm:hidden flex flex-col tracking-tight transition-colors duration-150 ${colorState}`}
-                    >
-                      <span className="text-[18px] font-light leading-none opacity-70 mb-1">
-                        {firstLine}
-                      </span>
-                      <span
-                        className="font-semibold leading-[0.95]"
-                        style={{
-                          fontSize: "clamp(34px, 8.5vw, 60px)",
-                        }}
-                      >
-                        {lastWord}
-                      </span>
-                    </h3>
+                    className={`flex flex-col tracking-tight transition-all duration-300 ease-out ${colorState}
+                      xl:translate-x-0
+                      ${isActive ? "xl:translate-x-6" : ""}
+                    `}
+                  >
+                    <span className="text-[18px] lg:text-[26px] font-light opacity-60 mb-1">
+                      {firstLine}
+                    </span>
+                    <span className="font-medium leading-[0.95] text-[clamp(34px,6vw,96px)]">
+                      {lastWord}
+                    </span>
+                  </h3>
                   </div>
-
-                  <div className="mt-4 sm:mt-6 border-t border-black/10 w-full" />
                 </div>
               );
             })}
+
+            <div className="border-t border-black/10" />
           </div>
         </div>
       </div>
     </section>
   );
 }
+
 
 
 
@@ -3113,71 +2967,225 @@ function WhatWeDo() {
       text: `Delivery is not a finish line. We stay involved as work meets real
       audiences and evolving platforms—testing, refining, and adjusting
       over time. Long-term consistency requires care, shared attention,
-      and a commitment to improvement beyond launch.`,
+      and a commitment to improvement beyond launch. This is how clarity
+      holds even as scale, teams, and platforms change.`,
     },
   ];
 
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const rowsRef = useRef([]);
+  const splitsRef = useRef([]);
+  const ctxRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!sectionRef.current) return;
+
+    ctxRef.current = gsap.context(() => {
+      /* =========================
+         RESET
+      ========================= */
+      gsap.set(
+        [
+          titleRef.current,
+          ...rowsRef.current.flatMap((row) =>
+            row
+              ? [
+                  row.querySelector("[data-number]"),
+                  row.querySelector("[data-text]"),
+                ]
+              : []
+          ),
+        ],
+        { opacity: 1, clearProps: "transform" }
+      );
+
+      /* =========================
+         TITLE — REVEAL
+      ========================= */
+      const titleSplit = SplitText.create(titleRef.current, {
+        type: "lines",
+        linesClass: "line",
+        mask: "lines",
+      });
+      splitsRef.current.push(titleSplit);
+
+      gsap.from(titleSplit.lines, {
+        yPercent: 40,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.12,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: "top 75%",
+          once: true,
+        },
+      });
+
+      /* =========================
+         STEPS — ENTRY
+      ========================= */
+      rowsRef.current.forEach((row) => {
+        if (!row) return;
+
+        const number = row.querySelector("[data-number]");
+        const text = row.querySelector("[data-text]");
+
+        gsap.from(number, {
+          opacity: 0,
+          duration: 0.4,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: row,
+            start: "top 85%",
+            once: true,
+          },
+        });
+
+        const split = SplitText.create(text, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
+        splitsRef.current.push(split);
+
+        gsap.from(split.lines, {
+          yPercent: 30,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.05,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: row,
+            start: "top 85%",
+            once: true,
+          },
+        });
+      });
+
+      /* =========================
+         CENTER FOCUS LOGIC
+         (TUNED, NOT CHANGED)
+      ========================= */
+      const ACTIVE = "#000000";
+      const INACTIVE = "rgba(0,0,0,0.30)";
+      let currentActive = null;
+
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onUpdate: () => {
+          const viewportCenter = window.innerHeight / 2;
+
+          let closestText = null;
+          let closestDistance = Infinity;
+
+          rowsRef.current.forEach((row) => {
+            if (!row) return;
+
+            const text = row.querySelector("[data-text]");
+            if (!text) return;
+
+            const rect = text.getBoundingClientRect();
+            const textCenter = rect.top + rect.height / 2;
+            const distance = Math.abs(textCenter - viewportCenter);
+
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestText = text;
+            }
+          });
+
+          if (!closestText || closestText === currentActive) return;
+
+          currentActive = closestText;
+
+          rowsRef.current.forEach((row) => {
+            if (!row) return;
+            const text = row.querySelector("[data-text]");
+            if (!text) return;
+
+            gsap.to(text, {
+              color: text === currentActive ? ACTIVE : INACTIVE,
+              duration: 0.18,
+              ease: "power1.out",
+            });
+          });
+        },
+      });
+    }, sectionRef);
+
+    return () => {
+      splitsRef.current.forEach((s) => s.revert());
+      ctxRef.current && ctxRef.current.revert();
+    };
+  }, []);
+
   return (
-    <section className="min-h-screen bg-[#F3F4F5] px-6 sm:px-10 lg:px-[80px] py-10 sm:py-12 lg:py-[64px] font-sans">
-      {/* =========================
-          HEADER (EDITORIAL INLINE)
-      ========================== */}
-     <div className="w-full xl:max-w-[60vw] xl:mx-0 max-w-[1400px]">
-  <h1
-    className="font-normal tracking-tight leading-[1.04] text-black"
-    style={{ fontSize: "clamp(36px, 3.2vw, 64px)" }}
-  >
-    <span className="text-base tracking-normal hidden lg:inline-block align-top mr-[12rem]">
-      What we do
-    </span>
-    We take time to understand, define, and build things properly—then stay
-    involved long after they are delivered.
-  </h1>
-</div>
-
-
-      {/* =========================
-          PROCESS (NO VERTICAL STACK)
-      ========================== */}
-     <div className="mt-16 sm:mt-20 lg:mt-[120px]">
-  {steps.map((step) => (
-    <div
-      key={step.id}
-      className="border-t border-black/40 py-10 sm:py-12 lg:py-[45px]"
+    <section
+      ref={sectionRef}
+      data-theme="light"
+      className="min-h-screen bg-[#F3F4F5] px-6 sm:px-10 lg:px-[80px] py-10 sm:py-12 lg:py-[64px] font-sans"
     >
-      <div
-        className="
-          grid
-          grid-cols-[auto_1fr]
-          gap-x-10
-          pl-12
-          sm:pl-16
-          lg:pl-0
-          lg:grid-cols-[1fr_160px_420px]
-          lg:gap-x-0
-        "
-      >
-        {/* SPACER — DESKTOP ONLY */}
-        <div className="hidden lg:block" />
-
-        {/* STEP NUMBER */}
-        <div className="text-[32px] sm:text-[36px] lg:text-[48px] leading-none text-black">
-          {step.id}
-        </div>
-
-        {/* TEXT */}
-        <p className="text-[16px] sm:text-[17px] lg:text-[18px] leading-[1.30] lg:leading-[1.25] text-black/90">
-          {step.text}
-        </p>
+      {/* HEADER */}
+      <div className="w-full xl:max-w-[60vw] max-w-[1400px]">
+        <h1
+          ref={titleRef}
+          className="font-normal tracking-tight leading-[1.04] text-black"
+          style={{ fontSize: "clamp(36px, 3.2vw, 64px)" }}
+        >
+          <span className="text-base tracking-normal hidden lg:inline-block align-top mr-[12rem]">
+            What we do
+          </span>
+          We take time to understand, define, and build things properly—then
+          stay involved long after they are delivered.
+        </h1>
       </div>
-    </div>
-  ))}
-</div>
 
+      {/* PROCESS */}
+      <div className="mt-16 sm:mt-20 lg:mt-[120px]">
+        {steps.map((step, i) => (
+          <div
+            key={step.id}
+            ref={(el) => (rowsRef.current[i] = el)}
+            className="border-t border-black/40 py-10 sm:py-12 lg:py-[45px]"
+          >
+            <div
+              className="
+                grid
+                grid-cols-[auto_1fr]
+                gap-x-10
+                pl-12
+                sm:pl-16
+                lg:pl-0
+                lg:grid-cols-[1fr_160px_420px]
+                lg:gap-x-0
+              "
+            >
+              <div className="hidden lg:block" />
+
+              <div
+                data-number
+                className="text-[32px] sm:text-[36px] lg:text-[48px] leading-none text-black"
+              >
+                {step.id}
+              </div>
+
+              <p
+                data-text
+                className="text-[16px] sm:text-[17px] lg:text-[18px] leading-[1.30] lg:leading-[1.25]"
+              >
+                {step.text}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
-
 
 
 
@@ -3208,26 +3216,39 @@ function Description() {
         !dividerRef.current ||
         !statsRef.current ||
         !ctaRef.current
-      ) {
-        return;
-      }
+      ) return;
 
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        gsap.set(
-          [
-            titleRef.current,
-            dividerRef.current,
-            ctaRef.current,
-            ...statsRef.current.querySelectorAll("[data-stat]"),
-            ...bodyRef.current.querySelectorAll("[data-animate]"),
-          ],
-          { opacity: 1, clearProps: "transform" }
-        );
+        /* =========================
+           RESET
+        ========================= */
+        const allEls = [
+          titleRef.current,
+          dividerRef.current,
+          ctaRef.current,
+          ...statsRef.current.querySelectorAll("[data-stat]"),
+          ...bodyRef.current.querySelectorAll("[data-animate]"),
+        ];
 
+        gsap.set(allEls, { opacity: 1, clearProps: "transform" });
+
+        /* =========================
+           SHARED PARALLAX CONFIG
+        ========================= */
+        const PARALLAX_ST = {
+          trigger: sectionRef.current,
+          start: "top 90%",
+          end: "bottom 20%",
+          scrub: 0.6,
+        };
+
+        /* =========================
+           TITLE — REVEAL
+        ========================= */
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3248,6 +3269,18 @@ function Description() {
           },
         });
 
+        /* =========================
+           TITLE — PARALLAX (UP)
+        ========================= */
+        gsap.to(titleRef.current, {
+          y: -60,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
+        /* =========================
+           DIVIDER — REVEAL + PARALLAX
+        ========================= */
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -3263,6 +3296,15 @@ function Description() {
           }
         );
 
+        gsap.to(dividerRef.current, {
+          y: -35,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
+        /* =========================
+           BODY — REVEAL + PARALLAX
+        ========================= */
         bodyRef.current
           .querySelectorAll("[data-animate]")
           .forEach((p) => {
@@ -3285,9 +3327,20 @@ function Description() {
                 once: true,
               },
             });
+
+            gsap.to(p, {
+              y: -45,
+              ease: "none",
+              scrollTrigger: PARALLAX_ST,
+            });
           });
 
-        gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
+        /* =========================
+           STATS — REVEAL + PARALLAX
+        ========================= */
+        const stats = statsRef.current.querySelectorAll("[data-stat]");
+
+        gsap.from(stats, {
           opacity: 0,
           y: 10,
           duration: 0.6,
@@ -3300,6 +3353,15 @@ function Description() {
           },
         });
 
+        gsap.to(stats, {
+          y: -25,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
+        /* =========================
+           CTA — REVEAL + PARALLAX
+        ========================= */
         gsap.from(ctaRef.current, {
           opacity: 0,
           y: 10,
@@ -3310,6 +3372,12 @@ function Description() {
             start: "top 90%",
             once: true,
           },
+        });
+
+        gsap.to(ctaRef.current, {
+          y: -20,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
         });
       }, sectionRef);
 
@@ -3339,44 +3407,42 @@ function Description() {
   return (
     <section
       ref={sectionRef}
-      data-theme="light"
-      className="w-full bg-[#F3F4F5] text-black py-12 lg:py-20"
+      data-theme="dark"
+      className="w-full bg-neutral-950 text-neutral-100 py-12 lg:py-14 overflow-hidden"
     >
-      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
         {/* HEADLINE */}
-        <div className="max-w-full mb-6">
+        <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-sans font-medium tracking-tight leading-[1.05]"
-            style={{ fontSize: "clamp(32px, 5vw, 134px)" }}
+            className="font-sans font-medium tracking-tight leading-[1.05] text-neutral-50"
+            style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
             <span className="hidden lg:inline mr-80" />
-            We're a social media agency that helps brands stay consistent{" "}
-            <span className="inline-flex items-baseline align-baseline">
-              <FaInstagram className="w-[0.7em] h-[0.7em] translate-y-[0.07em]" />
+            We're a digital agency that helps brands stay consistent{" "}
+            <span className="inline-flex items-baseline gap-1">
+              <FaInstagram className="w-[0.7em] h-[0.7em] translate-y-[0.07em] text-neutral-50" />
               <span>nline</span>
             </span>
             . We keep everything on track so you can stay focused on what{" "}
-            <span className="italic">matters</span>.
+            <span className="italic text-neutral-200">matters</span>.
           </h1>
 
           <div
             ref={dividerRef}
-            className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-800"
+            className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-700"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
+        {/* CONTENT */}
+        <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-y-0 lg:gap-x-20">
           {/* STATS */}
-          <div ref={statsRef} className="lg:col-span-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <BriefcaseIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-400">
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <BriefcaseIcon className="w-6 h-6 text-neutral-500 sm:hidden" />
                 <div>
-                  <div className="text-[22px] font-medium text-neutral-800">
+                  <div className="text-[22px] font-medium text-neutral-100">
                     100+
                   </div>
                   <div className="text-xs uppercase tracking-widest">
@@ -3385,13 +3451,10 @@ function Description() {
                 </div>
               </div>
 
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <GlobeAltIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <GlobeAltIcon className="w-6 h-6 text-neutral-500 sm:hidden" />
                 <div>
-                  <div className="text-[22px] font-medium text-neutral-800">
+                  <div className="text-[22px] font-medium text-neutral-100">
                     3
                   </div>
                   <div className="text-xs uppercase tracking-widest">
@@ -3400,13 +3463,10 @@ function Description() {
                 </div>
               </div>
 
-              <div
-                data-stat
-                className="flex items-center sm:items-start gap-4 sm:flex-col"
-              >
-                <UsersIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <UsersIcon className="w-6 h-6 text-neutral-500 sm:hidden" />
                 <div>
-                  <div className="text-[22px] font-medium text-neutral-800">
+                  <div className="text-[22px] font-medium text-neutral-100">
                     2.5m+
                   </div>
                   <div className="text-xs uppercase tracking-widest">
@@ -3420,19 +3480,20 @@ function Description() {
           {/* BODY + CTA */}
           <div
             ref={bodyRef}
-            className="lg:col-span-7 max-w-full lg:max-w-xl lg:ml-auto text-neutral-950 text-[18px] lg:text-[19px] leading-[1.2]"
+            className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-100 text-[18px] lg:text-[19px] leading-[1.25]"
           >
             <p data-animate className="mb-8 lg:mb-10">
-            Boson is a digital agency based in Bali, working with brands across Qatar, Malaysia, and beyond. 
-We build digital experiences that stay sharp and consistent across every touchpoint — 
-combining design, development, and brand operations into one cohesive system.
-This isn’t just about being online. It’s about staying in control while everything scales.
+              Boson is an agency based in Bali, working with brands across
+              Qatar, Malaysia, and beyond. We build digital experiences that stay
+              sharp and consistent across every touchpoint — combining design,
+              development, and brand operations into one cohesive system. This means fewer revisions, clearer decisions, and content that keeps
+              working even as your brand scales.
             </p>
 
             <a
               ref={ctaRef}
               href="#projects"
-              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black"
+              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-neutral-600 bg-[#E96959] text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-neutral-900"
             >
               DISCOVER ALL PROJECTS →
             </a>
@@ -3442,6 +3503,7 @@ This isn’t just about being online. It’s about staying in control while ever
     </section>
   );
 }
+
 
 
 
@@ -3459,21 +3521,21 @@ function ProjectShowcase() {
   const projects = [
     {
       title: "Sunny\nDevelopment",
-      image: "https://i.imgur.com/Gjuxvj5.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Sunny_Vilage_-_Imgur_czxdgr.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A property development group delivering residential and hospitality projects with a focus on design, lifestyle, and long-term value",
     },
     {
       title: "Novo\nAmpang",
-      image: "https://i.imgur.com/UzRs3rO.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Novo_Ampang_-_Imgur_tcf27u.mp4",
       meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MARKETING"],
       desc:
         "A premium residential development in Kuala Lumpur designed for urban living and investment-driven buyers",
     },
     {
       title: "Shinobi\nSoirée",
-      image: "https://i.imgur.com/WJI4G8F.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812920/SHINOBI_-_Imgur_nn6mcd.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
@@ -4013,7 +4075,7 @@ function Footer() {
           <BigHeading />
         </div>
   
-   <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <ProjectShowcase />
         </div>
         
