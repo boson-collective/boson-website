@@ -1291,10 +1291,8 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-
         transformStyle: "preserve-3d",
 
-        // motion-linked props
         translateZ: motionProps.z,
         scale: motionProps.scale,
         x: motionProps.x,
@@ -1310,230 +1308,253 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 }
 
 function Projects() {
-const scrollRef = useRef(null);
+  const scrollRef = useRef(null);
 
-// ==================================================
-// SECTION SCROLL (UNTUK VISUAL & TRANSISI)
-// ==================================================
-const { scrollYProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start start", "end end"],
-});
+  /* =========================
+     SECTION SCROLL
+  ========================= */
+  const { scrollYProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start start", "end end"],
+  });
 
-// ==================================================
-// GLOBAL SCROLL (UNTUK DOT — NEVER STOPS)
-// ==================================================
-const { scrollY } = useScroll();
+  /* =========================
+     GLOBAL ROTATION
+  ========================= */
+  const { scrollY } = useScroll();
+  const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
-// normalize global scroll → smooth & slow
-const spinBase = useTransform(scrollY, (v) => v * 0.5);
+  const rotate1 = useTransform(spinBase, (v) => v);
+  const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
+  const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-const rotate1 = useTransform(spinBase, (v) => v);
-const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
-const rotate3 = useTransform(spinBase, (v) => v * 0.9);
+  /* =========================
+     IMAGES
+  ========================= */
+  const images = [
+    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
+    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
+    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
+    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
+    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
+    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
+    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
+    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
+    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
+    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
+    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
+    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
+    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
+    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
+    "/clients/tender-touch/6.jpg",
+  ];
 
-// ==================================================
-// LIGHT MODE TRANSITION
-// ==================================================
-const lightProgress = useTransform(scrollYProgress, [0.85, 1], [0, 1]);
+  /* =========================
+     IMAGE BURST (TIMING FIXED)
+  ========================= */
+  const baseStart = 0.14;
+  const step = 0.04;
+  const windowLen = 0.16;
 
-const bgColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(0,0,0)", "#f3f4f5"]
-);
-
-const textColor = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-const orbitStroke = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgba(255,255,255,0.15)", "rgba(0,0,0,0.15)"]
-);
-
-const dotFill = useTransform(
-  lightProgress,
-  [0, 1],
-  ["rgb(255,255,255)", "rgb(0,0,0)"]
-);
-
-// ==================================================
-// INTRO TEXT
-// ==================================================
-const { scrollYProgress: introProgress } = useScroll({
-  target: scrollRef,
-  offset: ["start end", "start start"],
-});
-
-const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
-const textY = useTransform(introProgress, [0, 1], [-50, 0]);
-const textFilter = useTransform(introProgress, [0, 1], [
-  "blur(20px)",
-  "blur(0px)",
-]);
-
-// ==================================================
-// ORBIT GEOMETRY
-// ==================================================
-const c1 = { cx: 425, cy: 350, r: 250 };
-const c2 = { cx: 325, cy: 500, r: 250 };
-const c3 = { cx: 525, cy: 500, r: 250 };
-
-const g1Ref = useRef(null);
-const g2Ref = useRef(null);
-const g3Ref = useRef(null);
-
-useEffect(() => {
-  const apply = (g, cx, cy, deg) => {
-    if (!g) return;
-    g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
-  };
-
-  const u1 = rotate1.on("change", (v) =>
-    apply(g1Ref.current, c1.cx, c1.cy, v)
-  );
-  const u2 = rotate2.on("change", (v) =>
-    apply(g2Ref.current, c2.cx, c2.cy, v)
-  );
-  const u3 = rotate3.on("change", (v) =>
-    apply(g3Ref.current, c3.cx, c3.cy, v)
+  const bursts = images.map((_, i) =>
+    useTransform(
+      scrollYProgress,
+      [baseStart + i * step, baseStart + i * step + windowLen],
+      [0, 1]
+    )
   );
 
-  return () => {
-    u1();
-    u2();
-    u3();
-  };
-}, [rotate1, rotate2, rotate3]);
+  const motionPropsList = bursts.map((b, i) => {
+    const dir = i % 4;
+    return {
+      x: useTransform(
+        b,
+        [0, 0.8, 1],
+        [0, dir % 2 === 0 ? 200 : -200, dir % 2 === 0 ? 240 : -240]
+      ),
+      y: useTransform(
+        b,
+        [0, 0.8, 1],
+        [0, dir < 2 ? -170 : 170, dir < 2 ? -200 : 200]
+      ),
+      z: useTransform(b, [0, 1], [-2000, 3000]),
+      scale: useTransform(b, [0, 1], [0.4, 1.1]),
+      opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
+    };
+  });
 
-// ==================================================
-// IMAGES
-// ==================================================
-const images = [
-  "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
-  "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
-  "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
-  "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
-  "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
-  "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
-  "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
-  "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
-  "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
-  "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
-  "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
-  "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
-  "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
-  "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-  "/clients/tender-touch/6.jpg",
-];
-
-const baseStart = 0.15;
-const step = 0.05;
-const windowLen = 0.15;
-
-const bursts = images.map((_, i) =>
-  useTransform(
+  /* =========================
+     LIGHT MODE
+  ========================= */
+  const lightProgress = useTransform(
     scrollYProgress,
-    [baseStart + i * step, baseStart + i * step + windowLen],
+    [1 - windowLen, 1],
     [0, 1]
-  )
-);
+  );
 
-const motionPropsList = bursts.map((b, i) => {
-  const dir = i % 4;
-  return {
-    x: useTransform(b, [0, 1], [0, dir % 2 === 0 ? 240 : -240]),
-    y: useTransform(b, [0, 1], [0, dir < 2 ? -200 : 200]),
-    z: useTransform(b, [0, 1], [-2000, 3000]),
-    scale: useTransform(b, [0, 1], [0.4, 1.1]),
-    opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
-  };
-});
+  const bgColor = useTransform(lightProgress, [0, 1], [
+    "rgb(0,0,0)",
+    "#f3f4f5",
+  ]);
 
-// ==================================================
-// RENDER
-// ==================================================
-return (
-  <motion.div
-    ref={scrollRef}
-    style={{
-      width: "100%",
-      height: "500vh",
-      position: "relative",
-      backgroundColor: bgColor,
-    }}
-  >
-    <div
+  const textColor = useTransform(lightProgress, [0, 1], [
+    "rgb(255,255,255)",
+    "rgb(0,0,0)",
+  ]);
+
+  const orbitStroke = useTransform(lightProgress, [0, 1], [
+    "rgba(255,255,255,0.15)",
+    "rgba(0,0,0,0.15)",
+  ]);
+
+  const dotFill = useTransform(lightProgress, [0, 1], [
+    "rgb(255,255,255)",
+    "rgb(0,0,0)",
+  ]);
+
+  /* =========================
+     ORBITS
+  ========================= */
+  const c1 = { cx: 425, cy: 350, r: 250 };
+  const c2 = { cx: 325, cy: 500, r: 250 };
+  const c3 = { cx: 525, cy: 500, r: 250 };
+
+  const g1Ref = useRef(null);
+  const g2Ref = useRef(null);
+  const g3Ref = useRef(null);
+
+  useEffect(() => {
+    const apply = (g, cx, cy, deg) => {
+      if (!g) return;
+      g.setAttribute("transform", `translate(${cx} ${cy}) rotate(${deg})`);
+    };
+
+    const u1 = rotate1.on("change", (v) =>
+      apply(g1Ref.current, c1.cx, c1.cy, v)
+    );
+    const u2 = rotate2.on("change", (v) =>
+      apply(g2Ref.current, c2.cx, c2.cy, v)
+    );
+    const u3 = rotate3.on("change", (v) =>
+      apply(g3Ref.current, c3.cx, c3.cy, v)
+    );
+
+    return () => {
+      u1();
+      u2();
+      u3();
+    };
+  }, [rotate1, rotate2, rotate3]);
+
+  /* =========================
+     INTRO TEXT
+  ========================= */
+  const { scrollYProgress: introProgress } = useScroll({
+    target: scrollRef,
+    offset: ["start end", "start start"],
+  });
+
+  const textOpacity = useTransform(introProgress, [0, 1], [0, 1]);
+  const textY = useTransform(introProgress, [0, 1], [-50, 0]);
+  const textFilter = useTransform(introProgress, [0, 1], [
+    "blur(20px)",
+    "blur(0px)",
+  ]);
+
+  /* =========================
+     RENDER
+  ========================= */
+  return (
+    <motion.div
+      ref={scrollRef}
+      data-theme="dark"
       style={{
-        position: "sticky",
-        top: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflow: "hidden",
-        pointerEvents: "none",
-        perspective: "1800px",
-        transformStyle: "preserve-3d",
+        width: "100%",
+        height: "500vh",
+        position: "relative",
+        backgroundColor: bgColor,
       }}
     >
-      {/* ORBITS */}
-      <svg viewBox="0 0 850 850" width="850" height="850">
-        {[c1, c2, c3].map((c, i) => (
-          <motion.circle
-            key={i}
-            cx={c.cx}
-            cy={c.cy}
-            r={c.r}
-            fill="none"
-            strokeWidth="0.5"
-            style={{ stroke: orbitStroke }}
-          />
+      <div className="projects-sticky">
+        <svg viewBox="0 0 850 850" className="projects-orbit">
+          {[c1, c2, c3].map((c, i) => (
+            <motion.circle
+              key={i}
+              cx={c.cx}
+              cy={c.cy}
+              r={c.r}
+              fill="none"
+              strokeWidth="1"
+              style={{ stroke: orbitStroke }}
+            />
+          ))}
+
+          <motion.g ref={g1Ref}>
+            <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g2Ref}>
+            <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+          <motion.g ref={g3Ref}>
+            <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
+          </motion.g>
+        </svg>
+
+        <motion.div
+          className="projects-text"
+          style={{
+            opacity: textOpacity,
+            y: textY,
+            filter: textFilter,
+            color: textColor,
+            mixBlendMode: "difference",
+          }}
+        >
+          A world where uncertainty <br />
+          becomes clarity.
+        </motion.div>
+
+        {images.map((src, i) => (
+          <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
+      </div>
 
-        <motion.g ref={g1Ref}>
-          <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g2Ref}>
-          <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-        <motion.g ref={g3Ref}>
-          <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
-        </motion.g>
-      </svg>
+      <style>{`
+        .projects-sticky {
+          position: sticky;
+          top: 0;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          pointer-events: none;
+          perspective: 1800px;
+          transform-style: preserve-3d;
+        }
 
-      {/* TEXT */}
-      <motion.div
-        style={{
-          opacity: textOpacity,
-          y: textY,
-          filter: textFilter,
-          color: textColor,
-          position: "absolute",
-          fontSize: "43px",
-          fontWeight: 200,
-          lineHeight: 1,
-          textAlign: "center",
-          whiteSpace: "pre-line",
-          zIndex: 10,
-        }}
-      >
-        A world where uncertainty <br />
-        becomes clarity.
-      </motion.div>
+        .projects-orbit {
+          position: absolute;
+          width: 850px;
+          height: 850px;
+          max-width: 100vw;
+          max-height: 100vw;
+        }
 
-      {/* IMAGES */}
-      {images.map((src, i) => (
-        <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
-      ))}
-    </div>
-  </motion.div>
-);
+        .projects-text {
+          position: absolute;
+          font-size: clamp(24px, 6vw, 43px);
+          font-weight: 200;
+          line-height: 1;
+          text-align: center;
+          white-space: pre-line;
+          z-index: 10;
+          mix-blend-mode: difference;
+        }
+      `}</style>
+    </motion.div>
+  );
 }
 
 
