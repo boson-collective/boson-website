@@ -27,7 +27,17 @@ function Webglbg() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const webgl = new GradientBg({ rendererEl: containerRef.current });
+    const webgl = new GradientBg({ rendererEl: containerRef.current, background: {
+      color1: [0.796, 0.294, 0.243],
+      color2: [0.914, 0.412, 0.349],
+      color3: [0, 0, 0],
+      colorAccent: new THREE.Color(0, 0, 0),
+      uLinesBlur: 0.33,
+      uNoise: 0.03,
+      uOffsetX: 0.05,
+      uOffsetY: -2.46,
+      uLinesAmount: 1.36,      
+    } });
     return () => webgl.destroy();
   }, []);
 
