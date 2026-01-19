@@ -508,8 +508,8 @@ function Webglbg() {
     ========================= */
     const mobileTextOverride = isMobile
       ? {
-          fontSize: "clamp(50px, 4.5vw, 104px)",
-          lineHeight: 1.25,
+          fontSize: "clamp(45px, 4.5vw, 104px)",
+          lineHeight: 1.15,
           wordSpacing: 0,
           textAlign: "left",
           hyphens: "none",
@@ -1278,6 +1278,7 @@ function VideoSection() {
 
 
 
+
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
     <motion.div
@@ -1306,7 +1307,7 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   );
 }
 
-function Projects() {
+ function Projects() {
   const scrollRef = useRef(null);
 
   /* ==================================================
@@ -1349,11 +1350,11 @@ function Projects() {
   ];
 
   /* ==================================================
-     IMAGE BURST — SAFE MULTI (INI INTINYA)
+     IMAGE BURST — SAFE MULTI
   ================================================== */
-  const baseStart = 0.14;   // sama prinsip kode 1
-  const step = 0.04;        // overlap → multi image
-  const windowLen = 0.16;   // DI BAWAH batas mobile aman
+  const baseStart = 0.14;
+  const step = 0.04;
+  const windowLen = 0.16;
 
   const bursts = images.map((_, i) =>
     useTransform(
@@ -1466,6 +1467,7 @@ function Projects() {
   return (
     <motion.div
       ref={scrollRef}
+      data-theme="dark"
       style={{
         width: "100%",
         height: "500vh",
@@ -1473,22 +1475,8 @@ function Projects() {
         backgroundColor: bgColor,
       }}
     >
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          overflow: "hidden",
-          pointerEvents: "none",
-          perspective: "1800px",
-          transformStyle: "preserve-3d",
-        }}
-      >
-        <svg viewBox="0 0 850 850" width="850" height="850">
+      <div className="projects-sticky">
+        <svg viewBox="0 0 850 850" className="projects-orbit">
           {[c1, c2, c3].map((c, i) => (
             <motion.circle
               key={i}
@@ -1496,7 +1484,7 @@ function Projects() {
               cy={c.cy}
               r={c.r}
               fill="none"
-              strokeWidth="0.5"
+              strokeWidth="1"
               style={{ stroke: orbitStroke }}
             />
           ))}
@@ -1512,19 +1500,15 @@ function Projects() {
           </motion.g>
         </svg>
 
+        {/* TEXT — MIX BLEND MODE RESTORED */}
         <motion.div
+          className="projects-text"
           style={{
             opacity: textOpacity,
             y: textY,
             filter: textFilter,
             color: textColor,
-            position: "absolute",
-            fontSize: "43px",
-            fontWeight: 200,
-            lineHeight: 1,
-            textAlign: "center",
-            whiteSpace: "pre-line",
-            zIndex: 10,
+            mixBlendMode: "difference",
           }}
         >
           A world where uncertainty <br />
@@ -1535,6 +1519,41 @@ function Projects() {
           <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
       </div>
+
+      <style>{`
+        .projects-sticky {
+          position: sticky;
+          top: 0;
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+          pointer-events: none;
+          perspective: 1800px;
+          transform-style: preserve-3d;
+        }
+
+        .projects-orbit {
+          position: absolute;
+          width: 850px;
+          height: 850px;
+          max-width: 100vw;
+          max-height: 100vw;
+        }
+
+        .projects-text {
+          position: absolute;
+          font-size: clamp(18px, 6vw, 43px);
+          font-weight: 200;
+          line-height: 1;
+          text-align: center;
+          white-space: pre-line;
+          z-index: 10;
+          mix-blend-mode: difference;
+        }
+      `}</style>
     </motion.div>
   );
 }
