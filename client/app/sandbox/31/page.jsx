@@ -1278,7 +1278,6 @@ function VideoSection() {
 
 
 
-
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
     <motion.div
@@ -1310,17 +1309,17 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
 function Projects() {
   const scrollRef = useRef(null);
 
-  /* =========================
+  /* ==================================================
      SECTION SCROLL
-  ========================= */
+  ================================================== */
   const { scrollYProgress } = useScroll({
     target: scrollRef,
     offset: ["start start", "end end"],
   });
 
-  /* =========================
+  /* ==================================================
      GLOBAL ROTATION
-  ========================= */
+  ================================================== */
   const { scrollY } = useScroll();
   const spinBase = useTransform(scrollY, (v) => v * 0.5);
 
@@ -1328,9 +1327,9 @@ function Projects() {
   const rotate2 = useTransform(spinBase, (v) => -v * 0.65);
   const rotate3 = useTransform(spinBase, (v) => v * 0.9);
 
-  /* =========================
+  /* ==================================================
      IMAGES
-  ========================= */
+  ================================================== */
   const images = [
     "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
     "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
@@ -1349,12 +1348,12 @@ function Projects() {
     "/clients/tender-touch/6.jpg",
   ];
 
-  /* =========================
-     IMAGE BURST (TIMING FIXED)
-  ========================= */
-  const baseStart = 0.14;
-  const step = 0.04;
-  const windowLen = 0.16;
+  /* ==================================================
+     IMAGE BURST — SAFE MULTI (INI INTINYA)
+  ================================================== */
+  const baseStart = 0.14;   // sama prinsip kode 1
+  const step = 0.04;        // overlap → multi image
+  const windowLen = 0.16;   // DI BAWAH batas mobile aman
 
   const bursts = images.map((_, i) =>
     useTransform(
@@ -1369,12 +1368,12 @@ function Projects() {
     return {
       x: useTransform(
         b,
-        [0, 0.8, 1],
+        [0, 0.85, 1],
         [0, dir % 2 === 0 ? 200 : -200, dir % 2 === 0 ? 240 : -240]
       ),
       y: useTransform(
         b,
-        [0, 0.8, 1],
+        [0, 0.85, 1],
         [0, dir < 2 ? -170 : 170, dir < 2 ? -200 : 200]
       ),
       z: useTransform(b, [0, 1], [-2000, 3000]),
@@ -1383,9 +1382,9 @@ function Projects() {
     };
   });
 
-  /* =========================
+  /* ==================================================
      LIGHT MODE
-  ========================= */
+  ================================================== */
   const lightProgress = useTransform(
     scrollYProgress,
     [1 - windowLen, 1],
@@ -1412,9 +1411,9 @@ function Projects() {
     "rgb(0,0,0)",
   ]);
 
-  /* =========================
+  /* ==================================================
      ORBITS
-  ========================= */
+  ================================================== */
   const c1 = { cx: 425, cy: 350, r: 250 };
   const c2 = { cx: 325, cy: 500, r: 250 };
   const c3 = { cx: 525, cy: 500, r: 250 };
@@ -1446,9 +1445,9 @@ function Projects() {
     };
   }, [rotate1, rotate2, rotate3]);
 
-  /* =========================
+  /* ==================================================
      INTRO TEXT
-  ========================= */
+  ================================================== */
   const { scrollYProgress: introProgress } = useScroll({
     target: scrollRef,
     offset: ["start end", "start start"],
@@ -1461,13 +1460,12 @@ function Projects() {
     "blur(0px)",
   ]);
 
-  /* =========================
+  /* ==================================================
      RENDER
-  ========================= */
+  ================================================== */
   return (
     <motion.div
       ref={scrollRef}
-      data-theme="dark"
       style={{
         width: "100%",
         height: "500vh",
@@ -1475,8 +1473,22 @@ function Projects() {
         backgroundColor: bgColor,
       }}
     >
-      <div className="projects-sticky">
-        <svg viewBox="0 0 850 850" className="projects-orbit">
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+          pointerEvents: "none",
+          perspective: "1800px",
+          transformStyle: "preserve-3d",
+        }}
+      >
+        <svg viewBox="0 0 850 850" width="850" height="850">
           {[c1, c2, c3].map((c, i) => (
             <motion.circle
               key={i}
@@ -1484,7 +1496,7 @@ function Projects() {
               cy={c.cy}
               r={c.r}
               fill="none"
-              strokeWidth="1"
+              strokeWidth="0.5"
               style={{ stroke: orbitStroke }}
             />
           ))}
@@ -1501,13 +1513,18 @@ function Projects() {
         </svg>
 
         <motion.div
-          className="projects-text"
           style={{
             opacity: textOpacity,
             y: textY,
             filter: textFilter,
             color: textColor,
-            mixBlendMode: "difference",
+            position: "absolute",
+            fontSize: "43px",
+            fontWeight: 200,
+            lineHeight: 1,
+            textAlign: "center",
+            whiteSpace: "pre-line",
+            zIndex: 10,
           }}
         >
           A world where uncertainty <br />
@@ -1518,41 +1535,6 @@ function Projects() {
           <ImageBurst key={i} src={src} motionProps={motionPropsList[i]} />
         ))}
       </div>
-
-      <style>{`
-        .projects-sticky {
-          position: sticky;
-          top: 0;
-          width: 100vw;
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          overflow: hidden;
-          pointer-events: none;
-          perspective: 1800px;
-          transform-style: preserve-3d;
-        }
-
-        .projects-orbit {
-          position: absolute;
-          width: 850px;
-          height: 850px;
-          max-width: 100vw;
-          max-height: 100vw;
-        }
-
-        .projects-text {
-          position: absolute;
-          font-size: clamp(24px, 6vw, 43px);
-          font-weight: 200;
-          line-height: 1;
-          text-align: center;
-          white-space: pre-line;
-          z-index: 10;
-          mix-blend-mode: difference;
-        }
-      `}</style>
     </motion.div>
   );
 }
