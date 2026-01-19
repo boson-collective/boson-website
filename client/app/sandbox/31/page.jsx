@@ -1311,6 +1311,19 @@ function Projects() {
   const scrollRef = useRef(null);
 
   /* ==================================================
+     MOBILE DETECTION (TAMBAHAN SAJA)
+  ================================================== */
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  /* ==================================================
      SECTION SCROLL
   ================================================== */
   const { scrollYProgress } = useScroll({
@@ -1518,9 +1531,10 @@ function Projects() {
             opacity: textOpacity,
             y: textY,
             filter: textFilter,
-            color: textColor, 
+            color: textColor,
+            mixBlendMode: isMobile ? "normal" : "difference",
             position: "absolute",
-            fontSize: "43px",
+            fontSize: "clamp(18px, 6vw, 43px)",
             fontWeight: 200,
             lineHeight: 1,
             textAlign: "center",
@@ -1539,6 +1553,7 @@ function Projects() {
     </motion.div>
   );
 }
+
 
 
 function Galery() {
