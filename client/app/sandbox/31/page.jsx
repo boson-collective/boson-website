@@ -18,6 +18,9 @@ import {
   GlobeAltIcon,
   UsersIcon,
 } from "@heroicons/react/24/outline";
+import { 
+  FaInstagram, 
+} from "react-icons/fa";
 
 gsap.registerPlugin(ScrollTrigger,SplitText,CustomEase);
 
@@ -1630,15 +1633,14 @@ function Galery() {
   const sectionRef = useRef(null);
   const textPinRef = useRef(null);
   const headlineRef = useRef(null);
-  const cursorRef = useRef(null);
-  const gridRef = useRef(null);
+  const getStartedRef = useRef(null);
   const fadeTopRef = useRef(null);
   const fadeBottomRef = useRef(null);
 
   const headlinePlayedRef = useRef(false);
 
   /* =========================
-     BASE STATE (GSAP ONLY)
+     BASE STATE
   ========================= */
   useEffect(() => {
     gsap.set(sectionRef.current, {
@@ -1652,8 +1654,8 @@ function Galery() {
       borderColor: "rgba(255,255,255,0.2)",
     });
 
-    gsap.set(cursorRef.current, {
-      backgroundColor: "#fff",
+    gsap.set([headlineRef.current, getStartedRef.current], {
+      opacity: 0,
     });
   }, []);
 
@@ -1705,45 +1707,63 @@ function Galery() {
   }, []);
 
   /* =========================
-     PIN + HEADLINE
+     PIN + TEXT (HALUS UNPIN)
   ========================= */
   useEffect(() => {
     const trigger = ScrollTrigger.create({
       trigger: sectionRef.current,
       start: "top top",
-      end: "bottom bottom",
+      end: "70% top", // PIN dilepas lebih cepat
       pin: textPinRef.current,
-      pinSpacing: false,
-      onEnter: playHeadline,
+      pinSpacing: true, // ⬅️ KUNCI KEHALUSAN
+      onEnter: playText,
     });
 
     return () => trigger.kill();
   }, []);
 
-  const playHeadline = () => {
+  const playText = () => {
     if (headlinePlayedRef.current) return;
     headlinePlayedRef.current = true;
 
     document.fonts.ready.then(() => {
-      gsap.set(headlineRef.current, { opacity: 1 });
+      gsap.set([headlineRef.current, getStartedRef.current], {
+        opacity: 1,
+      });
 
-      const split = SplitText.create(headlineRef.current, {
+      const headlineSplit = SplitText.create(headlineRef.current, {
         type: "lines",
         mask: "lines",
       });
 
-      gsap.from(split.lines, {
-        yPercent: 40,
-        opacity: 0,
-        duration: 1.2,
-        stagger: 0.12,
-        ease: "power2.out",
+      const getStartedSplit = SplitText.create(getStartedRef.current, {
+        type: "words",
       });
+
+      const tl = gsap.timeline();
+
+      tl.from(getStartedSplit.words, {
+        y: 12,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.06,
+        ease: "power2.out",
+      }).from(
+        headlineSplit.lines,
+        {
+          yPercent: 40,
+          opacity: 0,
+          duration: 1.2,
+          stagger: 0.12,
+          ease: "power2.out",
+        },
+        "-=0.2"
+      );
     });
   };
 
   /* =========================
-     DARK → LIGHT (CLEAN)
+     DARK → LIGHT
   ========================= */
   useEffect(() => {
     const tl = gsap.timeline({
@@ -1766,12 +1786,6 @@ function Galery() {
         { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
         0
       )
-      .fromTo(
-        cursorRef.current,
-        { backgroundColor: "#fff" },
-        { backgroundColor: "#111", ease: "none" },
-        0
-      )
       .to(
         [fadeTopRef.current, fadeBottomRef.current],
         { opacity: 0, ease: "none" },
@@ -1784,130 +1798,89 @@ function Galery() {
     };
   }, []);
 
-  /* =========================
-     CURSOR
-  ========================= */
-  useEffect(() => {
-    const section = sectionRef.current;
-    const cursor = cursorRef.current;
-
-    const move = (e) => {
-      cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-    };
-
-    const enter = () => {
-      section.style.cursor = "none";
-      cursor.style.opacity = "1";
-    };
-
-    const leave = () => {
-      section.style.cursor = "auto";
-      cursor.style.opacity = "0";
-    };
-
-    window.addEventListener("mousemove", move);
-    section.addEventListener("mouseenter", enter);
-    section.addEventListener("mouseleave", leave);
-
-    return () => {
-      window.removeEventListener("mousemove", move);
-      section.removeEventListener("mouseenter", enter);
-      section.removeEventListener("mouseleave", leave);
-    };
-  }, []);
-
   return (
-    <>
-      {/* CURSOR */}
+    <section
+      ref={sectionRef}
+      className="relative min-h-[480vh] overflow-hidden"
+    >
+      {/* GRID */}
       <div
-        ref={cursorRef}
-        className="fixed top-0 left-0 z-[9999] pointer-events-none opacity-0"
-        style={{
-          width: 20,
-          height: 20,
-          borderRadius: "50%",
-          transform: "translate(-50%, -50%)",
-        }}
-      />
-
-      <section
-        ref={sectionRef}
-        className="relative min-h-[480vh] overflow-hidden"
+        className="absolute inset-0 z-10 pointer-events-none grid"
+        style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
       >
-        {/* GRID */}
-        <div
-          ref={gridRef}
-          className="absolute inset-0 z-10 pointer-events-none grid"
-          style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
-        >
-          {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
-            <div key={i} className="grid-line border-r last:border-r-0" />
-          ))}
-        </div>
+        {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
+          <div key={i} className="grid-line border-r last:border-r-0" />
+        ))}
+      </div>
 
-        {/* PINNED TEXT */}
-        <div
-          ref={textPinRef}
-          className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center z-30 pointer-events-none"
-        >
-          <div className="text-center max-w-[90vw] px-6">
-            <span className="block text-[11px] tracking-[0.22em] opacity-80 mb-6">
-              GET STARTED
-            </span>
-            <h1
-              ref={headlineRef}
-              className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)] opacity-0"
-            >
-              Time to
-              <br />
-              Make it happen
-            </h1>
+      {/* PINNED TEXT */}
+      <div
+        ref={textPinRef}
+        className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center z-30 pointer-events-none"
+      >
+        <div className="text-center max-w-[90vw] px-6">
+          <span
+            ref={getStartedRef}
+            className="block text-[11px] tracking-[0.22em] opacity-80 mb-6"
+          >
+            GET STARTED
+          </span>
+
+          <h1
+            ref={headlineRef}
+            className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)]"
+          >
+            Time to
+            <br />
+            Make it happen
+          </h1>
+        </div>
+      </div>
+
+      {/* IMAGES */}
+      <div
+        className="absolute inset-0 z-20 grid"
+        style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
+      >
+        {LANES.map((lane, i) => (
+          <div
+            key={i}
+            className="lane relative h-full flex justify-center"
+            style={{ gridColumn: lane.col }}
+          >
+            {lane.items.map((item, j) => (
+              <figure
+                key={j}
+                className="absolute w-[240px] aspect-[3/4] bg-neutral-900 overflow-hidden"
+                style={{ top: item.top }}
+              >
+                <img
+                  src={item.src}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </figure>
+            ))}
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* IMAGES */}
-        <div
-          className="absolute inset-0 z-20 grid"
-          style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
-        >
-          {LANES.map((lane, i) => (
-            <div
-              key={i}
-              className="lane relative h-full flex justify-center"
-              style={{ gridColumn: lane.col }}
-            >
-              {lane.items.map((item, j) => (
-                <figure
-                  key={j}
-                  className="absolute w-[240px] aspect-[3/4] bg-neutral-900 overflow-hidden"
-                  style={{ top: item.top }}
-                >
-                  <img
-                    src={item.src}
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
-                </figure>
-              ))}
-            </div>
-          ))}
-        </div>
-
-        {/* FADES */}
-        <div
-          ref={fadeTopRef}
-          className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40
-                     bg-gradient-to-b from-black via-black/90 to-transparent"
-        />
-        <div
-          ref={fadeBottomRef}
-          className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40
-                     bg-gradient-to-t from-black via-black/90 to-transparent"
-        />
-      </section>
-    </>
+      {/* FADES */}
+      <div
+        ref={fadeTopRef}
+        className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40
+                   bg-gradient-to-b from-black via-black/90 to-transparent"
+      />
+      <div
+        ref={fadeBottomRef}
+        className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40
+                   bg-gradient-to-t from-black via-black/90 to-transparent"
+      />
+    </section>
   );
 }
+
+
 
 
 function BigHeading() {
@@ -1918,73 +1891,66 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
-  const bottomX = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
+  const bottomX = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
   return (
     <div
       ref={ref}
-      className="relative bg-black overflow-hidden w-full big-heading-container"
-      style={{ height: "130vh" }}
+      className="relative w-full overflow-hidden bg-[#F3F4F5] border border-black big-heading-container"
+      style={{ height: "150vh" }}
     >
       <div
-        className="big-heading-sticky pointer-events-none"
-        style={{ position: "sticky", top: 0, width: "100%", height: "150vh" }}
+        className="sticky top-0 w-full h-[150vh] pointer-events-none big-heading-sticky"
       >
-
         {/* TOP */}
         <div
-          className="big-heading-top-wrapper flex justify-center items-end overflow-hidden"
-          style={{ height: "75vh" }}
+          className="flex justify-center items-end overflow-hidden big-heading-top-wrapper"
+          style={{ height: "calc(75vh - 0.5px)" }}
         >
           <motion.div
-            className="big-heading-top flex whitespace-nowrap"
+            className="flex whitespace-nowrap text-black  opacity-100"
             style={{
-              x: topX,
-              transform: "translateY(10%)",
-              color: "white",
-              fontSize: "30vw",
-              fontWeight: 600,
+              x: topX,                       // ⛔ TIDAK DIUBAH 
+              fontSize: "clamp(14rem, 50vw, 56rem)"
+,
               lineHeight: 0.8,
-              opacity: 0.9,
-              textTransform: "uppercase",
-              gap: "4vw",
+              gap: "clamp(1rem, 4vw, 4rem)",
             }}
           >
-            <span>Work -</span>
-            <span>Work -</span>
-            <span>Work</span>
+            <span>WORK -</span>
+            <span>WORK -</span>
+            <span>WORK</span>
           </motion.div>
         </div>
 
+        {/* CENTER BORDER */}
+        <div className="w-full h-px bg-black" />
+
         {/* BOTTOM */}
         <div
-          className="big-heading-bottom-wrapper flex justify-center items-start overflow-hidden"
-          style={{ height: "75vh" }}
+          className="flex justify-center items-start overflow-hidden big-heading-bottom-wrapper"
+          style={{ height: "calc(75vh - 0.5px)" }}
         >
           <motion.div
-            className="big-heading-bottom flex whitespace-nowrap"
+            className="flex whitespace-nowrap text-black  opacity-100"
             style={{
-              x: bottomX,
-              transform: "translateY(-10%)",
-              color: "#3a3a3a",
-              fontSize: "30vw",
-              fontWeight: 600,
+              x: bottomX,                    // ⛔ TIDAK DIUBAH 
+              fontSize: "clamp(14rem, 50vw, 56rem)"
+,
               lineHeight: 0.8,
-              opacity: 0.45,
-              textTransform: "uppercase",
-              gap: "4vw",
+              gap: "clamp(1rem, 4vw, 4rem)",
             }}
           >
-            <span>Experiences -</span>
-            <span>Experiences -</span>
-            <span>Experiences</span>
+            <span>EXPERIENCES -</span>
+            <span>EXPERIENCES -</span>
+            <span>EXPERIENCES</span>
           </motion.div>
         </div>
       </div>
 
       <style>{`
-        @media(max-width: 1023px) {
+        @media (max-width: 1023px) {
           .big-heading-container {
             height: auto !important;
           }
@@ -1995,14 +1961,6 @@ function BigHeading() {
           .big-heading-top-wrapper,
           .big-heading-bottom-wrapper {
             height: auto !important;
-            padding: 2vh 0 !important; /* ← DIPERAPAT */
-          }
-        }
-
-        @media(max-width: 600px) {
-          .big-heading-top,
-          .big-heading-bottom {
-            font-size: 22vw !important;
           }
         }
       `}</style>
@@ -2238,8 +2196,10 @@ function WorksList() {
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
+  const totalIndex = String(items.length).padStart(2, "0");
+
   /* =========================
-     GSAP HEADER (UNCHANGED)
+     GSAP HEADER
   ========================= */
   useLayoutEffect(() => {
     const build = () => {
@@ -2310,8 +2270,10 @@ function WorksList() {
     <section
       ref={sectionRef}
       data-theme="dark"
-      style={{ background: "black", padding: "6vh 0" }}
+      className="bg-black"
+      style={{ padding: "6vh 0" }}
     >
+      
       {/* ================= HEADER ================= */}
       <div
         ref={headerRef}
@@ -2319,20 +2281,41 @@ function WorksList() {
         style={{
           display: "grid",
           gridTemplateColumns: "1.15fr 0.5fr",
-          padding: "0 6vw 6vh",
+          padding: "5vw 7vh",
           color: "white",
         }}
       >
         <h2
           ref={leftRef}
-          style={{ fontSize: "2.5vw", margin: 0 }}
+          style={{
+            margin: 0,
+            fontSize: "clamp(28px, 2.8vw, 44px)",
+            lineHeight: 1.15,
+            display: "inline-flex",
+            alignItems: "flex-start",
+            gap: "0.35em",
+          }}
         >
-          Industry Experience
+          <span>Industry Experience</span>
+          <sup
+            style={{
+              fontSize: "0.45em",
+              lineHeight: 1,
+              opacity: 0.7, 
+              fontFeatureSettings: "'lnum' 1, 'tnum' 1",
+            }}
+          >
+            {totalIndex}
+          </sup>
         </h2>
 
         <p
           ref={rightRef}
-          style={{ fontSize: "1vw", opacity: 0.7 }}
+          style={{
+            opacity: 0.7,
+            fontSize: "clamp(13px, 1vw, 16px)",
+            lineHeight: 1.6,
+          }}
         >
           This selection represents work developed under different business
           contexts, where constraints, scale, and objectives vary from project
@@ -2351,14 +2334,13 @@ function WorksList() {
             position: "relative",
             display: "grid",
             gridTemplateColumns: "1fr 2.2fr 1fr",
-            padding: "2.5vh 0",
+            padding: "3.8vh 0",
             borderBottom: "1px solid rgba(255,255,255,0.25)",
             color: "white",
             cursor: "pointer",
             overflow: "hidden",
           }}
         >
-          {/* WHITE OVERLAY — DESKTOP ONLY */}
           <motion.div
             className="hover-overlay"
             style={{
@@ -2379,7 +2361,12 @@ function WorksList() {
             <div />
             <div
               className="works-title"
-              style={{ fontSize: "4.5vw", textAlign: "center" }}
+              style={{
+                textAlign: "center",
+                fontSize: "clamp(32px, 4.5vw, 72px)",
+                lineHeight: 1.05,
+                letterSpacing: "-0.02em",
+              }}
             >
               {item.name}
             </div>
@@ -2720,19 +2707,13 @@ function BosonScrollText() {
 function ServicesHero() {
   const cursorRef = useRef(null);
   const sectionRef = useRef(null);
-  const headerRef = useRef(null);
-  const rightTextRef = useRef(null);
-
-  const splitsRef = useRef([]);
-  const ctxRef = useRef(null);
-  const resizeTimer = useRef(null);
 
   const [hoverIndex, setHoverIndex] = useState(null);
   const [inside, setInside] = useState(false);
 
-  // =====================
-  // CUSTOM CURSOR FOLLOW
-  // =====================
+  /* =====================
+     CUSTOM CURSOR
+  ===================== */
   useEffect(() => {
     const cursor = cursorRef.current;
     const section = sectionRef.current;
@@ -2754,82 +2735,6 @@ function ServicesHero() {
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
-  // =====================
-  // GSAP TEXT BUILD
-  // =====================
-  useLayoutEffect(() => {
-    const build = () => {
-      if (!sectionRef.current || !headerRef.current || !rightTextRef.current)
-        return;
-
-      splitsRef.current.forEach((s) => s.revert());
-      splitsRef.current = [];
-      if (ctxRef.current) ctxRef.current.revert();
-
-      ctxRef.current = gsap.context(() => {
-        gsap.set([headerRef.current, rightTextRef.current], {
-          opacity: 1,
-          clearProps: "transform",
-        });
-
-        const headerSplit = SplitText.create(headerRef.current, {
-          type: "lines",
-          linesClass: "line",
-          mask: "lines",
-        });
-        splitsRef.current.push(headerSplit);
-
-        gsap.from(headerSplit.lines, {
-          yPercent: 35,
-          opacity: 0,
-          duration: 1,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-        });
-
-        const rightSplit = SplitText.create(rightTextRef.current, {
-          type: "lines",
-          linesClass: "line",
-          mask: "lines",
-        });
-        splitsRef.current.push(rightSplit);
-
-        gsap.from(rightSplit.lines, {
-          yPercent: 25,
-          opacity: 0,
-          duration: 0.9,
-          stagger: 0.05,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: rightTextRef.current,
-            start: "top 85%",
-          },
-        });
-      }, sectionRef);
-
-      ScrollTrigger.refresh();
-    };
-
-    document.fonts.ready.then(build);
-
-    const onResize = () => {
-      clearTimeout(resizeTimer.current);
-      resizeTimer.current = setTimeout(build, 200);
-    };
-
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      splitsRef.current.forEach((s) => s.revert());
-      if (ctxRef.current) ctxRef.current.revert();
-    };
-  }, []);
-
   const services = [
     {
       label: "Social Media Marketing",
@@ -2842,7 +2747,7 @@ function ServicesHero() {
         "https://i.pinimg.com/736x/2e/14/bd/2e14bda3c06055b6345f718e2ea23620.jpg",
     },
     {
-      label: "Branding",
+      label: "Brand Strategy",
       image:
         "https://i.pinimg.com/1200x/f7/91/37/f79137ca724f78b5e0dd7e4820ad13f2.jpg",
     },
@@ -2855,18 +2760,17 @@ function ServicesHero() {
 
   return (
     <section
-    data-theme="light"
       ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#F3F4F5] text-black overflow-hidden cursor-none"
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900 cursor-none"
     >
-      {/* CUSTOM CURSOR */}
+      {/* CURSOR */}
       <div
         ref={cursorRef}
         className="pointer-events-none fixed top-0 left-0 z-[9999]"
-        style={{ transform: "translate3d(-9999px, -9999px, 0)" }}
+        style={{ transform: "translate3d(-9999px,-9999px,0)" }}
       >
         <div
-          className="w-[70px] h-[70px] rounded-full bg-[#C8FF4D]"
+          className="w-[64px] h-[64px] rounded-full bg-black"
           style={{
             transform: inside ? "scale(1)" : "scale(0)",
             opacity: inside ? 1 : 0,
@@ -2876,118 +2780,101 @@ function ServicesHero() {
         />
       </div>
 
-      <div className="max-w-screen mx-auto h-full px-6 sm:px-8 lg:px-16 py-10 flex flex-col">
-        {/* ===================== */}
-        {/* TOP TEXT — RAPAT */}
-        {/* ===================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-6 lg:gap-x-10 items-start">
-          {/* LEFT — HEADLINE */}
-          <div className="lg:col-span-7">
-            <h2
-              ref={headerRef}
-              className="font-sans font-normal tracking-tight"
-            >
-              <span className="block text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
-                Services built to help
-              </span>
+      <div className="w-full px-6 sm:px-10 lg:px-20 py-24">
+        {/* TOP GRID */}
+        <div className="grid grid-cols-12 items-start mb-32">
+          {/* LEFT */}
+          <div className="col-span-12 lg:col-span-3 text-sm text-neutral-500 mb-6 lg:mb-0">
+            Our Services
+          </div>
 
-              <span className="block -mt-1 text-[clamp(32px,5vw,55px)] leading-[1.02] text-neutral-900">
-                brands grow
-              </span>
-
-              <span className="block mt-2 text-[clamp(18px,2vw,26px)] leading-tight text-neutral-400">
-                and stay relevant
-              </span>
+          {/* CENTER BLOCK — LEFT ALIGNED */}
+          <div className="col-span-12 lg:col-span-5 lg:col-start-5 mb-10 lg:mb-0">
+            {/* TEXT CENTERED INSIDE */}
+            <h2 className="text-start text-[clamp(28px,4vw,42px)] font-medium leading-[1.02]">
+              How we make your 
+              <br />
+              brands grow and  relevant
             </h2>
           </div>
 
-          {/* RIGHT — SUPPORTING BODY */}
-          <div className="lg:col-span-4 lg:col-start-9 lg:mt-5">
-            <p
-              ref={rightTextRef}
-              className="text-[14px] leading-[1.55] text-neutral-800 max-w-sm"
-            >
-              <span className="lg:mr-10"></span>Most brands come to us when growth starts feeling harder to manage
-              and consistency across platforms begins to break down. We step in
-              to bring structure, clarity, and momentum back into their digital
-              work.
+          {/* RIGHT */}
+          <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm text-neutral-600">
+            <p className="max-w-[260px] lg:text-right">
+              We are a digital marketing agency with expertise, and we're on a
+              mission to help you take the next step in your business.
             </p>
+            <button className="inline-flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full text-xs font-medium w-fit">
+              See all services ↗
+            </button>
           </div>
-           
-          
         </div>
 
-        {/* ===================== */}
-        {/* MAIN CONTENT */}
-        {/* ===================== */}
-        <div className="relative flex-1 mt-16 sm:mt-20 lg:mt-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-6 items-start">
-          <div className="hidden xl:block xl:col-span-2" />
-
-          <div className="col-span-1 lg:col-span-12 xl:col-span-10 flex flex-col">
+        {/* SERVICES — SAME LEFT EDGE AS HEADER BLOCK */}
+        <div className="grid grid-cols-12">
+          <div className="col-span-12 lg:col-span-8 lg:col-start-5">
             {services.map((item, i) => {
               const isHovering = hoverIndex !== null;
               const isActive = hoverIndex === i;
-
+              
               const words = item.label.split(" ");
               const lastWord = words.at(-1);
               const firstLine = words.slice(0, -1).join(" ");
 
               const colorState = !isHovering
-                ? "text-black"
+                ? "text-neutral-900"
                 : isActive
-                ? "text-black"
-                : "text-black/30";
+                ? "text-neutral-900"
+                : "text-neutral-400";
 
               return (
                 <div
                   key={item.label}
-                  className="py-6 sm:py-8"
                   onMouseEnter={() => setHoverIndex(i)}
                   onMouseLeave={() => setHoverIndex(null)}
+                  className="relative py-14 border-t border-black/30"
                 >
                   <div className="flex items-center">
+                    {/* IMAGE — FLOW OK SEKARANG */}
                     <div
-                      className={`relative h-[110px] overflow-hidden transition-all duration-300 ease-out w-[160px] mr-6 xl:w-0 xl:mr-0 ${
-                        isActive ? "xl:w-[160px] xl:mr-8" : ""
-                      }`}
+                      className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
+                        w-0 mr-0
+                        ${isActive ? "w-[200px] mr-10" : ""}
+                      `}
                     >
                       <img
                         src={item.image}
                         alt=""
-                        className={`h-full w-full object-cover rounded-md transition-all duration-300 ease-out opacity-100 scale-100 xl:opacity-0 xl:scale-95 ${
-                          isActive ? "xl:opacity-100 xl:scale-100" : ""
-                        }`}
+                        className={`h-[120px] w-full object-cover rounded-md transition-all duration-300
+                          ${
+                            isActive
+                              ? "opacity-100 scale-100"
+                              : "opacity-0 scale-95"
+                          }
+                        `}
                       />
                     </div>
 
+                    {/* TITLE */}
                     <h3
-                      className={`hidden sm:block font-sans font-semibold tracking-tight leading-[1.05] transition-colors duration-150 ${colorState}`}
-                      style={{ fontSize: "clamp(36px, 7vw, 95px)" }}
-                    >
-                      {item.label}
-                    </h3>
-
-                    <h3
-                      className={`block sm:hidden flex flex-col tracking-tight transition-colors duration-150 ${colorState}`}
-                    >
-                      <span className="text-[18px] font-light leading-none opacity-70 mb-1">
-                        {firstLine}
-                      </span>
-                      <span
-                        className="font-semibold leading-[0.95]"
-                        style={{
-                          fontSize: "clamp(34px, 8.5vw, 60px)",
-                        }}
-                      >
-                        {lastWord}
-                      </span>
-                    </h3>
+                    className={`flex flex-col tracking-tight transition-all duration-300 ease-out ${colorState}
+                      xl:translate-x-0
+                      ${isActive ? "xl:translate-x-6" : ""}
+                    `}
+                  >
+                    <span className="text-[18px] lg:text-[26px] font-light opacity-60 mb-1">
+                      {firstLine}
+                    </span>
+                    <span className="font-semibold leading-[0.95] text-[clamp(34px,6vw,96px)]">
+                      {lastWord}
+                    </span>
+                  </h3>
                   </div>
-
-                  <div className="mt-4 sm:mt-6 border-t border-black/10 w-full" />
                 </div>
               );
             })}
+
+            <div className="border-t border-black/10" />
           </div>
         </div>
       </div>
@@ -3267,30 +3154,30 @@ function Description() {
         !dividerRef.current ||
         !statsRef.current ||
         !ctaRef.current
-      ) {
-        return;
-      }
+      ) return;
 
-      // cleanup
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        gsap.set(
-          [
-            titleRef.current,
-            dividerRef.current,
-            ctaRef.current,
-            ...statsRef.current.querySelectorAll("[data-stat]"),
-            ...bodyRef.current.querySelectorAll("[data-animate]"),
-          ],
-          { opacity: 1, clearProps: "transform" }
-        );
+        const allEls = [
+          titleRef.current,
+          dividerRef.current,
+          ctaRef.current,
+          ...statsRef.current.querySelectorAll("[data-stat]"),
+          ...bodyRef.current.querySelectorAll("[data-animate]"),
+        ];
 
-        /* =====================
-           TITLE
-        ===================== */
+        gsap.set(allEls, { opacity: 1, clearProps: "transform" });
+
+        const PARALLAX_ST = {
+          trigger: sectionRef.current,
+          start: "top 90%",
+          end: "bottom 20%",
+          scrub: 0.6,
+        };
+
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3311,9 +3198,12 @@ function Description() {
           },
         });
 
-        /* =====================
-           DIVIDER
-        ===================== */
+        gsap.to(titleRef.current, {
+          y: -60,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -3329,9 +3219,12 @@ function Description() {
           }
         );
 
-        /* =====================
-           BODY PARAGRAPHS
-        ===================== */
+        gsap.to(dividerRef.current, {
+          y: -35,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
         bodyRef.current
           .querySelectorAll("[data-animate]")
           .forEach((p) => {
@@ -3354,12 +3247,17 @@ function Description() {
                 once: true,
               },
             });
+
+            gsap.to(p, {
+              y: -45,
+              ease: "none",
+              scrollTrigger: PARALLAX_ST,
+            });
           });
 
-        /* =====================
-           STATS
-        ===================== */
-        gsap.from(statsRef.current.querySelectorAll("[data-stat]"), {
+        const stats = statsRef.current.querySelectorAll("[data-stat]");
+
+        gsap.from(stats, {
           opacity: 0,
           y: 10,
           duration: 0.6,
@@ -3372,9 +3270,12 @@ function Description() {
           },
         });
 
-        /* =====================
-           CTA
-        ===================== */
+        gsap.to(stats, {
+          y: -25,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
         gsap.from(ctaRef.current, {
           opacity: 0,
           y: 10,
@@ -3386,12 +3287,15 @@ function Description() {
             once: true,
           },
         });
+
+        gsap.to(ctaRef.current, {
+          y: -20,
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
       }, sectionRef);
 
-      // refresh ONLY desktop
-      if (!isTouch) {
-        requestAnimationFrame(() => ScrollTrigger.refresh());
-      }
+      if (!isTouch) requestAnimationFrame(() => ScrollTrigger.refresh());
     };
 
     document.fonts.ready.then(build);
@@ -3416,74 +3320,86 @@ function Description() {
     <section
       ref={sectionRef}
       data-theme="light"
-      className="w-full bg-[#F3F4F5] text-black py-12 lg:py-20"
+      className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
     >
-      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-12">
+      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
         {/* HEADLINE */}
-        <div className="max-w-full mb-12 lg:mb-16">
+        <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-sans font-medium tracking-tight leading-[1.05]"
-            style={{ fontSize: "clamp(32px, 5vw, 134px)" }}
+            className="font-sans font-medium tracking-tight leading-[1.05] text-neutral-900"
+            style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
-            <span className="hidden lg:inline mr-80" />
-            We are a social media agency that helps brands stay consistent
-            online. We keep everything on track so you can stay focused on
-            what <span className="italic">matters</span>
+            We're a digital agency that helps brands stay consistent online. We
+            keep everything on track so you can stay focused on what{" "}
+            <span className="italic">matters</span>.
           </h1>
 
           <div
             ref={dividerRef}
-            className="mt-8 lg:mt-10 h-px w-full bg-neutral-700"
+            className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-300"
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-14 lg:gap-y-20">
+        {/* CONTENT */}
+        <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-y-0 lg:gap-x-20">
           {/* STATS */}
-          <div ref={statsRef} className="lg:col-span-5">
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 text-neutral-500">
-    
-    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-      <BriefcaseIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-      <div>
-        <div className="text-[22px] font-medium text-neutral-800">100+</div>
-        <div className="text-xs uppercase tracking-widest">Projects delivered</div>
-      </div>
-    </div>
+          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <div>
+                  <div className="text-[22px] font-medium text-neutral-900">
+                    100+
+                  </div>
+                  <div className="text-xs uppercase tracking-widest">
+                    Projects delivered
+                  </div>
+                </div>
+              </div>
 
-    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-      <GlobeAltIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-      <div>
-        <div className="text-[22px] font-medium text-neutral-800">3</div>
-        <div className="text-xs uppercase tracking-widest">Countries served</div>
-      </div>
-    </div>
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <div>
+                  <div className="text-[22px] font-medium text-neutral-900">
+                    3
+                  </div>
+                  <div className="text-xs uppercase tracking-widest">
+                    Countries served
+                  </div>
+                </div>
+              </div>
 
-    <div data-stat className="flex items-center sm:items-start gap-4 sm:flex-col">
-      <UsersIcon className="w-6 h-6 text-neutral-700 block sm:hidden" />
-      <div>
-        <div className="text-[22px] font-medium text-neutral-800">2.5m+</div>
-        <div className="text-xs uppercase tracking-widest">Total audience reach</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
+              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
+                <div>
+                  <div className="text-[22px] font-medium text-neutral-900">
+                    2.5m+
+                  </div>
+                  <div className="text-xs uppercase tracking-widest">
+                    Total audience reach
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* BODY + CTA */}
           <div
             ref={bodyRef}
-            className="lg:col-span-7 max-w-full lg:max-w-xl lg:ml-auto text-neutral-800 text-[16px] lg:text-[17px] leading-[1.6]"
+            className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[18px] lg:text-[19px] leading-[1.25]"
           >
             <p data-animate className="mb-8 lg:mb-10">
-              Boson is a digital agency founded in 2021 and based in Bali,
-              working with clients across Qatar, Malaysia, and other regions.
-              Our work combines design, development, and brand operations,
-              giving teams a toolkit that keeps everything consistent.
+              Boson is an agency based in Bali, working with brands across Qatar,
+              Malaysia, and beyond. We build digital experiences that stay sharp
+              and consistent across every touchpoint — combining design,
+              development, and brand operations into one cohesive system. This
+              means fewer revisions, clearer decisions, and content that keeps
+              working even as your brand scales.
             </p>
 
-            <a ref={ctaRef} href="#projects" className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black">
+            <a
+              ref={ctaRef}
+              href="#projects"
+              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black"
+            >
               DISCOVER ALL PROJECTS →
             </a>
           </div>
@@ -3492,6 +3408,7 @@ function Description() {
     </section>
   );
 }
+
 
 
 
@@ -3509,27 +3426,27 @@ function ProjectShowcase() {
   const projects = [
     {
       title: "Sunny\nDevelopment",
-      image: "https://i.imgur.com/Gjuxvj5.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Sunny_Vilage_-_Imgur_czxdgr.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A property development group delivering residential and hospitality projects with a focus on design, lifestyle, and long-term value",
     },
     {
       title: "Novo\nAmpang",
-      image: "https://i.imgur.com/UzRs3rO.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Novo_Ampang_-_Imgur_tcf27u.mp4",
       meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MARKETING"],
       desc:
         "A premium residential development in Kuala Lumpur designed for urban living and investment-driven buyers",
     },
     {
       title: "Shinobi\nSoirée",
-      image: "https://i.imgur.com/WJI4G8F.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812920/SHINOBI_-_Imgur_nn6mcd.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
     },
     {
-      title: "Marrosh\nBali",
+      title: "Marroosh\nBali",
       image: "/clients/marrosh/main.mp4",
       meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
@@ -4025,45 +3942,45 @@ function Footer() {
           <BosonNarrative />
         </div>
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
-        </div>
+        </div> */}
   
         {/* ==================================================
           DESCRIPTION
         ================================================== */}
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <Description />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <VideoSection />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <ServicesHero />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <BigHeading />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <ProjectShowcase />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
-        </div> */}
+        </div>
   
         {/* <BosonScrollText /> */}
   
         {/* ==================================================
           GALERY
         ================================================== */}
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <Galery />
-        </div> */}
+        </div>
   
         {/*
           <MeetBoson />
