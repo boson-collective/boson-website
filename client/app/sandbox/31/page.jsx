@@ -3942,9 +3942,9 @@ function Footer() {
           <BosonNarrative />
         </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
-        </div> */}
+        </div>
   
         {/* ==================================================
           DESCRIPTION
