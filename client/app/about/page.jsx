@@ -115,7 +115,13 @@ function Hero() {
 }
 
 
-function ParallaxImage({ src, alt, priority = false, strength = 28 }) {
+function ParallaxImage({
+  src,
+  alt,
+  priority = false,
+  strength = 28,
+  sizes,
+}) {
   const ref = useRef(null)
 
   const { scrollYProgress } = useScroll({
@@ -123,17 +129,21 @@ function ParallaxImage({ src, alt, priority = false, strength = 28 }) {
     offset: ['start end', 'end start'],
   })
 
-  // satu arah, bukan bolak balik
+  // satu arah, bukan bolak-balik
   const y = useTransform(scrollYProgress, [0, 1], [-strength, strength])
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden">
-      <motion.div style={{ y }} className="absolute inset-0 will-change-transform">
+      <motion.div
+        style={{ y }}
+        className="absolute inset-0 will-change-transform"
+      >
         <Image
           src={src}
           alt={alt}
           fill
           priority={priority}
+          sizes={sizes}
           className="object-cover grayscale contrast-125 brightness-95"
         />
       </motion.div>
@@ -141,6 +151,9 @@ function ParallaxImage({ src, alt, priority = false, strength = 28 }) {
   )
 }
 
+/* ======================================================
+   TEAM SECTION
+====================================================== */
 function Team() {
   const sectionRef = useRef(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -156,35 +169,100 @@ function Team() {
   }, [])
 
   const team = [
-    { name: 'BRAHMA SATYA CARYA', roles: ['ACCOUNT MANAGER'], image: '/team/Brahma.png' },
-    { name: 'PINGKAN', roles: ['PRODUCTION AND CREATIVE DIRECTOR'], image: '/team/Pingkan.png' },
-    { name: 'DEWI ICHSANI', roles: ['HUMAN RELATION AND GENERAL AFFAIRS'], image: '/team/Dewi.png' },
-    { name: 'DIPSY', roles: ['VIDEOGRAPHER'], image: '/team/Dipsy.png' },
-    { name: 'RAHMAT', roles: ['VIDEO EDITOR'], image: '/team/Rahmat.png' },
-    { name: 'LINTANG', roles: ['WEB DEVELOPER'], image: '/team/Lintang.png' },
-    { name: 'BAGAS', roles: ['VIDEOGRAPHER'], image: '/team/Alfian.png' },
-    { name: 'FLAOUDIA', roles: ['SOCIAL MEDIA MANAGER'], image: '/team/Flaudia.png' },
-    { name: 'DIMAS', roles: ['GRAPHIC DESIGNER'], image: '/team/Dimas.png' },
-    { name: 'BAGAS', roles: ['SOCIAL MEDIA MANAGER'], image: '/team/Bagas.png' },
-    { name: 'FAUZI', roles: ['VIDEO EDITOR'], image: '/team/Fauzi.png' },
-    { name: 'EKATERINA BELIAEVA', roles: ['CHIEF EXECUTIVE OFFICER'], image: '/team/Kate.png' },
-    { name: 'MAHMOUD TURKOMANY', roles: ['FOUNDER'], image: '/team/Mahmoud.png' },
+    {
+      name: 'BRAHMA SATYA CARYA',
+      roles: ['ACCOUNT MANAGER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png',
+    },
+    {
+      name: 'PINGKAN',
+      roles: ['PRODUCTION AND CREATIVE DIRECTOR'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png',
+    },
+    {
+      name: 'DEWI ICHSANI',
+      roles: ['HUMAN RELATION AND GENERAL AFFAIRS'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png',
+    },
+    {
+      name: 'DIPSY',
+      roles: ['VIDEOGRAPHER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dipsy.png',
+    },
+    {
+      name: 'RAHMAT',
+      roles: ['VIDEO EDITOR'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896206/Rahmat.png',
+    },
+    {
+      name: 'LINTANG',
+      roles: ['WEB DEVELOPER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896208/Lintang.png',
+    },
+    {
+      name: 'BAGAS',
+      roles: ['VIDEOGRAPHER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896202/Arli.png',
+    },
+    {
+      name: 'FLAOUDIA',
+      roles: ['SOCIAL MEDIA MANAGER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896201/Flaudia.png',
+    },
+    {
+      name: 'DIMAS',
+      roles: ['GRAPHIC DESIGNER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896211/Dimas.png',
+    },
+    {
+      name: 'BAGAS',
+      roles: ['SOCIAL MEDIA MANAGER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896207/Bagas.png',
+    },
+    {
+      name: 'FAUZI',
+      roles: ['VIDEO EDITOR'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Fauzi.png',
+    },
+    {
+      name: 'EKATERINA BELIAEVA',
+      roles: ['CHIEF EXECUTIVE OFFICER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png',
+    },
+    {
+      name: 'MAHMOUD TURKOMANY',
+      roles: ['FOUNDER'],
+      image:
+        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png',
+    },
   ]
 
   const desktopLayout = [
-    { left: '6vw',  top: '10vh',  width: 30 },
-    { left: '58vw', top: '44vh',  width: 26 },
+    { left: '6vw', top: '10vh', width: 30 },
+    { left: '58vw', top: '44vh', width: 26 },
     { left: '10vw', top: '106vh', width: 22 },
     { left: '60vw', top: '126vh', width: 34 },
-    { left: '5vw',  top: '198vh', width: 28 },
+    { left: '5vw', top: '198vh', width: 28 },
     { left: '58vw', top: '232vh', width: 22 },
     { left: '12vw', top: '292vh', width: 34 },
     { left: '54vw', top: '326vh', width: 24 },
-    { left: '6vw',  top: '392vh', width: 30 },
+    { left: '6vw', top: '392vh', width: 30 },
     { left: '62vw', top: '424vh', width: 22 },
     { left: '10vw', top: '482vh', width: 26 },
     { left: '56vw', top: '516vh', width: 32 },
-    { left: '6vw',  top: '582vh', width: 28 },
+    { left: '6vw', top: '582vh', width: 28 },
   ]
 
   /* =========================
@@ -202,6 +280,7 @@ function Team() {
                     src={member.image}
                     alt={member.name}
                     fill
+                    sizes="(max-width: 768px) 82vw"
                     className="object-cover grayscale contrast-125 brightness-95"
                   />
                 </div>
@@ -230,7 +309,7 @@ function Team() {
   }
 
   /* =========================
-     DESKTOP (PARALLAX THAT YOU FEEL)
+     DESKTOP (PARALLAX)
   ========================= */
   return (
     <section
@@ -254,6 +333,7 @@ function Team() {
               alt={member.name}
               priority={index < 2}
               strength={index % 2 === 0 ? 32 : 22}
+              sizes={`${desktopLayout[index].width}vw`}
             />
           </div>
 

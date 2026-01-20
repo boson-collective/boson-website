@@ -22,7 +22,7 @@ import {
 const MAX_TEXTURE_SIZE = 2048;
 const SLIDES = [
   { id: "b", src: "https://cdn.dribbble.com/userupload/42930855/file/still-8aa6db1c445b429535ca5c98332a23b5.png" },
-  { id: "a", src: "/clients/marrosh/mockup.png" },
+  { id: "a", src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png" },
   { id: "c", src: "/clients/tender-touch/mockup.png" },
 ];
 

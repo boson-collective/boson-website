@@ -217,11 +217,11 @@ const WORKS = [
     category: "Logo / System Design",
     location: "Riyadh",
     year: "2024",
-    img: "/clients/marrosh/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898518/marroosh-main.jpg",
     collage: [
-      "/clients/marrosh/2.jpg",
-      "/clients/marrosh/3.jpg",
-      "/clients/marrosh/4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898519/marroosh-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898520/marroosh-3.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898519/marroosh-4.jpg",
     ],
   },
   {
@@ -231,11 +231,11 @@ const WORKS = [
     category: "Brand Identity / Motion / Photography",
     location: "Bali",
     year: "2025",
-    img: "/clients/tender-touch/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899599/tender-touch-main.jpg",
     collage: [
-      "/clients/tender-touch/2.jpg",
-      "/clients/tender-touch/3.jpg",
-      "/clients/tender-touch/4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
     ],
   },
   {
@@ -245,11 +245,11 @@ const WORKS = [
     category: "Campaign / Art Direction",
     location: "Bali",
     year: "2024",
-    img: "/clients/dwm/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-main.jpg",
     collage: [
-      "/clients/dwm/3.jpg",
-      "/clients/dwm/4.jpg",
-      "/clients/dwm/2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-3.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg",
     ],
   },
 ];

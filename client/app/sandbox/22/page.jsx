@@ -27,21 +27,21 @@ const COLUMN_CLASS = {
 //  PROJECT LIST
 // =========================
 const PROJECT = [
-  { src: "/clients/dwm/main.mp4", ratio: "4/5" },
-  { src: "/clients/tender-touch/10.jpg", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768900188/dwm-main.mp4", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899596/tender-touch-10.jpg", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/9455447/file/original-e200109bf9f22ddeb35587d6cf5c1437.mp4", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg?resize=2048x1536&vertical=center", ratio: "4/5" },
-  { src: "/clients/tender-touch/6.jpg", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-6.jpg", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg?resize=2048x1536&vertical=center", ratio: "4/5" },
-  { src: "/clients/tender-touch/5.jpg", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg", ratio: "4/5" },
   { src: "https://img.freepik.com/premium-psd/customized-notepad-mockup_206274-547.jpg?ga=GA1.1.1925110224.1765286355&semt=ais_hybrid&w=740&q=80", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/45827471/file/f180fcb3a2be0f98acf90fd05829cda4.jpg?resize=1504x1128&vertical=center", ratio: "4/5" },
-  { src: "/clients/tender-touch/3.jpg", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/38792503/file/original-9bf97d8735da91ce194ba9bc15733b1f.png?resize=2048x1536&vertical=center", ratio: "4/5" },
-  { src: "/clients/dwm/2.jpg", ratio: "4/5" },
-  { src: "/clients/marrosh/main.mp4", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768898521/marroosh-main.mp4", ratio: "4/5" },
   { src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg?resize=2048x1152&vertical=center", ratio: "4/5" },
-  { src: "/clients/tender-touch/main.mp4", ratio: "4/5" },
+  { src: "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768899602/tender-touch-main.mp4", ratio: "4/5" },
 ];
 
 export default function BosonMasonryV1() {

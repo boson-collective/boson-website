@@ -37,21 +37,21 @@ const SOCIAL_WORKS = [
     id: "marrosh-social",
     client: "Marrosh",
     category: "Social Media System",
-    img: "/clients/marrosh/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898518/marroosh-main.jpg",
     instagram: "https://instagram.com/marrosh", // ganti ke real IG
   },
   {
     id: "tender-touch-social",
     client: "Tender Touch",
     category: "Social Content Ops",
-    img: "/clients/tender-touch/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899599/tender-touch-main.jpg",
     instagram: "https://instagram.com/tendertouch", // ganti
   },
   {
     id: "dwm-social",
     client: "DWM",
     category: "Social Campaign Ops",
-    img: "/clients/dwm/main.jpg",
+    img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-main.jpg",
     instagram: "https://instagram.com/dwm", // ganti
   },
 ];

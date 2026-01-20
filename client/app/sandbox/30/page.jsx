@@ -198,15 +198,15 @@ function Webglbg() {
    ========================================== */ 
    function IntroOverlay() {
     const IMAGES = [
-      "/clients/dwm/4.jpg",
-      "/clients/tender-touch/5.jpg",
-      "/clients/dwm/3.jpg",
-      "/clients/tender-touch/4.jpg",
-      "/clients/dwm/5.jpg",
-      "/clients/tender-touch/3.jpg",
-      "/clients/tender-touch/7.jpg",
-      "/clients/dwm/6.jpg",
-      "/clients/dwm/2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-3.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-7.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-6.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg",
     ];
   
     const [phase, setPhase] = useState("slides");
@@ -774,8 +774,8 @@ function IndustriesPage() {
     {
       title: "Social Media Marketing",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -785,8 +785,8 @@ function IndustriesPage() {
     {
       title: "Branding & Design",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -796,8 +796,8 @@ function IndustriesPage() {
     {
       title: "Photo & Video Production",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -807,8 +807,8 @@ function IndustriesPage() {
     {
       title: "Website & Commerce",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -818,8 +818,8 @@ function IndustriesPage() {
     {
       title: "E-Commerce & Retail",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -829,8 +829,8 @@ function IndustriesPage() {
     {
       title: "Fashion & Beauty",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -840,8 +840,8 @@ function IndustriesPage() {
     {
       title: "Drone & Aerial Media",
       logos: [
-        "/clients/dwm/logo.png",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "/clients/novo-ampang/logo.png",
         "/clients/sdg/logo.png",
         "/clients/sunny-village/logo.png",
@@ -1355,7 +1355,7 @@ function Projects() {
     "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
     "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
     "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-    "/clients/tender-touch/6.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-6.jpg",
   ];
 
   /* =========================
@@ -1567,7 +1567,7 @@ function Galery() {
       col: 1,
       speed: -160,
       items: [
-        { src: "/clients/tender-touch/10.jpg", top: "220vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899596/tender-touch-10.jpg", top: "220vh" },
         {
           src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg",
           top: "380vh",
@@ -1592,8 +1592,8 @@ function Galery() {
       col: 3,
       speed: -140,
       items: [
-        { src: "/clients/tender-touch/5.jpg", top: "160vh" },
-        { src: "/clients/dwm/2.jpg", top: "280vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg", top: "160vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg", top: "280vh" },
         {
           src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg",
           top: "420vh",
@@ -2195,8 +2195,8 @@ function WorksList() {
         "/clients/novo-ampang/logo.png",
         "/clients/hey-yolo/main.jpg",
         "/clients/hey-yolo/logo.png",
-        "/clients/dwm/5.jpg",
-        "/clients/dwm/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
       ],
     },
     {
@@ -2204,8 +2204,8 @@ function WorksList() {
       name: "Hospitality",
       year: "2025",
       images: [
-        "/clients/tender-touch/4.jpg",
-        "/clients/tender-touch/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768899596/tender-touch-logo.png",
       ],
     },
     {
@@ -2214,7 +2214,7 @@ function WorksList() {
       year: "2025",
       images: [
         "https://i.imgur.com/GnY6iYR.jpeg",
-        "/clients/marrosh/logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
         "https://i.imgur.com/F4vcyc5.jpeg",
         "/clients/zai-cafe/logo.png",
       ],
@@ -3533,14 +3533,14 @@ function ProjectShowcase() {
     },
     {
       title: "Marrosh\nBali",
-      image: "/clients/marrosh/main.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768898521/marroosh-main.mp4",
       meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A Lebanese restaurant in Canggu offering authentic Middle Eastern cuisine in a warm, casual dining setting.",
     },
     {
       title: "Tender\nTouch",
-      image: "/clients/tender-touch/main.mp4",
+      image: "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768899602/tender-touch-main.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A wellness and massage brand in Bali offering premium treatments focused on recovery, relaxation, and holistic care",

@@ -147,15 +147,15 @@ return (
    ========================================== */ 
 function IntroOverlay() {
 const IMAGES = [
-  "/clients/tender-touch/5.jpg",
-  "/clients/tender-touch/3.jpg",
-  "/clients/tender-touch/4.jpg",
-  "/clients/tender-touch/5.jpg",
-  "/clients/tender-touch/3.jpg",
-  "/clients/tender-touch/4.jpg",
-  "/clients/tender-touch/5.jpg",
-  "/clients/tender-touch/3.jpg",
-  "/clients/tender-touch/4.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
 ];
 const [phase, setPhase] = useState("slides");
 const [visible, setVisible] = useState(Array(IMAGES.length).fill("start"));
@@ -526,34 +526,34 @@ function Projects() {
   // ============================
   // original 4 + 5 extra (looping through the same assets as example)
   const images = [
-    "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 0
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 1
     "/clients/tender-touch/mockup.png", // 2
     "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 4 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 5
     "/clients/tender-touch/mockup.png", // 6
     "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 8 (extra)
     "/clients/tender-touch/mockup.png", // 6
     "/clients/hidden-city-ubud/mockup.png", // 7
-    "/clients/marrosh/mockup.png", // 8 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 8 (extra)
     "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 4 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 5
     "/clients/tender-touch/mockup.png", // 6
-    "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 0
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 1
     "/clients/tender-touch/mockup.png", // 2
     "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
-    "/clients/marrosh/mockup.png", // 0
-    "/clients/dwm/mockup.png", // 1
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 4 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 5
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 0
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 1
     "/clients/tender-touch/mockup.png", // 2
     "/clients/hidden-city-ubud/mockup.png", // 3
-    "/clients/marrosh/mockup.png", // 4 (extra)
-    "/clients/dwm/mockup.png", // 5
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898521/marroosh-mockup.png", // 4 (extra)
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900190/dwm-mockup.png", // 5
   ];
 
   // ============================
@@ -1007,8 +1007,8 @@ function WorksList() {
       industry: "Fitness",
       name: "Tender Touch",
       year: "© 2025",
-      image1: "/clients/tender-touch/2.jpg",
-      image2: "/clients/tender-touch/main.jpg",
+      image1: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-2.jpg",
+      image2: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899599/tender-touch-main.jpg",
     },
     {
       industry: "Real Estate",
@@ -1021,15 +1021,15 @@ function WorksList() {
       industry: "Real Estate",
       name: "DWM",
       year: "© 2025",
-      image1: "/clients/dwm/5.jpg",
-      image2: "/clients/dwm/logo.png",
+      image1: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
+      image2: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
     },
     {
       industry: "Food & Beverage",
       name: "Marrosh",
       year: "© 2025",
-      image1: "/clients/marrosh/9.jpg",
-      image2: "/clients/marrosh/logo.png",
+      image1: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768898520/marroosh-9.jpg",
+      image2: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
     },
     {
       industry: "Real Estate",

@@ -7,30 +7,31 @@ export default function Team() {
   const team = [
     {
       name: 'MAHMOUD TURKOMANY',
-      roles: ['FOUNDER','CREATIVE DIRECTOR'],
-      image: '/team/Mahmoud.jpg',
+      roles: ['FOUNDER', 'CREATIVE DIRECTOR'],
+      image: 'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png',
     },
     {
-      name: 'EKATER/NA BELIAEVA',
+      name: 'EKATERINA BELIAEVA',
       roles: ['CEO', 'STRATEGIC PLANNING DIRECTOR'],
-      image: '/team/Kate.jpg',
-    }, 
+      image: 'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png',
+    },
     {
       name: 'BRAHMA SATYA CARYA',
       roles: ['ACCOUNT MANAGER'],
-      image: '/team/Brahma.jpg',
+      image: 'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png',
     },
     {
-      name: 'P/NGKAN',
+      name: 'PINGKAN',
       roles: ['CREATIVE DIRECTOR', 'GRAPHIC DESIGNER'],
-      image: '/team/Pingkan.jpg',
+      image: 'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png',
     },
     {
-      name: 'DEW/',
+      name: 'DEWI ICHSANI',
       roles: ['HUMAN RESOURCES AND GENERAL AFFAIRS'],
-      image: '/team/Dewi.jpg',
+      image: 'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png',
     },
   ]
+  
 
   return (
     <section className="w-full min-h-screen bg-white text-black px-20 py-24 flex flex-col lg:flex-row gap-16">

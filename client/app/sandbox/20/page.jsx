@@ -43,42 +43,87 @@ export default function TeamFieldDelta() {
       name: "MAHMOUD TURKOMANY",
       role: "Founder",
       tag: "System",
-      img: "/team/Mahmoud.png",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png",
     },
     {
       name: "EKATERINA BELIAEVA",
       role: "CHIEF EXECUTIVE OFFICER",
       tag: "Form",
-      img: "/team/Kate.png",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png",
     },
     {
       name: "BRAHMA SATYA CARYA",
       role: "ACCOUNT MANAGER",
       tag: "Identity",
-      img: "/team/Brahma.png",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png",
     },
     {
       name: "PINGKAN",
       role: "PRODUCTION AND CREATIVE DIRECTOR",
       tag: "Experience",
-      img: "/team/Pingkan.png",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png",
     },
   ];
+  
 
   /* ====================== EXTENDED TEAM (9 people) ====================== */
   const EXTENDED = [
-    { name: "DEWI ICHSANI", role: "HUMAN RELATION AND GENERAL AFFAIRS", tag: "Content", img: "/team/Dewi.png" },
-    { name: "DIPSY", role: "VIDEOGRAPHER", tag: "Video", img: "/team/Dipsy.png" },
-    { name: "RAHMAT", role: "VIDEO EDITOR", tag: "Edit", img: "/team/Rahmat.png" },
-
-    { name: "LINTANG", role: "WEB DEVELOPER", tag: "Web", img: "/team/Lintang.png" },
-    { name: "BAGAS", role: "VIDEOGRAPHER", tag: "Video", img: "/team/Alfian.png" },
-    { name: "FLAOUDIA", role: "SOCIAL MEDIA MANAGER", tag: "Social", img: "/team/Flaudia.png" },
-
-    { name: "DIMAS", role: "GRAPHIC DESIGNER", tag: "Design", img: "/team/Dimas.png" },
-    { name: "BAGAS", role: "SOCIAL MEDIA MANAGER", tag: "Ops", img: "/team/Bagas.png" },
-    { name: "FAUZI", role: "VIDEO EDITOR", tag: "Edit", img: "/team/Fauzi.png" },
+    {
+      name: "DEWI ICHSANI",
+      role: "HUMAN RELATION AND GENERAL AFFAIRS",
+      tag: "Content",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png",
+    },
+    {
+      name: "DIPSY",
+      role: "VIDEOGRAPHER",
+      tag: "Video",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dipsy.png",
+    },
+    {
+      name: "RAHMAT",
+      role: "VIDEO EDITOR",
+      tag: "Edit",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896206/Rahmat.png",
+    },
+    {
+      name: "LINTANG",
+      role: "WEB DEVELOPER",
+      tag: "Web",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896208/Lintang.png",
+    },
+    {
+      name: "BAGAS",
+      role: "VIDEOGRAPHER",
+      tag: "Video",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896202/Arli.png",
+    },
+    {
+      name: "FLAOUDIA",
+      role: "SOCIAL MEDIA MANAGER",
+      tag: "Social",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896201/Flaudia.png",
+    },
+    {
+      name: "DIMAS",
+      role: "GRAPHIC DESIGNER",
+      tag: "Design",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896211/Dimas.png",
+    },
+    {
+      name: "BAGAS",
+      role: "SOCIAL MEDIA MANAGER",
+      tag: "Ops",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896207/Bagas.png",
+    },
+    {
+      name: "FAUZI",
+      role: "VIDEO EDITOR",
+      tag: "Edit",
+      img: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Fauzi.png",
+    },
   ];
+  
 
   const [echo, setEcho] = useState("");
   const [sentEchoes, setSentEchoes] = useState([]);
