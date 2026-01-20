@@ -201,16 +201,32 @@ function Webglbg() {
    ========================================== */ 
    function IntroOverlay() {
     const IMAGES = [
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-3.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914152/novo-ampang-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-7.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-6.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915060/2.jpg", 
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899598/tender-touch-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914629/marroosh-12.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915333/hidden-city-ubud-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915808/hidden-city-ubud-3.jpg",
+      
+      
+      
+      
     ];
+    
+    // const IMAGES = [
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-3.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-7.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-6.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg",
+    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
+    // ];
   
     const [phase, setPhase] = useState("slides");
     const [visible, setVisible] = useState(
