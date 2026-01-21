@@ -202,35 +202,35 @@ function Webglbg() {
    function IntroOverlay() {
     const IMAGES = [
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914152/novo-ampang-2.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
-      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915060/2.jpg", 
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900186/dwm-5.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-4.jpg",
+      "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915060/2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899598/tender-touch-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914629/marroosh-12.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915333/hidden-city-ubud-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915808/hidden-city-ubud-3.jpg",
-      
-      
-      
-      
     ];
-    
-    // const IMAGES = [
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900188/dwm-4.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-3.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899598/tender-touch-3.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-7.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-6.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg",
-    //   "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg",
-    // ];
+   
+    // =========================
+    // CLOUDINARY AUTO TRANSFORM
+    // =========================
+    const OPTIMIZED_IMAGES = useMemo(() => {
+      return IMAGES.map((src) => {
+        if (!src.includes("/image/upload/")) return src;
+        if (/\/upload\/.*(w_|f_|q_)/.test(src)) return src;
+
+        return src.replace(
+          "/image/upload/",
+          "/image/upload/w_1100,c_limit,f_auto,q_auto/"
+        );
+      });
+    }, []);
+
   
     const [phase, setPhase] = useState("slides");
     const [visible, setVisible] = useState(
-      Array(IMAGES.length).fill("start")
+      Array(OPTIMIZED_IMAGES.length).fill("start")
     );
     const [topIndex, setTopIndex] = useState(0);
   
@@ -240,17 +240,15 @@ function Webglbg() {
     const [isMobile, setIsMobile] = useState(false);
   
     useEffect(() => {
-      const check = () => {
-        setIsMobile(window.innerWidth < 768);
-      };
+      const check = () => setIsMobile(window.innerWidth < 768);
       check();
       window.addEventListener("resize", check);
       return () => window.removeEventListener("resize", check);
     }, []);
   
     const scaleExpand = isMobile
-      ? { scaleX: 6, scaleY: 6 } // 📱 portrait
-      : { scaleX: 16, scaleY: 4 }; // 🖥 landscape
+      ? { scaleX: 6, scaleY: 6 }
+      : { scaleX: 16, scaleY: 4 };
   
     const getDuration = (i) => (i === 0 ? 650 : 250);
     const overlapOffset = 150;
@@ -258,7 +256,7 @@ function Webglbg() {
     useEffect(() => {
       let timeCursor = 0;
   
-      IMAGES.forEach((_, i) => {
+      OPTIMIZED_IMAGES.forEach((_, i) => {
         const duration = getDuration(i);
         const openTime = timeCursor;
         const softTime = i === 0 ? openTime + duration * 0.35 : openTime;
@@ -293,7 +291,7 @@ function Webglbg() {
         }, closeTime);
   
         setTimeout(() => {
-          if (i < IMAGES.length - 1) {
+          if (i < OPTIMIZED_IMAGES.length - 1) {
             setTopIndex(i + 1);
           }
         }, (i === 0 ? softTime : openTime) + overlapOffset);
@@ -312,16 +310,12 @@ function Webglbg() {
     return (
       <motion.div
         className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
-        animate={
-          phase === "expand"
-            ? scaleExpand
-            : { scaleX: 1, scaleY: 1 }
-        }
+        animate={phase === "expand" ? scaleExpand : { scaleX: 1, scaleY: 1 }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
       >
         <div className="relative" style={{ width: 260, height: 400 }}>
           <div className="absolute inset-0">
-            {IMAGES.map((src, i) => (
+            {OPTIMIZED_IMAGES.map((src, i) => (
               <img
                 key={i}
                 src={src}
@@ -348,7 +342,6 @@ function Webglbg() {
             ))}
           </div>
   
-          {/* HOLE */}
           <div className="absolute inset-0 spotlight pointer-events-none" />
         </div>
   
@@ -375,7 +368,7 @@ function Webglbg() {
   
   
   
-  function HeroJoin() {
+function HeroJoin() {
     const { scrollY } = useScroll();
     const titleY = useTransform(scrollY, [0, 800], [0, -80]);
   
@@ -441,7 +434,7 @@ function Webglbg() {
         `}</style>
       </div>
     );
-  }
+}
  
 
   function BosonNarrative() {
@@ -1364,21 +1357,20 @@ function Projects() {
      IMAGES
   ================================================== */
   const images = [
-    "https://i.pinimg.com/736x/c3/b1/11/c3b11179de6c74c444bd740118c1ae7d.jpg",
-    "https://i.pinimg.com/736x/6b/ce/00/6bce000cde7125363ff049f632983d0f.jpg",
-    "https://i.pinimg.com/736x/58/e5/ce/58e5ce7dd757fc4e95c01a9d7ee3d909.jpg",
-    "https://i.pinimg.com/736x/51/41/5f/51415fd5923fee1d9b0fc00b643c79c4.jpg",
-    "https://i.pinimg.com/736x/eb/72/5d/eb725db13fc17d3b39c38d3436d09c69.jpg",
-    "https://i.pinimg.com/1200x/69/f8/a5/69f8a548c9690f44b47d162dbfca1bf6.jpg",
-    "https://i.pinimg.com/736x/12/9f/ae/129fae7341a77e1b3d7f5d8c7d7e8bab.jpg",
-    "https://i.pinimg.com/736x/9e/a4/74/9ea474a7be64551feff14e34a6be5d4e.jpg",
-    "https://i.pinimg.com/736x/a2/26/b8/a226b8c51836c051a70e347f8954d4a0.jpg",
-    "https://i.pinimg.com/736x/ab/dc/6f/abdc6f50c425f07b45e2fc30b40e17e9.jpg",
-    "https://i.pinimg.com/736x/e9/f3/39/e9f3398872917363f0960cb8aa74af9c.jpg",
-    "https://i.pinimg.com/736x/13/7e/d3/137ed3f1af70ef163c5f69da71f47336.jpg",
-    "https://i.pinimg.com/736x/7f/23/a2/7f23a222c82d121fbcad3d43ccfb416a.jpg",
-    "https://i.pinimg.com/1200x/20/d4/a8/20d4a80fd78e7fa8ce05699860694b32.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-6.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-4.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-5.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-10.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-7.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-6.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-8.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969071/little-soho-9.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-11.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969069/little-soho-12.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-13.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-14.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-16.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-15.jpg"
   ];
 
   /* ==================================================
@@ -1583,9 +1575,9 @@ function Galery() {
       col: 1,
       speed: -160,
       items: [
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899596/tender-touch-10.jpg", top: "220vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972563/sunny-family-logo-bg.jpg", top: "220vh" },
         {
-          src: "https://i.pinimg.com/736x/b9/38/fc/b938fc84ffb5b038922947577be7ea29.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972964/little-brew-logo-bg.jpg",
           top: "380vh",
         },
       ],
@@ -1595,11 +1587,11 @@ function Galery() {
       speed: 120,
       items: [
         {
-          src: "https://cdn.dribbble.com/userupload/13311994/file/original-1b3e2a914e7aacef47d981ec6622517c.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980001/sunny-family-2.jpg",
           top: "80vh",
         },
         {
-          src: "https://i.pinimg.com/736x/2f/ed/d1/2fedd195865fd1ba2476e88710a57ee1.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980263/hey-yolo-logo-bg.jpg",
           top: "300vh",
         },
       ],
@@ -1608,10 +1600,10 @@ function Galery() {
       col: 3,
       speed: -140,
       items: [
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-5.jpg", top: "160vh" },
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900187/dwm-2.jpg", top: "280vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg", top: "160vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768898519/marroosh-4.jpg", top: "280vh" },
         {
-          src: "https://i.pinimg.com/736x/bf/60/fc/bf60fc2805a33c05b5c567e7cbd5dc1e.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768973018/newminatis-logo-bg.jpg",
           top: "420vh",
         },
       ],
@@ -1621,11 +1613,11 @@ function Galery() {
       speed: 100,
       items: [
         {
-          src: "https://cdn.dribbble.com/userupload/46029274/file/35dc49f9cb7ffa2053cc997a2af8c02e.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899597/tender-touch-7.jpg",
           top: "120vh",
         },
         {
-          src: "https://i.pinimg.com/736x/15/2a/f8/152af8b5b5482d248fdded7c9229b656.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768981020/hidden-city-ubud-logo-bg.jpg",
           top: "340vh",
         },
       ],
@@ -1635,11 +1627,11 @@ function Galery() {
       speed: -160,
       items: [
         {
-          src: "https://cdn.dribbble.com/userupload/45119801/file/aee8f3c47fe2aec531b71ba1e1de78ff.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-main.jpg",
           top: "250vh",
         },
         {
-          src: "https://i.pinimg.com/736x/de/98/e6/de98e6115337ff017e582de7e8526a7a.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768970811/logo.jpg",
           top: "430vh",
         },
       ],
@@ -3140,13 +3132,7 @@ function Header() {
   );
 }
 
-
-
-
-
-
-
-
+ 
 function Description() {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
@@ -3425,12 +3411,7 @@ function Description() {
   );
 }
 
-
-
-
-
-
-
+ 
 
 function ProjectShowcase() {
   const sectionRef = useRef(null);
