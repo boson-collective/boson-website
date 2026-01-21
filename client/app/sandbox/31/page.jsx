@@ -1836,7 +1836,7 @@ function Galery() {
 
           <h1
             ref={headlineRef}
-            className="font-light leading-[1.08] text-[clamp(44px,6.2vw,76px)]"
+            className="font-bold leading-[1.08] text-[clamp(44px,6.2vw,76px)]"
           >
             Time to
             <br />
@@ -2184,7 +2184,7 @@ function WorksList() {
     },
     {
       industry: "Branding",
-      name: "E-Commerce",
+      name: "Fashion & Beauty",
       year: "2025",
       images: [
         "/clients/hidden-city-ubud/logo.png",

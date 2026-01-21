@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  --tw-font-sans: 'SF Pro Display', ui-sans-serif, system-ui, -apple-system,
+  --tw-font-sans: 'Bricolage Grotesque', ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
     sans-serif; 
   /* --background: #ffffff; */
