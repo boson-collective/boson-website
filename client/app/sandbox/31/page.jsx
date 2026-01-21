@@ -64,7 +64,7 @@ function Webglbg() {
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 500], [0, 80]);
   
-    const BOSON_DELAY = 2.8;
+    const BOSON_DELAY = 3.1;
     const TEXT_DELAY = BOSON_DELAY + 1.5;
   
     // BASE COORDINATES
@@ -211,7 +211,7 @@ function Webglbg() {
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915808/hidden-city-ubud-3.jpg",
     ];
-   
+  
     // =========================
     // CLOUDINARY AUTO TRANSFORM
     // =========================
@@ -219,20 +219,30 @@ function Webglbg() {
       return IMAGES.map((src) => {
         if (!src.includes("/image/upload/")) return src;
         if (/\/upload\/.*(w_|f_|q_)/.test(src)) return src;
-
+  
         return src.replace(
           "/image/upload/",
-          "/image/upload/w_1100,c_limit,f_auto,q_auto/"
+          "/image/upload/w_1400,c_limit,f_auto,q_auto/"
         );
       });
     }, []);
-
   
     const [phase, setPhase] = useState("slides");
     const [visible, setVisible] = useState(
       Array(OPTIMIZED_IMAGES.length).fill("start")
     );
-    const [topIndex, setTopIndex] = useState(0);
+  
+    // =========================
+    // DERIVED TOP INDEX (KEY FIX)
+    // =========================
+    const topIndex = useMemo(() => {
+      for (let i = visible.length - 1; i >= 0; i--) {
+        if (visible[i] === "open" || visible[i] === "soft") {
+          return i;
+        }
+      }
+      return 0;
+    }, [visible]);
   
     // =========================
     // RESPONSIVE SCALE CONTROL
@@ -247,12 +257,15 @@ function Webglbg() {
     }, []);
   
     const scaleExpand = isMobile
-      ? { scaleX: 6, scaleY: 6 }
-      : { scaleX: 16, scaleY: 4 };
+      ? { scaleX: 5, scaleY: 5 }
+      : { scaleX: 14, scaleY: 4.5 };
   
     const getDuration = (i) => (i === 0 ? 650 : 250);
     const overlapOffset = 150;
   
+    // =========================
+    // ORIGINAL TIMELINE (UNCHANGED)
+    // =========================
     useEffect(() => {
       let timeCursor = 0;
   
@@ -269,7 +282,6 @@ function Webglbg() {
               arr[i] = "soft";
               return arr;
             });
-            setTopIndex(i);
           }, openTime);
         }
   
@@ -279,7 +291,6 @@ function Webglbg() {
             arr[i] = "open";
             return arr;
           });
-          setTopIndex(i);
         }, softTime);
   
         setTimeout(() => {
@@ -290,12 +301,7 @@ function Webglbg() {
           });
         }, closeTime);
   
-        setTimeout(() => {
-          if (i < OPTIMIZED_IMAGES.length - 1) {
-            setTopIndex(i + 1);
-          }
-        }, (i === 0 ? softTime : openTime) + overlapOffset);
-  
+        // ⛔ timeCursor tetap ASLI (visual tidak diubah)
         timeCursor += duration;
       });
   
@@ -313,35 +319,36 @@ function Webglbg() {
         animate={phase === "expand" ? scaleExpand : { scaleX: 1, scaleY: 1 }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
       >
-        <div className="relative" style={{ width: 260, height: 400 }}>
+        <div className="relative" style={{ width: 320, height: 480 }}>
           <div className="absolute inset-0">
             {OPTIMIZED_IMAGES.map((src, i) => (
               <img
                 key={i}
                 src={src}
                 draggable="false"
-                className={`absolute w-full h-full object-cover transition-all ${
-                  i === 0 ? "duration-[650ms]" : "duration-[250ms]"
-                } ${
-                  visible[i] === "soft"
-                    ? "reveal-soft"
-                    : visible[i] === "open"
-                    ? "reveal"
-                    : visible[i] === "close"
-                    ? "reveal-end"
-                    : "reveal-start"
-                }`}
+                className="absolute w-full h-full object-cover"
                 style={{
                   zIndex: i === topIndex ? 1000 : i,
+                  transitionProperty: "clip-path",
+                  transitionDuration: i === 0 ? "650ms" : "250ms",
                   transitionTimingFunction:
                     i === 0
                       ? "cubic-bezier(0.3, 0, 0.2, 1)"
                       : "ease-in-out",
+                  clipPath:
+                    visible[i] === "soft"
+                      ? "inset(92% 0% 0% 0%)"
+                      : visible[i] === "open"
+                      ? "inset(0% 0% 0% 0%)"
+                      : visible[i] === "close"
+                      ? "inset(0% 0% 100% 0%)"
+                      : "inset(100% 0% 0% 0%)",
                 }}
               />
             ))}
           </div>
   
+          {/* HOLE / SPOTLIGHT — UNCHANGED */}
           <div className="absolute inset-0 spotlight pointer-events-none" />
         </div>
   
@@ -349,22 +356,11 @@ function Webglbg() {
           .spotlight {
             box-shadow: 0 0 0 9999px white;
           }
-          .reveal-start {
-            clip-path: inset(100% 0% 0% 0%);
-          }
-          .reveal-soft {
-            clip-path: inset(92% 0% 0% 0%);
-          }
-          .reveal {
-            clip-path: inset(0% 0% 0% 0%);
-          }
-          .reveal-end {
-            clip-path: inset(0% 0% 100% 0%);
-          }
         `}</style>
       </motion.div>
     );
   }
+    
   
   
   
@@ -408,19 +404,14 @@ function HeroJoin() {
               select-none pointer-events-none
             "
           >
-            <motion.img
-              src="/png/boson-white.png"
-              alt="Boson Collective"
-              draggable="false"
-              initial={{ width: 200 }}
-              animate={{ width: 250 }}
-              transition={{
-                delay: 3.2,
-                duration: 3.8,
-                ease: [0.12, 0, 0.24, 1],
-              }}
-              className="object-contain"
-            />
+           <motion.img
+            src="/png/boson-white.png"
+            alt="Boson Collective"
+            draggable="false"
+            className="object-contain"
+            style={{ width: 250 }}
+          />
+
           </motion.div>
   
           {/* INTRO OVERLAY */}
@@ -437,7 +428,7 @@ function HeroJoin() {
 }
  
 
-  function BosonNarrative() {
+function BosonNarrative() {
     const wrap = useRef(null);
   
     const [pos, setPos] = useState({ x: -9999, y: -9999 });
@@ -591,7 +582,7 @@ function HeroJoin() {
         </div>
       </div>
     );
-  }
+}
 
 
 function IndustryItem({ title, logos }) {
@@ -1568,255 +1559,202 @@ function Projects() {
 
 
 function Galery() {
-  const GRID_COLUMNS = 5;
+  const FRAME_GAP = 10;
 
+  /* =========================
+     GRID LOGIC (mobile = 3, else = 5)
+  ========================= */
+  const getGridColumns = () => (window.innerWidth < 640 ? 3 : 5);
+  const [gridCols, setGridCols] = useState(getGridColumns());
+
+  useEffect(() => {
+    const onResize = () => setGridCols(getGridColumns());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  /* =========================
+     DATA
+  ========================= */
   const LANES = [
-    {
-      col: 1,
-      speed: -160,
-      items: [
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972563/sunny-family-logo-bg.jpg", top: "220vh" },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972964/little-brew-logo-bg.jpg",
-          top: "380vh",
-        },
-      ],
-    },
-    {
-      col: 2,
-      speed: 120,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980001/sunny-family-2.jpg",
-          top: "80vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980263/hey-yolo-logo-bg.jpg",
-          top: "300vh",
-        },
-      ],
-    },
-    {
-      col: 3,
-      speed: -140,
-      items: [
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg", top: "160vh" },
-        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768898519/marroosh-4.jpg", top: "280vh" },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768973018/newminatis-logo-bg.jpg",
-          top: "420vh",
-        },
-      ],
-    },
-    {
-      col: 4,
-      speed: 100,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899597/tender-touch-7.jpg",
-          top: "120vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768981020/hidden-city-ubud-logo-bg.jpg",
-          top: "340vh",
-        },
-      ],
-    },
-    {
-      col: 5,
-      speed: -160,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-main.jpg",
-          top: "250vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768970811/logo.jpg",
-          top: "430vh",
-        },
-      ],
-    },
+    { col: 1, speed: -160, items: [
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972563/sunny-family-logo-bg.jpg", top: "220vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972964/little-brew-logo-bg.jpg", top: "380vh" },
+    ]},
+    { col: 2, speed: 120, items: [
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980001/sunny-family-2.jpg", top: "80vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980263/hey-yolo-logo-bg.jpg", top: "300vh" },
+    ]},
+    { col: 3, speed: -140, items: [
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg", top: "160vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768898519/marroosh-4.jpg", top: "280vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768973018/newminatis-logo-bg.jpg", top: "420vh" },
+    ]},
+    { col: 4, speed: 100, items: [
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899597/tender-touch-7.jpg", top: "120vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768981020/hidden-city-ubud-logo-bg.jpg", top: "340vh" },
+    ]},
+    { col: 5, speed: -160, items: [
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-main.jpg", top: "250vh" },
+      { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768970811/logo.jpg", top: "430vh" },
+    ]},
   ];
 
+  /* =========================
+     REFS
+  ========================= */
   const sectionRef = useRef(null);
   const textPinRef = useRef(null);
   const headlineRef = useRef(null);
   const getStartedRef = useRef(null);
   const fadeTopRef = useRef(null);
   const fadeBottomRef = useRef(null);
+  const gridRef = useRef(null);
+  const laneRefs = useRef([]);
 
   const headlinePlayedRef = useRef(false);
+  let headlineSplit;
+  let getStartedSplit;
 
   /* =========================
-     BASE STATE
+     GSAP
   ========================= */
   useEffect(() => {
-    gsap.set(sectionRef.current, {
-      backgroundColor: "#000",
-      color: "#fff",
-      borderBottomLeftRadius: "7vw",
-      borderBottomRightRadius: "7vw",
-    });
+    const ctx = gsap.context(() => {
+      gsap.set(laneRefs.current, { force3D: true });
 
-    gsap.set(".grid-line", {
-      borderColor: "rgba(255,255,255,0.2)",
-    });
-
-    gsap.set([headlineRef.current, getStartedRef.current], {
-      opacity: 0,
-    });
-  }, []);
-
-  /* =========================
-     BORDER RADIUS
-  ========================= */
-  useEffect(() => {
-    const tween = gsap.to(sectionRef.current, {
-      borderBottomLeftRadius: "0vw",
-      borderBottomRightRadius: "0vw",
-      ease: "none",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "bottom bottom",
-        end: "top+=35% top",
-        scrub: 2,
-      },
-    });
-
-    return () => tween.scrollTrigger?.kill();
-  }, []);
-
-  /* =========================
-     PARALLAX LANES
-  ========================= */
-  useEffect(() => {
-    const triggers = [];
-
-    gsap.utils.toArray(".lane").forEach((lane, i) => {
-      const t = gsap.fromTo(
-        lane,
-        { y: LANES[i].speed * -0.35 },
-        {
-          y: LANES[i].speed,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1.6,
-          },
-        }
-      );
-
-      triggers.push(t.scrollTrigger);
-    });
-
-    return () => triggers.forEach((t) => t?.kill());
-  }, []);
-
-  /* =========================
-     PIN + TEXT (HALUS UNPIN)
-  ========================= */
-  useEffect(() => {
-    const trigger = ScrollTrigger.create({
-      trigger: sectionRef.current,
-      start: "top top",
-      end: "70% top", // PIN dilepas lebih cepat
-      pin: textPinRef.current,
-      pinSpacing: true, // ⬅️ KUNCI KEHALUSAN
-      onEnter: playText,
-    });
-
-    return () => trigger.kill();
-  }, []);
-
-  const playText = () => {
-    if (headlinePlayedRef.current) return;
-    headlinePlayedRef.current = true;
-
-    document.fonts.ready.then(() => {
-      gsap.set([headlineRef.current, getStartedRef.current], {
-        opacity: 1,
+      gsap.set(sectionRef.current, {
+        backgroundColor: "#000",
+        color: "#fff",
+        borderBottomLeftRadius: "7vw",
+        borderBottomRightRadius: "7vw",
       });
 
-      const headlineSplit = SplitText.create(headlineRef.current, {
-        type: "lines",
-        mask: "lines",
+      gsap.set(gridRef.current.querySelectorAll(".grid-line"), {
+        borderColor: "rgba(255,255,255,0.2)",
       });
 
-      const getStartedSplit = SplitText.create(getStartedRef.current, {
-        type: "words",
-      });
+      gsap.set([headlineRef.current, getStartedRef.current], { opacity: 0 });
 
-      const tl = gsap.timeline();
-
-      tl.from(getStartedSplit.words, {
-        y: 12,
-        opacity: 0,
-        duration: 0.6,
-        stagger: 0.06,
-        ease: "power2.out",
-      }).from(
-        headlineSplit.lines,
-        {
-          yPercent: 40,
-          opacity: 0,
-          duration: 1.2,
-          stagger: 0.12,
-          ease: "power2.out",
+      gsap.to(sectionRef.current, {
+        borderBottomLeftRadius: "0vw",
+        borderBottomRightRadius: "0vw",
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "bottom bottom",
+          end: "top+=35% top",
+          scrub: 2,
         },
-        "-=0.2"
-      );
-    });
-  };
+      });
 
-  /* =========================
-     DARK → LIGHT
-  ========================= */
-  useEffect(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
+      laneRefs.current.forEach((lane, i) => {
+        if (!lane) return;
+        gsap.fromTo(
+          lane,
+          { y: LANES[i].speed * -0.35 },
+          {
+            y: LANES[i].speed,
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.8,
+            },
+          }
+        );
+      });
+
+      /* ===== HEADLINE: ONCE ONLY ===== */
+      ScrollTrigger.create({
         trigger: sectionRef.current,
-        start: "55% bottom",
-        end: "85% bottom",
-        scrub: true,
-      },
-    });
+        start: "top top",
+        end: "70% top",
+        pin: textPinRef.current,
+        pinSpacing: true,
+        once: true, // 🔒 kunci 1x saja
+        onEnter: () => {
+          if (headlinePlayedRef.current) return;
+          headlinePlayedRef.current = true;
 
-    tl.fromTo(
-      sectionRef.current,
-      { backgroundColor: "#000", color: "#fff" },
-      { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
-    )
-      .fromTo(
-        ".grid-line",
-        { borderColor: "rgba(255,255,255,0.2)" },
-        { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
-        0
+          document.fonts.ready.then(() => {
+            gsap.set([headlineRef.current, getStartedRef.current], { opacity: 1 });
+
+            headlineSplit = SplitText.create(headlineRef.current, {
+              type: "lines",
+              mask: "lines",
+            });
+
+            getStartedSplit = SplitText.create(getStartedRef.current, {
+              type: "words",
+            });
+
+            gsap.timeline()
+              .from(getStartedSplit.words, {
+                y: 12,
+                opacity: 0,
+                duration: 0.6,
+                stagger: 0.06,
+                ease: "power2.out",
+              })
+              .from(
+                headlineSplit.lines,
+                {
+                  yPercent: 40,
+                  opacity: 0,
+                  duration: 1.2,
+                  stagger: 0.12,
+                  ease: "power2.out",
+                },
+                "-=0.2"
+              );
+          });
+        },
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "55% bottom",
+          end: "85% bottom",
+          scrub: true,
+        },
+      });
+
+      tl.fromTo(
+        sectionRef.current,
+        { backgroundColor: "#000", color: "#fff" },
+        { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
       )
-      .to(
-        [fadeTopRef.current, fadeBottomRef.current],
-        { opacity: 0, ease: "none" },
-        0
-      );
+        .fromTo(
+          gridRef.current.querySelectorAll(".grid-line"),
+          { borderColor: "rgba(255,255,255,0.2)" },
+          { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
+          0
+        )
+        .to([fadeTopRef.current, fadeBottomRef.current], { opacity: 0 }, 0);
+    }, sectionRef);
 
     return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
+      headlineSplit?.revert();
+      getStartedSplit?.revert();
+      ctx.revert();
     };
   }, []);
 
+  /* =========================
+     RENDER
+  ========================= */
   return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-[480vh] overflow-hidden"
-    >
+    <section ref={sectionRef} className="relative min-h-[480vh] overflow-hidden">
       {/* GRID */}
       <div
+        ref={gridRef}
         className="absolute inset-0 z-10 pointer-events-none grid"
-        style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
       >
-        {Array.from({ length: GRID_COLUMNS }).map((_, i) => (
+        {Array.from({ length: gridCols }).map((_, i) => (
           <div key={i} className="grid-line border-r last:border-r-0" />
         ))}
       </div>
@@ -1836,7 +1774,7 @@ function Galery() {
 
           <h1
             ref={headlineRef}
-            className="font-bold leading-[1.08] text-[clamp(44px,6.2vw,76px)]"
+            className="font-base leading-[1.08] text-[clamp(40px,5.4vw,88px)]"
           >
             Time to
             <br />
@@ -1848,25 +1786,30 @@ function Galery() {
       {/* IMAGES */}
       <div
         className="absolute inset-0 z-20 grid"
-        style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, 1fr)` }}
+        style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
       >
         {LANES.map((lane, i) => (
           <div
             key={i}
-            className="lane relative h-full flex justify-center"
-            style={{ gridColumn: lane.col }}
+            ref={(el) => (laneRefs.current[i] = el)}
+            className="lane relative h-full will-change-transform"
+            style={{ gridColumn: Math.min(lane.col, gridCols) }}
           >
             {lane.items.map((item, j) => (
               <figure
                 key={j}
-                className="absolute w-[240px] aspect-[3/4] bg-neutral-900 overflow-hidden"
-                style={{ top: item.top }}
+                className="absolute w-full overflow-hidden"
+                style={{ top: item.top, paddingInline: `${FRAME_GAP}px` }}
               >
-                <img
-                  src={item.src}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
+                <div className="w-full aspect-[3/4] overflow-hidden">
+                  <img
+                    src={item.src}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                </div>
               </figure>
             ))}
           </div>
@@ -1887,6 +1830,8 @@ function Galery() {
     </section>
   );
 }
+
+
 
 
 
@@ -3698,10 +3643,17 @@ function Footer() {
   return (
     <footer
       id="top"
-      className="relative bg-neutral-950 text-white overflow-hidden"
+      className="relative w-full bg-neutral-950 text-white overflow-hidden"
     >
       {/* SIGNAL BAR */}
-      <div className="px-[6vw] py-4 sm:py-5 flex flex-wrap items-center justify-between text-[10px] sm:text-[11px] tracking-wide border-b border-white/10 gap-y-2">
+      <div
+        className="
+          px-[6vw] py-4 sm:py-5
+          flex flex-wrap items-center justify-between
+          tracking-wide border-b border-white/10 gap-y-2
+          text-[clamp(10px,0.7vw,12px)]
+        "
+      >
         <div className="opacity-50 uppercase">
           GMT +7 · Operating globally
         </div>
@@ -3721,13 +3673,18 @@ function Footer() {
       </div>
 
       {/* CTA */}
-      <div className="relative max-w-screen-xl mx-auto px-6 lg:px-12 py-20 sm:py-28">
+      <div className="relative px-[6vw] py-20 sm:py-28">
         <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
           <div className="col-span-12 lg:col-span-6">
-            <p className="text-neutral-500 max-w-md leading-relaxed text-sm sm:text-base">
+            <p
+              className="
+                text-neutral-500 leading-relaxed
+                max-w-[520px]
+                text-[clamp(14px,1.1vw,17px)]
+              "
+            >
               We work with teams building thoughtful digital products
               <br />
-              <span className="hidden sm:inline mr-10"></span>
               If you have a project in mind, we would{" "}
               <span className="italic">looove</span> to hear about it
             </p>
@@ -3738,12 +3695,8 @@ function Footer() {
               ref={emailRef}
               href="mailto:hello@studio.com"
               className="
-                inline-block
-                font-light
-                tracking-tight
-                text-white
-                cursor-pointer
-                text-[clamp(24px,7vw,42px)]
+                inline-block font-light tracking-tight text-white cursor-pointer
+                text-[clamp(26px,4.5vw,44px)]
               "
             >
               <span className="inline-flex overflow-hidden">
@@ -3757,18 +3710,26 @@ function Footer() {
                   </span>
                 ))}
               </span>
-              <span className="block h-[1px] w-full bg-white/30 mt-1" />
+              <span className="block h-[1px] w-full bg-white/30 mt-2" />
             </a>
           </div>
         </div>
       </div>
 
       {/* BRAND MASS */}
-      <div className="relative px-6 lg:px-12 pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
-        <div className="max-w-screen-xl mx-auto grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
+      <div className="relative px-[6vw] pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
+        <div className="grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
           
-          {/* META — MOBILE FIRST */}
-          <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500 order-1 lg:order-2">
+          {/* META */}
+          <div
+            className="
+              col-span-12 lg:col-span-5
+              flex flex-col lg:items-end gap-5 sm:gap-6
+              order-1 lg:order-2
+              text-neutral-500
+              text-[clamp(11px,0.9vw,13px)]
+            "
+          >
             <div className="space-y-1 lg:text-right">
               <div>+62 812 3456 789</div>
               <div>Bali · Indonesia</div>
@@ -3786,12 +3747,18 @@ function Footer() {
             </div>
           </div>
 
-          {/* BRAND LOGO — PINDAH KE PALING BAWAH DI MOBILE */}
+          {/* LOGO — DIBERI CEILING */}
           <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
             <img
               src="/png/boson-white3.png"
               alt="Boson"
-              className="w-full max-w-[900px]"
+              className="
+                w-full
+                object-contain
+                max-h-[55vh]
+                sm:max-h-[50vh]
+                lg:max-h-[45vh]
+              "
             />
           </div>
 
@@ -3932,43 +3899,43 @@ function Footer() {
   
         <Header />
   
-        <div
+        {/* <div
           data-theme="dark"
           style={{ position: "relative", zIndex: 2, width: "100%" }}
         >
           <BosonNarrative />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
-        </div>
+        </div> */}
   
         {/* ==================================================
           DESCRIPTION
         ================================================== */}
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <Description />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <VideoSection />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <ServicesHero />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <BigHeading />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <ProjectShowcase />
-        </div>
+        </div> */}
   
-        <div style={{ position: "relative", zIndex: 2 }}>
+        {/* <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
-        </div>
+        </div> */}
   
         {/* <BosonScrollText /> */}
   
