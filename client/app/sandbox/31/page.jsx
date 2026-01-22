@@ -372,7 +372,7 @@ function Hero() {
   
   
   
-function HeroJoin() {
+  function HeroJoin() {
     const { scrollY } = useScroll();
     const titleY = useTransform(scrollY, [0, 800], [0, -80]);
   
@@ -380,7 +380,7 @@ function HeroJoin() {
       <div
         style={{
           width: "100%",
-          height: "100vh",
+          height: "100dvh",
           background: "white",
           position: "relative",
         }}
@@ -389,7 +389,7 @@ function HeroJoin() {
           style={{
             position: "relative",
             width: "100%",
-            height: "100vh",
+            height: "100dvh",
             overflow: "hidden",
             zIndex: 1,
             background: "white",
@@ -398,28 +398,42 @@ function HeroJoin() {
           {/* HERO FULLSCREEN DI BELAKANG */}
           <Hero />
   
-          {/* BOSON — DEAD CENTER → REVEAL SCALE */}
+          {/* BOSON — REAL VISUAL CENTER */}
           <motion.div
             style={{ y: titleY }}
+            className="
+              fixed
+              inset-x-0 top-0
+              z-[65]
+              grid place-items-center
+              pointer-events-none
+              select-none
+            "
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            className="
-              absolute
-              left-1/2 top-1/2
-              -translate-x-1/2 -translate-y-1/2
-              z-[65]
-              flex items-center justify-center
-              select-none pointer-events-none
-            "
           >
-           <motion.img
-            src="/png/boson-white.png"
-            alt="Boson Collective"
-            draggable="false"
-            className="object-contain"
-            style={{ width: 250 }}
-          />
-
+            <div
+              style={{
+                height: "100dvh",
+                display: "grid",
+                placeItems: "center",
+                paddingTop: "env(safe-area-inset-top)",
+                paddingBottom: "env(safe-area-inset-bottom)",
+              }}
+            >
+              <motion.img
+                src="/png/boson-white.png"
+                alt="Boson Collective"
+                draggable="false"
+                className="object-contain"
+                style={{
+                  width:
+                    typeof window !== "undefined" && window.innerWidth < 768
+                      ? 200
+                      : 250,
+                }}
+              />
+            </div>
           </motion.div>
   
           {/* INTRO OVERLAY */}
@@ -433,7 +447,7 @@ function HeroJoin() {
         `}</style>
       </div>
     );
-}
+  }
  
 
 function BosonNarrative() {
