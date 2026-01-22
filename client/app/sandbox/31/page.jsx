@@ -209,7 +209,7 @@ function Hero() {
   /* ==========================================
    INTRO FRAME OVERLAY (SLIDES + PORTAL)
    ========================================== */ 
-function IntroOverlay() {
+   function IntroOverlay() {
     const IMAGES = [
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914152/novo-ampang-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900186/dwm-5.jpg",
@@ -243,19 +243,17 @@ function IntroOverlay() {
     );
   
     // =========================
-    // DERIVED TOP INDEX (KEY FIX)
+    // TOP INDEX
     // =========================
     const topIndex = useMemo(() => {
       for (let i = visible.length - 1; i >= 0; i--) {
-        if (visible[i] === "open" || visible[i] === "soft") {
-          return i;
-        }
+        if (visible[i] === "open" || visible[i] === "soft") return i;
       }
       return 0;
     }, [visible]);
   
     // =========================
-    // RESPONSIVE SCALE CONTROL
+    // RESPONSIVE
     // =========================
     const [isMobile, setIsMobile] = useState(false);
   
@@ -266,15 +264,18 @@ function IntroOverlay() {
       return () => window.removeEventListener("resize", check);
     }, []);
   
+    const frameSize = isMobile
+      ? { width: 240, height: 360 }
+      : { width: 320, height: 480 };
+  
     const scaleExpand = isMobile
-      ? { scaleX: 5, scaleY: 5 }
+      ? { scaleX: 4, scaleY: 4 }
       : { scaleX: 14, scaleY: 4.5 };
   
     const getDuration = (i) => (i === 0 ? 650 : 250);
-    const overlapOffset = 150;
   
     // =========================
-    // ORIGINAL TIMELINE (UNCHANGED)
+    // TIMELINE (UNCHANGED)
     // =========================
     useEffect(() => {
       let timeCursor = 0;
@@ -311,7 +312,6 @@ function IntroOverlay() {
           });
         }, closeTime);
   
-        // ⛔ timeCursor tetap ASLI (visual tidak diubah)
         timeCursor += duration;
       });
   
@@ -325,41 +325,54 @@ function IntroOverlay() {
   
     return (
       <motion.div
-        className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
+        className="absolute inset-0 z-[60] pointer-events-none"
         animate={phase === "expand" ? scaleExpand : { scaleX: 1, scaleY: 1 }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
       >
-        <div className="relative" style={{ width: 320, height: 480 }}>
-          <div className="absolute inset-0">
-            {OPTIMIZED_IMAGES.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                draggable="false"
-                className="absolute w-full h-full object-cover"
-                style={{
-                  zIndex: i === topIndex ? 1000 : i,
-                  transitionProperty: "clip-path",
-                  transitionDuration: i === 0 ? "650ms" : "250ms",
-                  transitionTimingFunction:
-                    i === 0
-                      ? "cubic-bezier(0.3, 0, 0.2, 1)"
-                      : "ease-in-out",
-                  clipPath:
-                    visible[i] === "soft"
-                      ? "inset(92% 0% 0% 0%)"
-                      : visible[i] === "open"
-                      ? "inset(0% 0% 0% 0%)"
-                      : visible[i] === "close"
-                      ? "inset(0% 0% 100% 0%)"
-                      : "inset(100% 0% 0% 0%)",
-                }}
-              />
-            ))}
-          </div>
+        {/* SAFE AREA CENTER */}
+        <div className="w-full h-full flex items-center justify-center">
+          <div
+            className="relative"
+            style={{
+              width: frameSize.width,
+              height: frameSize.height,
+            }}
+          >
+            <div className="absolute inset-0 overflow-hidden">
+              {OPTIMIZED_IMAGES.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  draggable="false"
+                  className="absolute w-full h-full object-cover"
+                  style={{
+                    zIndex: i === topIndex ? 1000 : i,
+                    transitionProperty: "clip-path",
+                    transitionDuration: i === 0 ? "650ms" : "250ms",
+                    transitionTimingFunction:
+                      i === 0
+                        ? "cubic-bezier(0.3, 0, 0.2, 1)"
+                        : "ease-in-out",
+                    clipPath:
+                      visible[i] === "soft"
+                        ? "inset(92% 0% 0% 0%)"
+                        : visible[i] === "open"
+                        ? "inset(0% 0% 0% 0%)"
+                        : visible[i] === "close"
+                        ? "inset(0% 0% 100% 0%)"
+                        : "inset(100% 0% 0% 0%)",
+                  }}
+                />
+              ))}
+            </div>
   
-          {/* HOLE / SPOTLIGHT — UNCHANGED */}
-          <div className="absolute inset-0 spotlight pointer-events-none" />
+            {/* HOLE */}
+            <div className="absolute inset-0 spotlight pointer-events-none" />
+          </div>
         </div>
   
         <style jsx>{`
@@ -369,7 +382,9 @@ function IntroOverlay() {
         `}</style>
       </motion.div>
     );
-}
+  }
+  
+  
     
   
   
