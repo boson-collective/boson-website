@@ -1956,7 +1956,7 @@ function BigHeading() {
   return (
     <div
       ref={ref}
-      className="relative w-full overflow-hidden bg-[#F3F4F5] border border-black big-heading-container"
+      className="relative w-full overflow-hidden bg-[#F3F4F5]  border-black/20 big-heading-container"
       style={{ height: "150vh" }}
     >
       <div
@@ -2221,12 +2221,14 @@ function WorksList() {
       name: "Real Estate & Property",
       year: "2025",
       images: [
-        "https://i.imgur.com/MqFOJqk.jpeg",
-        "/clients/novo-ampang/logo.png",
-        "/clients/hey-yolo/main.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068279/the-linea-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068306/the-linea-2.jpg",
         "/clients/hey-yolo/logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768900186/dwm-5.jpg",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768900186/dwm-logo.png",
+        "/clients/hey-yolo/main.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068787/hidden-city-ubud-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915333/hidden-city-ubud-2.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069228/petra-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069229/petra-2.jpg",
       ],
     },
     {
@@ -2234,8 +2236,10 @@ function WorksList() {
       name: "Hospitality",
       year: "2025",
       images: [
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-4.jpg",
         "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768899596/tender-touch-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-9.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1769066430/hairaholic-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1769066538/hairaholic-2.jpg",
       ],
     },
     {
@@ -2243,10 +2247,12 @@ function WorksList() {
       name: "Food & Beverage",
       year: "2025",
       images: [
-        "https://i.imgur.com/GnY6iYR.jpeg",
         "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
-        "https://i.imgur.com/F4vcyc5.jpeg",
+        "https://i.imgur.com/GnY6iYR.jpeg",
         "/clients/zai-cafe/logo.png",
+        "https://i.imgur.com/F4vcyc5.jpeg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067632/tea-time-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067634/tea-time-2.jpg",
       ],
     },
     {
@@ -2254,8 +2260,8 @@ function WorksList() {
       name: "Fashion & Beauty",
       year: "2025",
       images: [
-        "/clients/hidden-city-ubud/logo.png",
-        "/clients/hidden-city-ubud/2.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067253/newminatis-logo.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067396/newminatis-2.jpg",
       ],
     },
     {
@@ -2968,7 +2974,7 @@ function ServicesHero() {
               );
             })}
 
-            <div className="border-t border-black/10" />
+            <div className="border-t border-black/20" />
           </div>
         </div>
       </div>
