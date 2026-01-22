@@ -42,11 +42,11 @@ function Webglbg() {
         color3: [0, 0, 0],
         colorAccent: new THREE.Color(0, 0, 0),
 
-        uLinesBlur: isMobile ? 0.09 : 0.33,
-        uNoise: isMobile ? 0.07 : 0.08,
-        uOffsetX: isMobile ? -3.43 : 0.05,
-        uOffsetY: isMobile ? -2.46 : -2.46,
-        uLinesAmount: isMobile ? 1.36 : 1.36,
+        uLinesBlur: isMobile ? 0.13 : 0.33,
+        uNoise: isMobile ? 0.03 : 0.03,
+        uOffsetX: isMobile ? -3.96 : 0.05,
+        uOffsetY: isMobile ? -3.77 : -2.46,
+        uLinesAmount: isMobile ? 1.89 : 1.36,
       },
     });
 
