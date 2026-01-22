@@ -521,8 +521,8 @@ function BosonNarrative() {
     ========================= */
     const mobileTextOverride = isMobile
       ? {
-          fontSize: "clamp(45px, 4.5vw, 104px)",
-          lineHeight: 1.15,
+          fontSize: "clamp(34px, 4.5vw, 104px)",
+          lineHeight: 1.25,
           wordSpacing: 0,
           textAlign: "left",
           hyphens: "none",

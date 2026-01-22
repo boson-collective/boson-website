@@ -1064,7 +1064,7 @@ export default class WebGL extends THREE.EventDispatcher {
     this.preloader = new Preloader();
   
     this.gui = new GUI();
-    // this.gui.hide();
+    this.gui.hide();
     this.pixelRatio = 1;
   
     this.rendererEl = rendererEl;
