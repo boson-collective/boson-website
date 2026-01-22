@@ -226,7 +226,6 @@ function Hero() {
       return IMAGES.map((src) => {
         if (!src.includes("/image/upload/")) return src;
         if (/\/upload\/.*(w_|f_|q_)/.test(src)) return src;
-  
         return src.replace(
           "/image/upload/",
           "/image/upload/w_1400,c_limit,f_auto,q_auto/"
@@ -247,7 +246,6 @@ function Hero() {
     }, [visible]);
   
     const [isMobile, setIsMobile] = useState(false);
-  
     useEffect(() => {
       const check = () => setIsMobile(window.innerWidth < 768);
       check();
@@ -313,58 +311,53 @@ function Hero() {
   
     return (
       <motion.div
-        className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
+        className="fixed inset-x-0 top-0 z-[60] pointer-events-none"
         animate={phase === "expand" ? scaleExpand : { scaleX: 1, scaleY: 1 }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
         style={{
+          height: "100dvh",
+          display: "grid",
+          placeItems: "center",
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
-        {/* ✅ COMPENSATED CENTER */}
         <div
+          className="relative"
           style={{
-            transform:
-              "translateY(calc((env(safe-area-inset-top) - env(safe-area-inset-bottom)) / 2))",
+            width: frameSize.width,
+            height: frameSize.height,
           }}
         >
-          <div
-            className="relative"
-            style={{
-              width: frameSize.width,
-              height: frameSize.height,
-            }}
-          >
-            <div className="absolute inset-0 overflow-hidden">
-              {OPTIMIZED_IMAGES.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  draggable="false"
-                  className="absolute w-full h-full object-cover"
-                  style={{
-                    zIndex: i === topIndex ? 1000 : i,
-                    transitionProperty: "clip-path",
-                    transitionDuration: i === 0 ? "650ms" : "250ms",
-                    transitionTimingFunction:
-                      i === 0
-                        ? "cubic-bezier(0.3, 0, 0.2, 1)"
-                        : "ease-in-out",
-                    clipPath:
-                      visible[i] === "soft"
-                        ? "inset(92% 0% 0% 0%)"
-                        : visible[i] === "open"
-                        ? "inset(0% 0% 0% 0%)"
-                        : visible[i] === "close"
-                        ? "inset(0% 0% 100% 0%)"
-                        : "inset(100% 0% 0% 0%)",
-                  }}
-                />
-              ))}
-            </div>
-  
-            <div className="absolute inset-0 spotlight pointer-events-none" />
+          <div className="absolute inset-0 overflow-hidden">
+            {OPTIMIZED_IMAGES.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                draggable="false"
+                className="absolute w-full h-full object-cover"
+                style={{
+                  zIndex: i === topIndex ? 1000 : i,
+                  transitionProperty: "clip-path",
+                  transitionDuration: i === 0 ? "650ms" : "250ms",
+                  transitionTimingFunction:
+                    i === 0
+                      ? "cubic-bezier(0.3, 0, 0.2, 1)"
+                      : "ease-in-out",
+                  clipPath:
+                    visible[i] === "soft"
+                      ? "inset(92% 0% 0% 0%)"
+                      : visible[i] === "open"
+                      ? "inset(0% 0% 0% 0%)"
+                      : visible[i] === "close"
+                      ? "inset(0% 0% 100% 0%)"
+                      : "inset(100% 0% 0% 0%)",
+                }}
+              />
+            ))}
           </div>
+  
+          <div className="absolute inset-0 spotlight pointer-events-none" />
         </div>
   
         <style jsx>{`
