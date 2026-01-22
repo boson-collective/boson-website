@@ -60,7 +60,7 @@ function Webglbg() {
    HERO (PERSIS PUNYA LO)
    ========================================== */
  
-   function Hero() {
+function Hero() {
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 500], [0, 80]);
   
@@ -193,13 +193,13 @@ function Webglbg() {
         `}</style>
       </div>
     );
-  }
+}
 
   
   /* ==========================================
    INTRO FRAME OVERLAY (SLIDES + PORTAL)
    ========================================== */ 
-   function IntroOverlay() {
+function IntroOverlay() {
     const IMAGES = [
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914152/novo-ampang-2.jpg",
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900186/dwm-5.jpg",
@@ -359,7 +359,7 @@ function Webglbg() {
         `}</style>
       </motion.div>
     );
-  }
+}
     
   
   
@@ -1049,6 +1049,56 @@ function MeetBoson() {
 }
 
 function VideoSection() {
+  const isMobile =
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 768px)").matches
+      : false;
+
+  /* =====================================================
+     MOBILE — VIDEO LANDSCAPE ONLY (16:9 FIXED)
+  ===================================================== */
+  if (isMobile) {
+    return (
+      <section
+        data-theme="dark"
+        style={{
+          width: "100%",
+          backgroundColor: "#000",
+          padding: "0",
+          margin: "0",
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            aspectRatio: "16 / 9", // 🔥 INI KUNCI LANDSCAPE
+            backgroundColor: "#000",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <video
+            src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls={false}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain", // 🔥 BUKAN cover
+              display: "block",
+            }}
+          />
+        </div>
+      </section>
+    );
+  }
+
+  /* =====================================================
+     DESKTOP — FULL CINEMATIC (ASLI, TIDAK DIUBAH)
+  ===================================================== */
   const outerRef = useRef(null);
   const sectionRef = useRef(null);
   const holeRef = useRef(null);
@@ -1065,7 +1115,7 @@ function VideoSection() {
 
   const holeBaseW = 300;
   const holeBaseH = 450;
-  const holeMaxScale = 7;
+  const holeMaxScale = 10;
 
   useLayoutEffect(() => {
     const outer = outerRef.current;
@@ -1077,13 +1127,11 @@ function VideoSection() {
 
     if (!outer || !section || !hole || !video || !text || !process) return;
 
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    hole.style.width = `${isMobile ? 180 : holeBaseW}px`;
-    hole.style.height = `${isMobile ? 260 : holeBaseH}px`;
+    hole.style.width = `${holeBaseW}px`;
+    hole.style.height = `${holeBaseH}px`;
 
     gsap.set(section, { backgroundColor: "#000" });
-    gsap.set(video, { scale: isMobile ? 1.25 : 1.6 });
+    gsap.set(video, { scale: 1.6 });
     gsap.set(text, { opacity: 0 });
 
     gsap.set(hole, {
@@ -1095,30 +1143,20 @@ function VideoSection() {
       scrollTrigger: {
         trigger: outer,
         start: "top top",
-        end: isMobile ? "+=110%" : "+=140%",
+        end: "+=140%",
         scrub: 0.8,
       },
     });
 
-    tl.to(
-      hole,
-      {
-        scale: isMobile ? holeMaxScale * 0.75 : holeMaxScale,
-        ease: "none",
-      },
-      0
-    ).to(
+    tl.to(hole, { scale: holeMaxScale, ease: "none" }, 0).to(
       video,
-      {
-        scale: 1,
-        ease: "none",
-      },
+      { scale: 1, ease: "none" },
       0
     );
 
     tl.to(text, { opacity: 1, ease: "power1.out" }, 0.9).fromTo(
       process.children,
-      { opacity: 0, y: isMobile ? 24 : 36 },
+      { opacity: 0, y: 32 },
       {
         opacity: 1,
         y: 0,
@@ -1132,16 +1170,13 @@ function VideoSection() {
       tRef.current += 0.01;
 
       if (sigilDiscoverRef.current) {
-        sigilDiscoverRef.current.style.transform = `rotate(${Math.sin(tRef.current) * 1}deg)`;
+        sigilDiscoverRef.current.style.transform = `rotate(${Math.sin(tRef.current)}deg)`;
       }
-
       if (sigilCreateRef.current) {
-        const s = 1 + Math.sin(tRef.current * 0.8) * 0.01;
-        sigilCreateRef.current.style.transform = `scale(${s})`;
+        sigilCreateRef.current.style.transform = `scale(${1 + Math.sin(tRef.current * 0.8) * 0.01})`;
       }
-
       if (sigilDeliverRef.current) {
-        sigilDeliverRef.current.style.transform = `translateY(${Math.sin(tRef.current * 1.1) * 1}px)`;
+        sigilDeliverRef.current.style.transform = `translateY(${Math.sin(tRef.current * 1.1)}px)`;
       }
 
       rafRef.current = requestAnimationFrame(loop);
@@ -1155,16 +1190,20 @@ function VideoSection() {
     };
   }, []);
 
-  const isMobile =
-    typeof window !== "undefined"
-      ? window.matchMedia("(max-width: 768px)").matches
-      : false;
-
   return (
-    <div ref={outerRef} data-theme="dark" style={{ height: "300vh", position: "relative" }}>
+    <div
+      ref={outerRef}
+      data-theme="dark"
+      style={{ height: "300vh", position: "relative" }}
+    >
       <section
         ref={sectionRef}
-        style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflow: "hidden",
+        }}
       >
         <video
           ref={videoRef}
@@ -1187,7 +1226,7 @@ function VideoSection() {
           ref={holeRef}
           style={{
             position: "absolute",
-            top: "52%",
+            top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             borderTopLeftRadius: "100rem",
@@ -1196,88 +1235,136 @@ function VideoSection() {
           }}
         />
 
-        {/* TEXT WRAPPER — HANYA POSITION YANG DIUBAH */}
         <div
           ref={textRef}
           style={{
             position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: isMobile ? "auto" : "10vh",
-            top: isMobile ? "50%" : "auto",
-            transform: isMobile ? "translateY(-50%)" : "none",
-            paddingLeft: "14vw",
-            paddingRight: "6vw",
+            inset: 0,
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            paddingBottom: "10vh",
+            paddingLeft: "clamp(20px, 6vw, 120px)",
+            paddingRight: "clamp(20px, 6vw, 120px)",
             color: "white",
             zIndex: 20,
             pointerEvents: "none",
           }}
         >
-          <div style={{ maxWidth: "1080px" }}>
-            <div
-              ref={processRef}
-              style={{
-                display: "grid",
-                gridTemplateColumns: isMobile
-                  ? "1fr"
-                  : "repeat(3, minmax(260px, 1fr))",
-                gap: isMobile ? "40px" : "56px",
-              }}
-            >
-              {/* === ISI KONTEN ASLI — TIDAK DIUBAH === */}
+         <div style={{ width: "100%", maxWidth: "1080px" }}>
+  <div
+    ref={processRef}
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(3, minmax(260px, 1fr))",
+      gap: "56px",
+    }}
+  >
+    {/* DISCOVER */}
+    <div>
+      <svg
+        ref={sigilDiscoverRef}
+        width="36"
+        height="36"
+        viewBox="0 0 100 100"
+        style={{ marginBottom: "14px" }}
+      >
+        <circle cx="50" cy="50" r="36" fill="none" stroke="white" strokeWidth="1" />
+        <circle cx="50" cy="50" r="6" fill="none" stroke="white" strokeWidth="1" />
+        <line x1="50" y1="14" x2="50" y2="34" stroke="white" strokeWidth="1" />
+        <line x1="86" y1="50" x2="66" y2="50" stroke="white" strokeWidth="1" />
+        <line x1="50" y1="86" x2="50" y2="66" stroke="white" strokeWidth="1" />
+        <line x1="14" y1="50" x2="34" y2="50" stroke="white" strokeWidth="1" />
+      </svg>
 
-              <div>
-                <svg ref={sigilDiscoverRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
-                  <circle cx="50" cy="50" r="36" fill="none" stroke="white" strokeWidth="1" />
-                  <circle cx="50" cy="50" r="6" fill="none" stroke="white" strokeWidth="1" />
-                  <line x1="50" y1="14" x2="50" y2="34" stroke="white" strokeWidth="1" />
-                  <line x1="86" y1="50" x2="66" y2="50" stroke="white" strokeWidth="1" />
-                  <line x1="50" y1="86" x2="50" y2="66" stroke="white" strokeWidth="1" />
-                  <line x1="14" y1="50" x2="34" y2="50" stroke="white" strokeWidth="1" />
-                </svg>
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
-                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
-                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
-                </p>
-              </div>
+      <div
+        style={{
+          height: "1px",
+          background: "rgba(255,255,255,0.2)",
+          marginBottom: "20px",
+        }}
+      />
 
-              <div>
-                <svg ref={sigilCreateRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
-                  <rect x="20" y="20" width="60" height="60" rx="8" fill="none" stroke="white" strokeWidth="1" />
-                  <circle cx="35" cy="35" r="3" fill="white" />
-                  <circle cx="65" cy="35" r="3" fill="white" />
-                  <circle cx="50" cy="65" r="3" fill="white" />
-                  <line x1="35" y1="35" x2="65" y2="35" stroke="white" strokeWidth="0.8" />
-                  <line x1="65" y1="35" x2="50" y2="65" stroke="white" strokeWidth="0.8" />
-                  <line x1="50" y1="65" x2="35" y2="35" stroke="white" strokeWidth="0.8" />
-                </svg>
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
-                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
-                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
-                  Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
-                </p>
-              </div>
+      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
 
-              <div>
-                <svg ref={sigilDeliverRef} width="36" height="36" viewBox="0 0 100 100" style={{ marginBottom: "14px" }}>
-                  <rect x="26" y="30" width="48" height="36" rx="4" fill="none" stroke="white" strokeWidth="1" />
-                  <line x1="20" y1="70" x2="80" y2="70" stroke="white" strokeWidth="1.2" />
-                </svg>
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
-                <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
-                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
-                  Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
-                </p>
-              </div>
+      <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
+        Most projects fail because no one really looks at what’s happening day to day.
+        We start by understanding how your content is actually used and where things
+        begin to slip.
+      </p>
+    </div>
 
-            </div>
-          </div>
+    {/* CREATE */}
+    <div>
+      <svg
+        ref={sigilCreateRef}
+        width="36"
+        height="36"
+        viewBox="0 0 100 100"
+        style={{ marginBottom: "14px" }}
+      >
+        <rect x="20" y="20" width="60" height="60" rx="8" fill="none" stroke="white" strokeWidth="1" />
+        <circle cx="35" cy="35" r="3" fill="white" />
+        <circle cx="65" cy="35" r="3" fill="white" />
+        <circle cx="50" cy="65" r="3" fill="white" />
+        <line x1="35" y1="35" x2="65" y2="35" stroke="white" strokeWidth="0.8" />
+        <line x1="65" y1="35" x2="50" y2="65" stroke="white" strokeWidth="0.8" />
+        <line x1="50" y1="65" x2="35" y2="35" stroke="white" strokeWidth="0.8" />
+      </svg>
+
+      <div
+        style={{
+          height: "1px",
+          background: "rgba(255,255,255,0.2)",
+          marginBottom: "20px",
+        }}
+      />
+
+      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
+
+      <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
+        Once things are clear, we focus on structure. We turn ideas into content
+        that’s easier to manage, repeat, and grow without starting from zero every time.
+      </p>
+    </div>
+
+    {/* DELIVER */}
+    <div>
+      <svg
+        ref={sigilDeliverRef}
+        width="36"
+        height="36"
+        viewBox="0 0 100 100"
+        style={{ marginBottom: "14px" }}
+      >
+        <rect x="26" y="30" width="48" height="36" rx="4" fill="none" stroke="white" strokeWidth="1" />
+        <line x1="20" y1="70" x2="80" y2="70" stroke="white" strokeWidth="1.2" />
+      </svg>
+
+      <div
+        style={{
+          height: "1px",
+          background: "rgba(255,255,255,0.2)",
+          marginBottom: "20px",
+        }}
+      />
+
+      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
+
+      <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
+        Publishing is only part of the work. We test, adjust, and keep things moving
+        so your content stays consistent as platforms and needs change.
+      </p>
+    </div>
+  </div>
+</div>
+
         </div>
       </section>
     </div>
   );
 }
+
 
 
 
@@ -1562,16 +1649,10 @@ function Galery() {
   const FRAME_GAP = 10;
 
   /* =========================
-     GRID LOGIC (mobile = 3, else = 5)
+     GRID LOGIC
   ========================= */
   const getGridColumns = () => (window.innerWidth < 640 ? 3 : 5);
   const [gridCols, setGridCols] = useState(getGridColumns());
-
-  useEffect(() => {
-    const onResize = () => setGridCols(getGridColumns());
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
 
   /* =========================
      DATA
@@ -1612,14 +1693,34 @@ function Galery() {
   const gridRef = useRef(null);
   const laneRefs = useRef([]);
 
-  const headlinePlayedRef = useRef(false);
-  let headlineSplit;
-  let getStartedSplit;
+  const resizeTimer = useRef(null);
+
+  /* === INI KUNCI: FLAG PLAY ONCE === */
+  const textPlayedRef = useRef(false);
+
+  /* =========================
+     RESIZE
+  ========================= */
+  useEffect(() => {
+    const onResize = () => {
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(() => {
+        setGridCols(getGridColumns());
+        ScrollTrigger.refresh(true);
+      }, 150);
+    };
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   /* =========================
      GSAP
   ========================= */
-  useEffect(() => {
+  useLayoutEffect(() => {
+    let headlineSplit;
+    let getStartedSplit;
+
     const ctx = gsap.context(() => {
       gsap.set(laneRefs.current, { force3D: true });
 
@@ -1636,6 +1737,7 @@ function Galery() {
 
       gsap.set([headlineRef.current, getStartedRef.current], { opacity: 0 });
 
+      /* --- BORDER MORPH --- */
       gsap.to(sectionRef.current, {
         borderBottomLeftRadius: "0vw",
         borderBottomRightRadius: "0vw",
@@ -1648,6 +1750,7 @@ function Galery() {
         },
       });
 
+      /* --- PARALLAX LANES --- */
       laneRefs.current.forEach((lane, i) => {
         if (!lane) return;
         gsap.fromTo(
@@ -1661,32 +1764,36 @@ function Galery() {
               start: "top bottom",
               end: "bottom top",
               scrub: 0.8,
+              invalidateOnRefresh: true,
             },
           }
         );
       });
 
-      /* ===== HEADLINE: ONCE ONLY ===== */
+      /* =========================
+         PIN + TEXT REVEAL (PLAY ONCE)
+      ========================= */
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
         end: "70% top",
         pin: textPinRef.current,
         pinSpacing: true,
-        once: true, // 🔒 kunci 1x saja
+        invalidateOnRefresh: true,
+
         onEnter: () => {
-          if (headlinePlayedRef.current) return;
-          headlinePlayedRef.current = true;
+          if (textPlayedRef.current) return;
+          textPlayedRef.current = true;
 
           document.fonts.ready.then(() => {
             gsap.set([headlineRef.current, getStartedRef.current], { opacity: 1 });
 
-            headlineSplit = SplitText.create(headlineRef.current, {
+            headlineSplit = new SplitText(headlineRef.current, {
               type: "lines",
               mask: "lines",
             });
 
-            getStartedSplit = SplitText.create(getStartedRef.current, {
+            getStartedSplit = new SplitText(getStartedRef.current, {
               type: "words",
             });
 
@@ -1713,20 +1820,20 @@ function Galery() {
         },
       });
 
-      const tl = gsap.timeline({
+      /* --- COLOR SHIFT --- */
+      gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "55% bottom",
           end: "85% bottom",
           scrub: true,
         },
-      });
-
-      tl.fromTo(
-        sectionRef.current,
-        { backgroundColor: "#000", color: "#fff" },
-        { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
-      )
+      })
+        .fromTo(
+          sectionRef.current,
+          { backgroundColor: "#000", color: "#fff" },
+          { backgroundColor: "#f5f5f5", color: "#111", ease: "none" }
+        )
         .fromTo(
           gridRef.current.querySelectorAll(".grid-line"),
           { borderColor: "rgba(255,255,255,0.2)" },
@@ -1741,7 +1848,7 @@ function Galery() {
       getStartedSplit?.revert();
       ctx.revert();
     };
-  }, []);
+  }, [gridCols]);
 
   /* =========================
      RENDER
@@ -1792,7 +1899,7 @@ function Galery() {
           <div
             key={i}
             ref={(el) => (laneRefs.current[i] = el)}
-            className="lane relative h-full will-change-transform"
+            className="relative h-full will-change-transform"
             style={{ gridColumn: Math.min(lane.col, gridCols) }}
           >
             {lane.items.map((item, j) => (
@@ -1830,7 +1937,6 @@ function Galery() {
     </section>
   );
 }
-
 
 
 
@@ -1927,6 +2033,9 @@ function MarqueeOverlay({ item, active }) {
   const x = useMotionValue(0);
   const segmentWidthRef = useRef(0);
 
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth <= 768;
+
   /* =========================
      MEASURE WIDTH
   ========================= */
@@ -1959,7 +2068,14 @@ function MarqueeOverlay({ item, active }) {
     const segmentWidth = segmentWidthRef.current;
     if (!segmentWidth) return;
 
-    const speed = active ? 180 : 30;
+    const speed = isMobile
+      ? active
+        ? 60
+        : 20
+      : active
+      ? 180
+      : 30;
+
     let next = x.get() - (speed * delta) / 1000;
 
     if (next <= -segmentWidth) {
@@ -1974,7 +2090,7 @@ function MarqueeOverlay({ item, active }) {
   ========================= */
   const isLogo = (src) => {
     const s = src.toLowerCase();
-    return s.endsWith(".png");
+    return s.endsWith(".png") || s.includes("logo");
   };
 
   /* =========================
@@ -1988,10 +2104,11 @@ function MarqueeOverlay({ item, active }) {
           src={src}
           draggable={false}
           style={{
-            height: "13vh",
+            height: isMobile ? "7vh" : "13vh",
             width: "auto",
             objectFit: "contain",
             filter: "invert(1) brightness(0)",
+            opacity: 0.85,
             flexShrink: 0,
           }}
         />
@@ -2004,13 +2121,15 @@ function MarqueeOverlay({ item, active }) {
         src={src}
         draggable={false}
         style={{
-          height: "13vh",
-          width: "32vh",
-          borderRadius: "6vh",
+          height: isMobile ? "8vh" : "13vh",
+          width: isMobile ? "18vh" : "32vh",
+          borderRadius:  "6vh",
           objectFit: "cover",
-          boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
           flexShrink: 0,
           background: "black",
+          boxShadow: isMobile
+            ? "0 4px 10px rgba(0,0,0,0.12)"
+            : "0 6px 16px rgba(0,0,0,0.15)",
         }}
       />
     );
@@ -2026,7 +2145,7 @@ function MarqueeOverlay({ item, active }) {
 
   const segmentImages = useMemo(() => {
     const out = [];
-    for (let i = 0; i < 3; i++) out.push(...baseImages);
+    for (let i = 0; i < 2; i++) out.push(...baseImages);
     return out;
   }, [baseImages]);
 
@@ -2036,8 +2155,8 @@ function MarqueeOverlay({ item, active }) {
       style={{
         display: "flex",
         alignItems: "center",
-        gap: "4vw",
-        paddingRight: "4vw",
+        gap: isMobile ? "6vw" : "4vw",
+        paddingRight: isMobile ? "6vw" : "4vw",
       }}
     >
       {segmentImages.map((src, i) =>
@@ -2053,17 +2172,19 @@ function MarqueeOverlay({ item, active }) {
         top: "50%",
         left: 0,
         width: "100%",
-        height: "22vh",
+        height: isMobile ? "14vh" : "22vh",
         transform: "translateY(-50%)",
         overflow: "hidden",
         zIndex: 2,
         pointerEvents: "none",
-        background: active ? "white" : "transparent",
         display: "flex",
         alignItems: "center",
-        padding: "0 3vw",
+        padding: isMobile ? "0 5vw" : "0 3vw",
+        background: active && !isMobile ? "white" : "transparent",
       }}
-      animate={{ opacity: active ? 1 : 0 }}
+      animate={{
+        opacity: active ? 1 : 0,
+      }}
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
     >
       <motion.div
@@ -2081,6 +2202,7 @@ function MarqueeOverlay({ item, active }) {
     </motion.div>
   );
 }
+
 
 
 function WorksList() {
@@ -2148,12 +2270,9 @@ function WorksList() {
   ];
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
-
   const totalIndex = String(items.length).padStart(2, "0");
 
-  /* =========================
-     GSAP HEADER
-  ========================= */
+  /* ================= HEADER ANIMATION ================= */
   useLayoutEffect(() => {
     const build = () => {
       splitsRef.current.forEach((s) => s.revert());
@@ -2171,8 +2290,8 @@ function WorksList() {
         gsap.from(leftSplit.lines, {
           yPercent: 40,
           opacity: 0,
-          duration: 1.2,
-          stagger: 0.12,
+          duration: 1.1,
+          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: headerRef.current,
@@ -2190,7 +2309,7 @@ function WorksList() {
         gsap.from(rightSplit.lines, {
           yPercent: 28,
           opacity: 0,
-          duration: 1,
+          duration: 0.9,
           stagger: 0.08,
           ease: "power1.out",
           scrollTrigger: {
@@ -2226,7 +2345,6 @@ function WorksList() {
       className="bg-black"
       style={{ padding: "6vh 0" }}
     >
-      
       {/* ================= HEADER ================= */}
       <div
         ref={headerRef}
@@ -2236,6 +2354,7 @@ function WorksList() {
           gridTemplateColumns: "1.15fr 0.5fr",
           padding: "5vw 7vh",
           color: "white",
+          gap: "2vh",
         }}
       >
         <h2
@@ -2245,7 +2364,6 @@ function WorksList() {
             fontSize: "clamp(28px, 2.8vw, 44px)",
             lineHeight: 1.15,
             display: "inline-flex",
-            alignItems: "flex-start",
             gap: "0.35em",
           }}
         >
@@ -2253,8 +2371,7 @@ function WorksList() {
           <sup
             style={{
               fontSize: "0.45em",
-              lineHeight: 1,
-              opacity: 0.7, 
+              opacity: 0.7,
               fontFeatureSettings: "'lnum' 1, 'tnum' 1",
             }}
           >
@@ -2268,6 +2385,7 @@ function WorksList() {
             opacity: 0.7,
             fontSize: "clamp(13px, 1vw, 16px)",
             lineHeight: 1.6,
+            maxWidth: "42ch",
           }}
         >
           This selection represents work developed under different business
@@ -2287,13 +2405,14 @@ function WorksList() {
             position: "relative",
             display: "grid",
             gridTemplateColumns: "1fr 2.2fr 1fr",
-            padding: "3.8vh 0",
+            padding: "3.8vh 7vh",
             borderBottom: "1px solid rgba(255,255,255,0.25)",
             color: "white",
             cursor: "pointer",
             overflow: "hidden",
           }}
         >
+          {/* Hover background (desktop only) */}
           <motion.div
             className="hover-overlay"
             style={{
@@ -2310,39 +2429,38 @@ function WorksList() {
 
           <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
-          <div style={{ zIndex: 2, display: "contents" }}>
-            <div />
+          <div style={{ zIndex: 1, gridColumn: "2 / span 1" }}>
             <div
               className="works-title"
               style={{
                 textAlign: "center",
-                fontSize: "clamp(32px, 4.5vw, 72px)",
+                fontSize: "clamp(32px, 4.5vw, 82px)",
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
               }}
             >
               {item.name}
             </div>
-            <div />
           </div>
         </div>
       ))}
 
-      {/* ================= MOBILE ONLY ================= */}
+      {/* ================= MOBILE ================= */}
       <style jsx>{`
         @media (max-width: 768px) {
           .works-header {
             grid-template-columns: 1fr !important;
             padding: 0 6vw 4vh !important;
+            gap: 2vh;
           }
 
           .works-header h2 {
-            font-size: 32px !important;
+            font-size: 30px !important;
           }
 
           .works-header p {
             font-size: 14px !important;
-            max-width: 90%;
+            max-width: 100% !important;
           }
 
           .works-row {
@@ -2363,6 +2481,7 @@ function WorksList() {
     </section>
   );
 }
+
 
 
   
@@ -2664,10 +2783,24 @@ function ServicesHero() {
   const [hoverIndex, setHoverIndex] = useState(null);
   const [inside, setInside] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(false);
+
   /* =====================
-     CUSTOM CURSOR
+     DEVICE DETECTION
   ===================== */
   useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  /* =====================
+     CUSTOM CURSOR (DESKTOP ONLY)
+  ===================== */
+  useEffect(() => {
+    if (isMobile) return;
+
     const cursor = cursorRef.current;
     const section = sectionRef.current;
     if (!cursor || !section) return;
@@ -2686,7 +2819,7 @@ function ServicesHero() {
 
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
-  }, []);
+  }, [isMobile]);
 
   const services = [
     {
@@ -2714,62 +2847,61 @@ function ServicesHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900 cursor-none"
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900"
     >
-      {/* CURSOR */}
-      <div
-        ref={cursorRef}
-        className="pointer-events-none fixed top-0 left-0 z-[9999]"
-        style={{ transform: "translate3d(-9999px,-9999px,0)" }}
-      >
+      {/* CURSOR — DESKTOP ONLY */}
+      {!isMobile && (
         <div
-          className="w-[64px] h-[64px] rounded-full bg-black"
-          style={{
-            transform: inside ? "scale(1)" : "scale(0)",
-            opacity: inside ? 1 : 0,
-            transition:
-              "transform 220ms cubic-bezier(0.22,1,0.36,1), opacity 180ms ease-out",
-          }}
-        />
-      </div>
+          ref={cursorRef}
+          className="pointer-events-none fixed top-0 left-0 z-[9999]"
+          style={{ transform: "translate3d(-9999px,-9999px,0)" }}
+        >
+          <div
+            className="w-[64px] h-[64px] rounded-full bg-black"
+            style={{
+              transform: inside ? "scale(1)" : "scale(0)",
+              opacity: inside ? 1 : 0,
+              transition:
+                "transform 220ms cubic-bezier(0.22,1,0.36,1), opacity 180ms ease-out",
+            }}
+          />
+        </div>
+      )}
 
-      <div className="w-full px-6 sm:px-10 lg:px-20 py-24">
-        {/* TOP GRID */}
-        <div className="grid grid-cols-12 items-start mb-32">
-          {/* LEFT */}
-          <div className="col-span-12 lg:col-span-3 text-sm text-neutral-500 mb-6 lg:mb-0">
+      <div className="w-full px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+        {/* ================= TOP ================= */}
+        <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
+          <div className="col-span-12 lg:col-span-3 text-xs tracking-wide text-neutral-500">
             Our Services
           </div>
 
-          {/* CENTER BLOCK — LEFT ALIGNED */}
-          <div className="col-span-12 lg:col-span-5 lg:col-start-5 mb-10 lg:mb-0">
-            {/* TEXT CENTERED INSIDE */}
-            <h2 className="text-start text-[clamp(28px,4vw,42px)] font-medium leading-[1.02]">
-              How we make your 
+          <div className="col-span-12 lg:col-span-5 lg:col-start-5">
+            <h2 className="text-start text-[clamp(26px,5vw,42px)] font-medium leading-[1.05]">
+              How we make your
               <br />
-              brands grow and  relevant
+              brands grow and relevant
             </h2>
           </div>
 
-          {/* RIGHT */}
           <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm text-neutral-600">
-            <p className="max-w-[260px] lg:text-right">
+            <p className="max-w-full lg:max-w-[260px] lg:text-right">
               We are a digital marketing agency with expertise, and we're on a
               mission to help you take the next step in your business.
             </p>
+
             <button className="inline-flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full text-xs font-medium w-fit">
               See all services ↗
             </button>
           </div>
         </div>
 
-        {/* SERVICES — SAME LEFT EDGE AS HEADER BLOCK */}
+        {/* ================= SERVICES ================= */}
         <div className="grid grid-cols-12">
           <div className="col-span-12 lg:col-span-8 lg:col-start-5">
             {services.map((item, i) => {
               const isHovering = hoverIndex !== null;
               const isActive = hoverIndex === i;
-              
+
               const words = item.label.split(" ");
               const lastWord = words.at(-1);
               const firstLine = words.slice(0, -1).join(" ");
@@ -2783,45 +2915,54 @@ function ServicesHero() {
               return (
                 <div
                   key={item.label}
-                  onMouseEnter={() => setHoverIndex(i)}
-                  onMouseLeave={() => setHoverIndex(null)}
-                  className="relative py-14 border-t border-black/30"
+                  onMouseEnter={() => !isMobile && setHoverIndex(i)}
+                  onMouseLeave={() => !isMobile && setHoverIndex(null)}
+                  className="relative py-10 lg:py-14 border-t border-black/20"
                 >
-                  <div className="flex items-center">
-                    {/* IMAGE — FLOW OK SEKARANG */}
-                    <div
-                      className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
-                        w-0 mr-0
-                        ${isActive ? "w-[200px] mr-10" : ""}
-                      `}
-                    >
-                      <img
-                        src={item.image}
-                        alt=""
-                        className={`h-[120px] w-full object-cover rounded-md transition-all duration-300
-                          ${
-                            isActive
-                              ? "opacity-100 scale-100"
-                              : "opacity-0 scale-95"
-                          }
+                 <div className="flex items-center gap-5 lg:gap-0">
+                    {/* IMAGE */}
+                    {isMobile && (
+                      <div className="w-[88px] h-[64px] flex-shrink-0 overflow-hidden rounded-md bg-neutral-200">
+                        <img
+                          src={item.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {!isMobile && (
+                      <div
+                        className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
+                          w-0 mr-0
+                          ${isActive ? "w-[200px] mr-10" : ""}
                         `}
-                      />
-                    </div>
+                      >
+                        <img
+                          src={item.image}
+                          alt=""
+                          className={`h-[120px] w-full object-cover rounded-md transition-all duration-300
+                            ${
+                              isActive
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-95"
+                            }
+                          `}
+                        />
+                      </div>
+                    )}
 
                     {/* TITLE */}
                     <h3
-                    className={`flex flex-col tracking-tight transition-all duration-300 ease-out ${colorState}
-                      xl:translate-x-0
-                      ${isActive ? "xl:translate-x-6" : ""}
-                    `}
-                  >
-                    <span className="text-[18px] lg:text-[26px] font-light opacity-60 mb-1">
-                      {firstLine}
-                    </span>
-                    <span className="font-semibold leading-[0.95] text-[clamp(34px,6vw,96px)]">
-                      {lastWord}
-                    </span>
-                  </h3>
+                      className={`flex flex-col tracking-tight transition-colors duration-300 ease-out ${colorState}`}
+                    >
+                      <span className="text-[13px] lg:text-[26px] font-light opacity-60 mb-1">
+                        {firstLine}
+                      </span>
+                      <span className="font-semibold leading-[1] text-[clamp(28px,7vw,96px)]">
+                        {lastWord}
+                      </span>
+                    </h3>
                   </div>
                 </div>
               );
@@ -2834,6 +2975,7 @@ function ServicesHero() {
     </section>
   );
 }
+
 
 
 
@@ -3091,7 +3233,16 @@ function Description() {
   const resizeTimer = useRef(null);
 
   useLayoutEffect(() => {
-    const isTouch = ScrollTrigger.isTouch === 1;
+    const getProfile = () => {
+      const w = window.innerWidth;
+      if (w < 640) {
+        return { factor: 0.12, clamp: 12, scrub: 0.1 };
+      }
+      if (w < 1024) {
+        return { factor: 0.4, clamp: 28, scrub: 0.4 };
+      }
+      return { factor: 1, clamp: null, scrub: 0.6 };
+    };
 
     const build = () => {
       if (
@@ -3101,30 +3252,30 @@ function Description() {
         !dividerRef.current ||
         !statsRef.current ||
         !ctaRef.current
-      ) return;
+      )
+        return;
+
+      const PROFILE = getProfile();
+      const move = (v) => {
+        const raw = v * PROFILE.factor;
+        return PROFILE.clamp
+          ? gsap.utils.clamp(-PROFILE.clamp, PROFILE.clamp, raw)
+          : raw;
+      };
 
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        const allEls = [
-          titleRef.current,
-          dividerRef.current,
-          ctaRef.current,
-          ...statsRef.current.querySelectorAll("[data-stat]"),
-          ...bodyRef.current.querySelectorAll("[data-animate]"),
-        ];
-
-        gsap.set(allEls, { opacity: 1, clearProps: "transform" });
-
         const PARALLAX_ST = {
           trigger: sectionRef.current,
-          start: "top 90%",
-          end: "bottom 20%",
-          scrub: 0.6,
+          start: "top 95%",
+          end: "bottom 45%",
+          scrub: PROFILE.scrub,
         };
 
+        // TITLE
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -3133,10 +3284,10 @@ function Description() {
         splitsRef.current.push(titleSplit);
 
         gsap.from(titleSplit.lines, {
-          yPercent: 40,
+          yPercent: 35,
           opacity: 0,
-          duration: 1.2,
-          stagger: 0.12,
+          duration: 1.1,
+          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -3146,17 +3297,18 @@ function Description() {
         });
 
         gsap.to(titleRef.current, {
-          y: -60,
+          y: move(-60),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
 
+        // DIVIDER
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
           {
             scaleX: 1,
-            duration: 1,
+            duration: 0.9,
             ease: "power2.out",
             scrollTrigger: {
               trigger: dividerRef.current,
@@ -3167,48 +3319,48 @@ function Description() {
         );
 
         gsap.to(dividerRef.current, {
-          y: -35,
+          y: move(-30),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
 
-        bodyRef.current
-          .querySelectorAll("[data-animate]")
-          .forEach((p) => {
-            const split = SplitText.create(p, {
-              type: "lines",
-              linesClass: "line",
-              mask: "lines",
-            });
-            splitsRef.current.push(split);
+        // BODY
+        bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
+          const split = SplitText.create(p, {
+            type: "lines",
+            linesClass: "line",
+            mask: "lines",
+          });
+          splitsRef.current.push(split);
 
-            gsap.from(split.lines, {
-              yPercent: 32,
-              opacity: 0,
-              duration: 1.1,
-              stagger: 0.06,
-              ease: "power1.out",
-              scrollTrigger: {
-                trigger: p,
-                start: "top 85%",
-                once: true,
-              },
-            });
-
-            gsap.to(p, {
-              y: -45,
-              ease: "none",
-              scrollTrigger: PARALLAX_ST,
-            });
+          gsap.from(split.lines, {
+            yPercent: 26,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.05,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: p,
+              start: "top 85%",
+              once: true,
+            },
           });
 
+          gsap.to(p, {
+            y: move(-40),
+            ease: "none",
+            scrollTrigger: PARALLAX_ST,
+          });
+        });
+
+        // STATS
         const stats = statsRef.current.querySelectorAll("[data-stat]");
 
         gsap.from(stats, {
           opacity: 0,
-          y: 10,
-          duration: 0.6,
-          stagger: 0.15,
+          y: 8,
+          duration: 0.5,
+          stagger: 0.12,
           ease: "power2.out",
           scrollTrigger: {
             trigger: statsRef.current,
@@ -3218,15 +3370,16 @@ function Description() {
         });
 
         gsap.to(stats, {
-          y: -25,
+          y: move(-22),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
 
+        // CTA
         gsap.from(ctaRef.current, {
           opacity: 0,
-          y: 10,
-          duration: 0.6,
+          y: 8,
+          duration: 0.5,
           ease: "power2.out",
           scrollTrigger: {
             trigger: ctaRef.current,
@@ -3236,22 +3389,20 @@ function Description() {
         });
 
         gsap.to(ctaRef.current, {
-          y: -20,
+          y: move(-18),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
       }, sectionRef);
 
-      if (!isTouch) requestAnimationFrame(() => ScrollTrigger.refresh());
+      ScrollTrigger.refresh();
     };
 
     document.fonts.ready.then(build);
 
     const onResize = () => {
       clearTimeout(resizeTimer.current);
-      resizeTimer.current = setTimeout(() => {
-        if (!isTouch) build();
-      }, 200);
+      resizeTimer.current = setTimeout(build, 200);
     };
 
     window.addEventListener("resize", onResize);
@@ -3270,11 +3421,10 @@ function Description() {
       className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
     >
       <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
-        {/* HEADLINE */}
         <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-sans font-medium tracking-tight leading-[1.05] text-neutral-900"
+            className="font-sans font-medium tracking-tight leading-[1.05]"
             style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
             We're a digital agency that helps brands stay consistent online. We
@@ -3288,47 +3438,32 @@ function Description() {
           />
         </div>
 
-        {/* CONTENT */}
-        <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-y-0 lg:gap-x-20">
-          {/* STATS */}
+        <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-x-20">
           <div ref={statsRef} className="w-full lg:flex-[0_0_42%]">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
-              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
-                <div>
-                  <div className="text-[22px] font-medium text-neutral-900">
-                    100+
-                  </div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Projects delivered
-                  </div>
+              <div data-stat>
+                <div className="text-[22px] font-medium text-neutral-900">100+</div>
+                <div className="text-xs uppercase tracking-widest">
+                  Projects delivered
                 </div>
               </div>
-
-              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
-                <div>
-                  <div className="text-[22px] font-medium text-neutral-900">
-                    3
-                  </div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Countries served
-                  </div>
+              <div data-stat>
+                <div className="text-[22px] font-medium text-neutral-900">3</div>
+                <div className="text-xs uppercase tracking-widest">
+                  Countries served
                 </div>
               </div>
-
-              <div data-stat className="flex items-center sm:flex-col sm:items-start gap-4">
-                <div>
-                  <div className="text-[22px] font-medium text-neutral-900">
-                    2.5m+
-                  </div>
-                  <div className="text-xs uppercase tracking-widest">
-                    Total audience reach
-                  </div>
+              <div data-stat>
+                <div className="text-[22px] font-medium text-neutral-900">
+                  2.5m+
+                </div>
+                <div className="text-xs uppercase tracking-widest">
+                  Total audience reach
                 </div>
               </div>
             </div>
           </div>
 
-          {/* BODY + CTA */}
           <div
             ref={bodyRef}
             className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[18px] lg:text-[19px] leading-[1.25]"
@@ -3336,10 +3471,7 @@ function Description() {
             <p data-animate className="mb-8 lg:mb-10">
               Boson is an agency based in Bali, working with brands across Qatar,
               Malaysia, and beyond. We build digital experiences that stay sharp
-              and consistent across every touchpoint — combining design,
-              development, and brand operations into one cohesive system. This
-              means fewer revisions, clearer decisions, and content that keeps
-              working even as your brand scales.
+              and consistent across every touchpoint.
             </p>
 
             <a
@@ -3362,8 +3494,12 @@ function ProjectShowcase() {
   const sectionRef = useRef(null);
   const trackRef = useRef(null);
   const progressRef = useRef(null);
+  const ctxRef = useRef(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined" && window.innerWidth >= 1024
+  );
 
   const projects = [
     {
@@ -3405,14 +3541,30 @@ function ProjectShowcase() {
 
   const isVideo = (src) => /\.(mp4|webm|ogg)$/i.test(src);
 
+  /* =========================
+     DESKTOP DETECTION
+  ========================= */
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  /* =========================
+     GSAP SETUP (ISOLATED)
+  ========================= */
   useLayoutEffect(() => {
-    if (window.innerWidth < 1024) return;
+    ctxRef.current?.revert();
 
-    const ctx = gsap.context(() => {
+    if (!isDesktop) {
+      gsap.set(
+        [trackRef.current, ".parallax-title", ".parallax-image", ".parallax-meta"],
+        { clearProps: "all" }
+      );
+      return;
+    }
+
+    ctxRef.current = gsap.context(() => {
       const slidesCount = projects.length;
       const track = trackRef.current;
       const progressBar = progressRef.current;
@@ -3436,11 +3588,9 @@ function ProjectShowcase() {
               scaleX: self.progress,
               transformOrigin: "left center",
             });
-
-            const index = Math.round(
-              self.progress * (slidesCount - 1)
+            setActiveIndex(
+              Math.round(self.progress * (slidesCount - 1))
             );
-            setActiveIndex(index);
           },
         },
       });
@@ -3470,25 +3620,20 @@ function ProjectShowcase() {
       parallax(".parallax-meta", 140, -140);
     }, sectionRef);
 
-    return () => ctx.revert();
-  }, [projects.length]);
+    return () => ctxRef.current?.revert();
+  }, [isDesktop, projects.length]);
 
   return (
     <section
       ref={sectionRef}
-      data-theme="dark"
       className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
-      {/* TRACK */}
       <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
           className="flex flex-col lg:flex-row"
           style={{
-            width:
-              typeof window !== "undefined" && window.innerWidth >= 1024
-                ? `${projects.length * 100}vw`
-                : "100%",
+            width: isDesktop ? `${projects.length * 100}vw` : "100%",
           }}
         >
           {projects.map((p, i) => (
@@ -3496,41 +3641,21 @@ function ProjectShowcase() {
               key={i}
               className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
             >
-              <div className="relative max-w-[1600px] mx-auto h-full px-6 lg:px-16 pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
+              <div className="relative mx-auto h-full px-[clamp(3rem,6vw,10rem)] pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
                 <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
                   PROJECT 0{i + 1}
                 </span>
 
-                {/* TITLE — MIX BLEND MODE */}
-                <h1
-                  className="
-                    parallax-title
-                    text-[56px] leading-[1]
-                    font-light whitespace-pre-line
-                    lg:text-[96px] lg:leading-[0.95]
-                    lg:absolute lg:left-50 lg:top-[25%]
-                    z-30
-                    mix-blend-difference
-                    pointer-events-none
-                    select-none
-                  "
-                >
+                <h2 className="lg:hidden text-[42px] leading-[0.95] font-light whitespace-pre-line">
+                  {p.title}
+                </h2>
+
+                <h1 className="parallax-title hidden lg:block absolute left-1/3 top-[25%] -translate-x-1/2 text-[clamp(3.5rem,6vw,6rem)] leading-[0.95] font-light whitespace-pre-line mix-blend-difference pointer-events-none select-none z-30">
                   {p.title}
                 </h1>
 
-                {/* MEDIA */}
-                <div className="lg:col-span-4 lg:col-start-5 z-10">
-                  <div
-                    className="
-                      parallax-image
-                      relative
-                      w-full
-                      aspect-[3/4]
-                      overflow-hidden
-                      lg:max-w-[420px]
-                      lg:mx-auto
-                    "
-                  >
+                <div className="lg:col-span-4 lg:col-start-5 z-10 flex justify-center">
+                  <div className="parallax-image relative w-[clamp(320px,80vw,680px)] lg:w-[clamp(420px,30vw,680px)] aspect-[3/4]">
                     {isVideo(p.image) ? (
                       <video
                         src={p.image}
@@ -3550,7 +3675,6 @@ function ProjectShowcase() {
                   </div>
                 </div>
 
-                {/* META */}
                 <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 lg:justify-end">
                   <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
@@ -3559,7 +3683,7 @@ function ProjectShowcase() {
                       </p>
                     ))}
                   </div>
-                  <p className="text-sm text-white/60">
+                  <p className="text-sm text-white/60 leading-relaxed max-w-[34ch]">
                     {p.desc}
                   </p>
                 </div>
@@ -3569,21 +3693,24 @@ function ProjectShowcase() {
         </div>
       </div>
 
-      {/* PROGRESS */}
-      <div className="hidden lg:block absolute bottom-0 left-0 right-0 px-28 pb-6">
-        <div className="h-[1px] bg-white/20">
-          <div
-            ref={progressRef}
-            className="h-full bg-white origin-left scale-x-0"
-          />
+      {isDesktop && (
+        <div className="absolute bottom-0 left-0 right-0 px-28 pb-6">
+          <div className="h-px bg-white/20">
+            <div
+              ref={progressRef}
+              className="h-full bg-white origin-left scale-x-0"
+            />
+          </div>
+          <div className="mt-4 text-sm">
+            [ {activeIndex + 1} — {projects.length} ]
+          </div>
         </div>
-        <div className="mt-4 text-sm">
-          [ {activeIndex + 1} — {projects.length} ]
-        </div>
-      </div>
+      )}
     </section>
   );
 }
+
+
 
 
 
@@ -3899,43 +4026,43 @@ function Footer() {
   
         <Header />
   
-        {/* <div
+        <div
           data-theme="dark"
           style={{ position: "relative", zIndex: 2, width: "100%" }}
         >
           <BosonNarrative />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <Projects />
-        </div> */}
+        </div>
   
         {/* ==================================================
           DESCRIPTION
         ================================================== */}
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <Description />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <VideoSection />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <ServicesHero />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <BigHeading />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <ProjectShowcase />
-        </div> */}
+        </div>
   
-        {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <div style={{ position: "relative", zIndex: 2 }}>
           <WorksList />
-        </div> */}
+        </div>
   
         {/* <BosonScrollText /> */}
   
