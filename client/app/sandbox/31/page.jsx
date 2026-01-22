@@ -30,17 +30,26 @@ function Webglbg() {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const webgl = new GradientBg({ rendererEl: containerRef.current, background: {
-      color1: [0.796, 0.294, 0.243],
-      color2: [0.914, 0.412, 0.349],
-      color3: [0, 0, 0],
-      colorAccent: new THREE.Color(0, 0, 0),
-      uLinesBlur: 0.33,
-      uNoise: 0.03,
-      uOffsetX: 0.05,
-      uOffsetY: -2.46,
-      uLinesAmount: 1.36,      
-    } });
+
+    const isMobile =
+      typeof window !== "undefined" && window.innerWidth <= 768;
+
+    const webgl = new GradientBg({
+      rendererEl: containerRef.current,
+      background: {
+        color1: [0.796, 0.294, 0.243],
+        color2: [0.914, 0.412, 0.349],
+        color3: [0, 0, 0],
+        colorAccent: new THREE.Color(0, 0, 0),
+
+        uLinesBlur: isMobile ? 0.33 : 0.33,
+        uNoise: isMobile ? 0.03 : 0.03,
+        uOffsetX: isMobile ? 0.05 : 0.05,
+        uOffsetY: isMobile ? -3.66 : -2.46,
+        uLinesAmount: isMobile ? 1.36 : 1.36,
+      },
+    });
+
     return () => webgl.destroy();
   }, []);
 
@@ -55,6 +64,7 @@ function Webglbg() {
     />
   );
 }
+
 
 /* ==========================================
    HERO (PERSIS PUNYA LO)
@@ -1938,10 +1948,6 @@ function Galery() {
   );
 }
 
-
-
-
-
 function BigHeading() {
   const ref = useRef(null);
 
@@ -1950,7 +1956,7 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-15%"]);
+  const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-9%"]);
   const bottomX = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
   return (
@@ -2874,7 +2880,8 @@ function ServicesHero() {
         </div>
       )}
 
-      <div className="w-full px-6 sm:px-10 lg:px-20 py-20 lg:py-24">
+<div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
+
         {/* ================= TOP ================= */}
         <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
           <div className="col-span-12 lg:col-span-3 text-xs tracking-wide text-neutral-500">
