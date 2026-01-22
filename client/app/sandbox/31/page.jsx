@@ -222,9 +222,6 @@ function Hero() {
       "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915808/hidden-city-ubud-3.jpg",
     ];
   
-    // =========================
-    // CLOUDINARY AUTO TRANSFORM
-    // =========================
     const OPTIMIZED_IMAGES = useMemo(() => {
       return IMAGES.map((src) => {
         if (!src.includes("/image/upload/")) return src;
@@ -242,9 +239,6 @@ function Hero() {
       Array(OPTIMIZED_IMAGES.length).fill("start")
     );
   
-    // =========================
-    // TOP INDEX
-    // =========================
     const topIndex = useMemo(() => {
       for (let i = visible.length - 1; i >= 0; i--) {
         if (visible[i] === "open" || visible[i] === "soft") return i;
@@ -252,9 +246,6 @@ function Hero() {
       return 0;
     }, [visible]);
   
-    // =========================
-    // RESPONSIVE
-    // =========================
     const [isMobile, setIsMobile] = useState(false);
   
     useEffect(() => {
@@ -274,9 +265,6 @@ function Hero() {
   
     const getDuration = (i) => (i === 0 ? 650 : 250);
   
-    // =========================
-    // TIMELINE (UNCHANGED)
-    // =========================
     useEffect(() => {
       let timeCursor = 0;
   
@@ -325,7 +313,7 @@ function Hero() {
   
     return (
       <motion.div
-        className="absolute inset-0 z-[60] pointer-events-none"
+        className="absolute inset-0 flex items-center justify-center z-[60] pointer-events-none"
         animate={phase === "expand" ? scaleExpand : { scaleX: 1, scaleY: 1 }}
         transition={{ duration: 1.6, ease: "easeInOut" }}
         style={{
@@ -333,8 +321,13 @@ function Hero() {
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
       >
-        {/* SAFE AREA CENTER */}
-        <div className="w-full h-full flex items-center justify-center">
+        {/* ✅ COMPENSATED CENTER */}
+        <div
+          style={{
+            transform:
+              "translateY(calc((env(safe-area-inset-top) - env(safe-area-inset-bottom)) / 2))",
+          }}
+        >
           <div
             className="relative"
             style={{
@@ -370,7 +363,6 @@ function Hero() {
               ))}
             </div>
   
-            {/* HOLE */}
             <div className="absolute inset-0 spotlight pointer-events-none" />
           </div>
         </div>
@@ -383,8 +375,6 @@ function Hero() {
       </motion.div>
     );
   }
-  
-  
     
   
   
