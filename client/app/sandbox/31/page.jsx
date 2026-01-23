@@ -1215,7 +1215,7 @@ function VideoSection() {
       >
         <video
           ref={videoRef}
-          src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
+          src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov"
           autoPlay
           loop
           muted
