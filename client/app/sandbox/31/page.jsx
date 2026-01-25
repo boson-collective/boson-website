@@ -124,12 +124,21 @@ function Hero() {
           className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide text-white"
         >
           <div className="flex gap-4 sm:gap-8">
-            <span>About</span>
-            <span>Services</span>
+            <Link href="/about" className="hover:opacity-100 transition-opacity">
+              About
+            </Link>
+            <Link href="/services" className="hover:opacity-100 transition-opacity">
+              Services
+            </Link>
           </div>
+
           <div className="flex gap-4 sm:gap-8">
-            <span>Works</span>
-            <span>Contact</span>
+            <Link href="/works" className="hover:opacity-100 transition-opacity">
+              Works
+            </Link>
+            <Link href="/contact" className="hover:opacity-100 transition-opacity">
+              Contact
+            </Link>
           </div>
         </motion.div>
   
@@ -3480,9 +3489,11 @@ function Description() {
             className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[18px] lg:text-[19px] leading-[1.25]"
           >
             <p data-animate className="mb-8 lg:mb-10">
-              Boson is an agency based in Bali, working with brands across Qatar,
-              Malaysia, and beyond. We build digital experiences that stay sharp
-              and consistent across every touchpoint.
+              Boson is an agency based in Bali, working with brands across
+              Qatar, Malaysia, and beyond. We build digital experiences that stay
+              sharp and consistent across every touchpoint — combining design,
+              development, and brand operations into one cohesive system. This means fewer revisions, clearer decisions, and content that keeps
+              working even as your brand scales.
             </p>
 
             <a

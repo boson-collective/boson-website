@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useContext, useRef, useLayoutEffect, useState } from "react";
+import React, { useEffect, useContext, useRef, useLayoutEffect, useState, useCallback } from "react";
 import * as THREE from "three";
 import { motion, useSpring, useScroll, useTransform, useAnimationFrame, useAnimation, useReducedMotion, useMotionValue, animate} from "framer-motion";
 import GradientBg from '../../components/organisms/GradientBg'
@@ -104,7 +104,7 @@ function Hero() {
                 let's talk
               </span>
 
-              You've got it! Lay out all the juicy details for us. Feel free to reach out if you want to collaborate with us, or simply have a chat
+              You've got it! Lay out all the juicy details for us. Let's see what we can dream up together
             </h1>
           </div>
 
@@ -411,36 +411,188 @@ const DOT_MODES = {
   SELECTED: "selected",
   FOCUS: "focus",
 };
+  
+/* =====================
+   PRIMITIVES
+===================== */
 
-export default function Page() {
-  const [service, setService] = useState(null);
-  const [budget, setBudget] = useState(null);
-  const [delivery, setDelivery] = useState(null);
-  const [source, setSource] = useState(null);
+function Field({ label, children }) {
+  return (
+    <div className="py-20 border-b border-black/10">
+      <div className="mb-6 text-[11px] uppercase tracking-wide text-black/75">
+        {label}
+      </div>
+      {children}
+    </div>
+  );
+}
 
+function TextInput({ placeholder, onFocus, onBlur, anchorRefs }) {
+  return (
+    <input
+      type="text"
+      placeholder={placeholder}
+      ref={(el) => el && anchorRefs.current.push(el)}
+      onFocus={(e) => onFocus(e.currentTarget)}
+      onBlur={onBlur}
+      className="
+        w-full
+        bg-transparent
+        outline-none
+        text-[28px]
+        leading-tight
+        font-light
+        text-black/80
+        placeholder:text-black/25
+      "
+    />
+  );
+}
+
+function TextArea({ placeholder, onFocus, onBlur, anchorRefs }) {
+  return (
+    <textarea
+      rows={4}
+      placeholder={placeholder}
+      ref={(el) => el && anchorRefs.current.push(el)}
+      onFocus={(e) => onFocus(e.currentTarget)}
+      onBlur={onBlur}
+      className="
+        w-full
+        bg-transparent
+        outline-none
+        resize-none
+        text-[28px]
+        leading-snug
+        font-light
+        text-black/80
+        placeholder:text-black/25
+      "
+    />
+  );
+}
+
+/* =====================
+   TOP INFO
+===================== */
+
+function TopInfo({ baliTime, blink }) {
+  return (
+    <div className="w-full border-b border-black/10 text-[10px] uppercase tracking-wide">
+      <div className="max-w-7xl mx-auto px-6 lg:px-20 py-3 grid sm:grid-cols-3 gap-y-2">
+        <div className="opacity-50">
+          Bali · {baliTime.hour}
+          <span className={blink ? "opacity-100" : "opacity-0"}>:</span>
+          {baliTime.minute} (UTC+8)
+        </div>
+        <div className="sm:text-center text-black/60">
+          WhatsApp · +62 812 3456 789
+        </div>
+        <div className="sm:text-right text-black/50">
+          Replies in 1–2 working days
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* =====================
+   FORM
+===================== */
+
+function ContactForm({ anchorRefs, onFocus, onBlur }) {
+  return (
+    <div className="mt-5">
+      <Field label="Your Name">
+        <TextInput
+          placeholder="Your autograph, please"
+          anchorRefs={anchorRefs}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
+      </Field>
+
+      <Field label="Your Company">
+        <TextInput
+          placeholder="Company name"
+          anchorRefs={anchorRefs}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
+      </Field>
+
+      <Field label="Your E-mail">
+        <TextInput
+          placeholder="@"
+          anchorRefs={anchorRefs}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
+      </Field>
+
+      <Field label="Project Details">
+        <TextArea
+          placeholder="What's on your mind..."
+          anchorRefs={anchorRefs}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
+      </Field>
+    </div>
+  );
+}
+
+/* =====================
+   ACTION
+===================== */
+
+function FormAction({ anchorRefs, submitButtonRef, onHover }) {
+  return (
+    <div className="pt-32 flex flex-col items-end gap-6">
+      <button
+        ref={(el) => {
+          submitButtonRef.current = el;
+          if (el) anchorRefs.current.push(el);
+        }}
+        onMouseEnter={onHover}
+        type="submit"
+        className="
+          text-[20px]
+          font-normal
+          tracking-tight
+          group
+        "
+      >
+        <span>Send Request</span>
+        <span className="inline-block ml-3 transition-transform duration-300 group-hover:translate-x-3">
+          →
+        </span>
+      </button>
+
+      <p className="text-[11px] text-black/40 max-w-xs text-right">
+        Submitted information is used for communication related to this request.
+      </p>
+
+      <p className="text-[11px] text-black/35 text-right">
+        By submitting, you agree to our{" "}
+        <span className="underline">Privacy Policy</span>.
+      </p>
+    </div>
+  );
+}
+
+/* =====================
+   PAGE
+===================== */
+
+function ContactPage() {
   const [baliTime, setBaliTime] = useState({ hour: "--", minute: "--" });
   const [blink, setBlink] = useState(true);
-  
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
-  /* =====================
-     DOT SYSTEM
-  ===================== */
   const dotRef = useRef(null);
-  const idleTimer = useRef(null);
-  const raf = useRef(null);
-  const [dotMode, setDotMode] = useState(DOT_MODES.IDLE);
-  const dotLocked = useRef(false); // ⬅️ KUNCI FINAL
-
-  // SEMUA TARGET DOT
   const anchorRefs = useRef([]);
   const submitButtonRef = useRef(null);
 
-  /* =====================
-     TIME EFFECT
-  ===================== */
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -464,53 +616,199 @@ export default function Page() {
     };
   }, []);
 
-  /* =====================
-     DOT MOVE CORE
-  ===================== */
-  const moveDotToEl = (el, lock = false) => {
+  const moveDotToEl = (el) => {
     if (!dotRef.current || !el) return;
-    if (dotLocked.current) return;
-
     const r = el.getBoundingClientRect();
-    const DOT_OFFSET_X = 12;
-
-    const x = r.right + DOT_OFFSET_X;
-    const y = r.top + r.height / 2;
-
-    const distance = Math.hypot(x, y);
-    const duration = Math.min(Math.max(distance * 0.6, 180), 700);
-
-    dotRef.current.style.transitionDuration = `${duration}ms`;
-    dotRef.current.style.left = `${x}px`;
-    dotRef.current.style.top = `${y}px`;
+    dotRef.current.style.left = `${r.right + 12}px`;
+    dotRef.current.style.top = `${r.top + r.height / 2}px`;
     dotRef.current.style.opacity = "1";
     dotRef.current.style.transform = "translate(-50%, -50%) scale(1)";
+  };
 
-    if (lock) {
-      dotLocked.current = true; // ⬅️ MATI TOTAL
-      setDotMode(DOT_MODES.SELECTED);
+  const handleFocus = (el) => moveDotToEl(el);
+  const handleBlur = () => {
+    dotRef.current.style.opacity = "0.2";
+    dotRef.current.style.transform =
+      "translate(-50%, -50%) scale(0.8)";
+  };
+
+  const handleSubmitHover = () => {
+    if (submitButtonRef.current) {
+      moveDotToEl(submitButtonRef.current);
     }
   };
 
+  return (
+    <main className="min-h-screen bg-[#d7d3da] text-black">
+      {/* DOT */}
+      <span
+        ref={dotRef}
+        className="
+          fixed
+          w-2
+          h-2
+          rounded-full
+          bg-black
+          pointer-events-none
+          z-50
+          transition-all
+          duration-300
+          ease-out
+        "
+        style={{
+          left: 0,
+          top: 0,
+          opacity: 0.2,
+          transform: "translate(-50%, -50%) scale(0.8)",
+        }}
+      />
+
+      <TopInfo baliTime={baliTime} blink={blink} />
+
+      <section className="max-w-7xl mx-auto px-6 lg:px-20 pb-48">
+        <div className="pt-32 pb-16 text-center text-[22px] text-black/80">
+          Let’s see what we can dream up together.
+        </div>
+
+        <form>
+          <ContactForm
+            anchorRefs={anchorRefs}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+
+          <FormAction
+            anchorRefs={anchorRefs}
+            submitButtonRef={submitButtonRef}
+            onHover={handleSubmitHover}
+          />
+        </form>
+      </section>
+    </main>
+  );
+}
+
+
+
+
+
+
+
+export default  function Page() {
+  const [baliTime, setBaliTime] = useState({ hour: "--", minute: "--" });
+  const [blink, setBlink] = useState(true);
+  const [dotMode, setDotMode] = useState(DOT_MODES.IDLE);
+
+  const dotRef = useRef(null);
+  const anchorRefs = useRef([]);
+  const submitButtonRef = useRef(null);
+
+  const dotLocked = useRef(false);
+  const idleTimer = useRef(null);
+  const raf = useRef(null);
+  const mounted = useRef(false);
+
   /* =====================
-     SCROLL LOGIC
+     SAFE DOM ACCESS
+  ===================== */
+  const withDot = useCallback(fn => {
+    const dot = dotRef.current;
+    if (!mounted.current || !dot) return;
+    fn(dot);
+  }, []);
+
+  /* =====================
+     TIME
   ===================== */
   useEffect(() => {
-    const onScroll = () => {
-      if (dotLocked.current) return;
-      if (dotMode === DOT_MODES.SELECTED || dotMode === DOT_MODES.FOCUS) return;
+    mounted.current = true;
 
-      clearTimeout(idleTimer.current);
+    const updateTime = () => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Makassar",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+      const [hour, minute] = formatter.format(now).split(":");
+      setBaliTime({ hour, minute });
+    };
+
+    updateTime();
+
+    const t = setInterval(updateTime, 60000);
+    const b = setInterval(() => setBlink(v => !v), 1000);
+
+    return () => {
+      mounted.current = false;
+      clearInterval(t);
+      clearInterval(b);
+    };
+  }, []);
+
+  /* =====================
+     DOT CORE
+  ===================== */
+  const moveDotToEl = useCallback((el, lock = false) => {
+    if (!el || dotLocked.current) return;
+
+    withDot(dot => {
+      const r = el.getBoundingClientRect();
+      const x = r.right + 12;
+      const y = r.top + r.height / 2;
+
+      const distance = Math.hypot(x, y);
+      const duration = Math.min(Math.max(distance * 0.6, 180), 700);
+
+      Object.assign(dot.style, {
+        transitionDuration: `${duration}ms`,
+        left: `${x}px`,
+        top: `${y}px`,
+        opacity: "1",
+        transform: "translate(-50%, -50%) scale(1)",
+      });
+
+      if (lock) {
+        dotLocked.current = true;
+        setDotMode(DOT_MODES.SELECTED);
+      }
+    });
+  }, [withDot]);
+
+  /* =====================
+     SCROLL
+  ===================== */
+  useEffect(() => {
+    if (!mounted.current) return;
+
+    const onScroll = () => {
+      if (
+        dotLocked.current ||
+        [DOT_MODES.SELECTED, DOT_MODES.FOCUS].includes(dotMode)
+      )
+        return;
+
+      if (idleTimer.current) {
+        clearTimeout(idleTimer.current);
+        idleTimer.current = null;
+      }
+
       setDotMode(DOT_MODES.SCROLL);
 
-      if (raf.current) cancelAnimationFrame(raf.current);
+      if (raf.current) {
+        cancelAnimationFrame(raf.current);
+        raf.current = null;
+      }
 
       raf.current = requestAnimationFrame(() => {
+        if (!mounted.current) return;
+
         const centerY = window.innerHeight / 2;
         let closest = null;
         let minDist = Infinity;
 
-        anchorRefs.current.forEach((el) => {
+        anchorRefs.current.forEach(el => {
           if (!el) return;
           const r = el.getBoundingClientRect();
           const y = r.top + r.height / 2;
@@ -526,29 +824,38 @@ export default function Page() {
 
       idleTimer.current = setTimeout(() => {
         if (dotLocked.current) return;
+
         setDotMode(DOT_MODES.IDLE);
-        dotRef.current.style.opacity = "0.2";
-        dotRef.current.style.transform =
-          "translate(-50%, -50%) scale(0.8)";
+
+        withDot(dot => {
+          dot.style.opacity = "0.2";
+          dot.style.transform = "translate(-50%, -50%) scale(0.8)";
+        });
       }, 1200);
     };
 
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [dotMode]);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+
+      if (raf.current) {
+        cancelAnimationFrame(raf.current);
+        raf.current = null;
+      }
+
+      if (idleTimer.current) {
+        clearTimeout(idleTimer.current);
+        idleTimer.current = null;
+      }
+    };
+  }, [dotMode, moveDotToEl, withDot]);
 
   /* =====================
-     INPUT HANDLERS
+     HANDLERS
   ===================== */
-  const handleRadioSelect = (value, setter, el) => {
-    if (dotLocked.current) return;
-    setter(value);
-    setDotMode(DOT_MODES.SELECTED);
-    moveDotToEl(el);
-  };
-
-  const handleFocus = (el) => {
+  const handleFocus = el => {
     if (dotLocked.current) return;
     setDotMode(DOT_MODES.FOCUS);
     moveDotToEl(el);
@@ -561,15 +868,18 @@ export default function Page() {
 
   const handleSubmitHover = () => {
     if (!submitButtonRef.current) return;
-    moveDotToEl(submitButtonRef.current, true); // ⬅️ FINAL DESTINATION
+    moveDotToEl(submitButtonRef.current, true);
   };
 
+  /* =====================
+     RENDER
+  ===================== */
   return (
-    <main className="min-h-screen bg-white text-black selection:bg-black selection:text-white">
+    <main className="min-h-screen bg-white text-black">
       {/* DOT */}
       <span
         ref={dotRef}
-        className="fixed w-2 h-2 rounded-full bg-black pointer-events-none z-50 transition-all ease-[cubic-bezier(.22,1,.36,1)]"
+        className="fixed hidden w-2 h-2 rounded-full bg-black pointer-events-none z-50 transition-all ease-[cubic-bezier(.22,1,.36,1)]"
         style={{
           left: 0,
           top: 0,
@@ -579,207 +889,25 @@ export default function Page() {
       />
 
       <Hero />
+      <TopInfo baliTime={baliTime} blink={blink} />
 
-      {/* TOP INFO */}
-      <div className="w-full border-b border-black/10 text-[10px] sm:text-[11px] uppercase tracking-wide">
-        <div className="max-w-7xl mx-auto px-6 lg:px-20 py-3 grid grid-cols-1 sm:grid-cols-3 gap-y-2 items-center">
-          <div className="opacity-50">
-            Bali · {baliTime.hour}
-            <span className={blink ? "opacity-100" : "opacity-0"}>:</span>
-            {baliTime.minute} (UTC+8)
-          </div>
-          <div className="sm:text-center text-black/70">
-            WhatsApp · +62 812 3456 789
-          </div>
-          <div className="sm:text-right text-black/60">
-            Replies in 1–2 working days
-          </div>
-        </div>
-      </div>
-
-      {/* FORM */}
       <section className="px-6 lg:px-20 max-w-7xl mx-auto pb-40">
-      <form className="border-t border-black/20">
-
-<FormRow index="01." label="What do you need?">
-  <RadioList
-    value={service}
-    onChange={(v, el) => handleRadioSelect(v, setService, el)}
-    options={[
-      "Website",
-      "Branding",
-      "Motion Design",
-      "Editorial Design",
-      "Naming",
-      "Art Direction",
-      "Video Direction",
-      "Copy",
-      "App Design",
-      "Front-End Development",
-    ]}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="02." label="Project Budget (€)">
-  <RadioList
-    value={budget}
-    onChange={(v, el) => handleRadioSelect(v, setBudget, el)}
-    options={["20k–50k", "50k–100k", "> 100k"]}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="03." label="Your Company">
-  <TextInput
-    placeholder="Your company"
-    onFocus={handleFocus}
-    onBlur={handleBlur}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="04." label="Your Name">
-  <TextInput
-    placeholder="Your name"
-    onFocus={handleFocus}
-    onBlur={handleBlur}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="05." label="Your E-mail">
-  <TextInput
-    placeholder="Your e-mail"
-    onFocus={handleFocus}
-    onBlur={handleBlur}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="06." label="Project Details">
-  <textarea
-    rows={5}
-    placeholder="Tell us about your project, goals, constraints, expectations."
-    onFocus={(e) => handleFocus(e.currentTarget)}
-    onBlur={handleBlur}
-    ref={(el) => el && anchorRefs.current.push(el)}
-    className="w-full bg-transparent outline-none resize-none text-lg text-black/70 placeholder:text-black/30"
-  />
-</FormRow>
-
-<FormRow index="07." label="Project Delivery Date">
-  <RadioList
-    value={delivery}
-    onChange={(v, el) => handleRadioSelect(v, setDelivery, el)}
-    options={["3 months", "6 months", "9 months", "Next year"]}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-<FormRow index="08." label="Where did you hear about us?">
-  <RadioList
-    value={source}
-    onChange={(v, el) => handleRadioSelect(v, setSource, el)}
-    options={[
-      "Awwwards",
-      "LinkedIn",
-      "Made by Büro project",
-      "Friend",
-      "Other",
-    ]}
-    anchorRefs={anchorRefs}
-  />
-</FormRow>
-
-{/* ACTION + CONTEXT (SATU BLOK, KANAN) */}
-<div className="py-24 flex flex-col items-end gap-4">
-<button
-  ref={(el) => {
-    submitButtonRef.current = el;
-    if (el) anchorRefs.current.push(el);
-  }}
-  onMouseEnter={handleSubmitHover}
-  type="submit"
-  className="group text-xl font-semibold tracking-tight transition-opacity"
->
-  <span>Send Request</span>
-  <span
-    className="
-      inline-block ml-2
-      transition-transform duration-300 ease-out delay-75
-      group-hover:translate-x-3
-    "
-  >
-    →
-  </span>
-</button>
-
-
-  <p className="text-[11px] text-black/45 max-w-xs text-right">
-    Submitted information is used for communication related to this request.
-  </p>
-
-  <p className="text-[11px] text-black/40 text-right">
-    By submitting, you agree to our{" "}
-    <span className="underline">Privacy Policy</span>.
-  </p>
-</div>
-
-</form>
-
+        <form className="border-t border-black/20">
+          <ContactForm
+            anchorRefs={anchorRefs}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+          <FormAction
+            anchorRefs={anchorRefs}
+            submitButtonRef={submitButtonRef}
+            onHover={handleSubmitHover}
+          />
+        </form>
       </section>
 
       <FAQ />
       <Footer />
     </main>
-  );
-}
-
-/* =====================
-   SUB COMPONENTS
-===================== */
-
-function FormRow({ index, label, children }) {
-  return (
-    <div className="grid grid-cols-[72px_1fr_2fr] gap-8 py-14 border-b border-black/20">
-      <div className="text-lg">{index}</div>
-      <div className="text-lg">{label}</div>
-      <div>{children}</div>
-    </div>
-  );
-}
-
-function RadioList({ options, value, onChange, anchorRefs }) {
-  return (
-    <div className="space-y-4">
-      {options.map((opt) => (
-        <label key={opt} className="flex items-center gap-4 text-[15px] md:text-lg cursor-pointer">
-          <span className="w-4 h-4 rounded-full border border-black flex items-center justify-center">
-            {value === opt && <span className="w-2 h-2 rounded-full bg-black" />}
-          </span>
-          <input type="radio" checked={value === opt} readOnly className="hidden" />
-          <span
-            ref={(el) => el && anchorRefs.current.push(el)}
-            onClick={(e) => onChange(opt, e.currentTarget)}
-          >
-            {opt}
-          </span>
-        </label>
-      ))}
-    </div>
-  );
-}
-
-function TextInput({ placeholder, onFocus, onBlur, anchorRefs }) {
-  return (
-    <input
-      type="text"
-      placeholder={placeholder}
-      onFocus={(e) => onFocus(e.currentTarget)}
-      onBlur={onBlur}
-      ref={(el) => el && anchorRefs.current.push(el)}
-      className="w-full bg-transparent outline-none text-lg text-black/70 placeholder:text-black/30"
-    />
   );
 }
