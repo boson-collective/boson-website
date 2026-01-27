@@ -1095,7 +1095,7 @@ function VideoSection() {
           }}
         >
           <video
-            src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768191599/Private_Jet_ouqtwx.mp4"
+            src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov"
             autoPlay
             loop
             muted
@@ -2794,14 +2794,9 @@ function BosonScrollText() {
   );
 }
 
-
+ 
 function ServicesHero() {
-  const cursorRef = useRef(null);
-  const sectionRef = useRef(null);
-
   const [hoverIndex, setHoverIndex] = useState(null);
-  const [inside, setInside] = useState(false);
-
   const [isMobile, setIsMobile] = useState(false);
 
   /* =====================
@@ -2813,32 +2808,6 @@ function ServicesHero() {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
-
-  /* =====================
-     CUSTOM CURSOR (DESKTOP ONLY)
-  ===================== */
-  useEffect(() => {
-    if (isMobile) return;
-
-    const cursor = cursorRef.current;
-    const section = sectionRef.current;
-    if (!cursor || !section) return;
-
-    const move = (e) => {
-      const rect = section.getBoundingClientRect();
-      const isInside =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
-
-      cursor.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-      setInside(isInside);
-    };
-
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, [isMobile]);
 
   const services = [
     {
@@ -2864,31 +2833,8 @@ function ServicesHero() {
   ];
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900"
-    >
-      {/* CURSOR — DESKTOP ONLY */}
-      {!isMobile && (
-        <div
-          ref={cursorRef}
-          className="pointer-events-none fixed top-0 left-0 z-[9999]"
-          style={{ transform: "translate3d(-9999px,-9999px,0)" }}
-        >
-          <div
-            className="w-[64px] h-[64px] rounded-full bg-black"
-            style={{
-              transform: inside ? "scale(1)" : "scale(0)",
-              opacity: inside ? 1 : 0,
-              transition:
-                "transform 220ms cubic-bezier(0.22,1,0.36,1), opacity 180ms ease-out",
-            }}
-          />
-        </div>
-      )}
-
-<div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
-
+    <section className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900">
+      <div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
         {/* ================= TOP ================= */}
         <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
           <div className="col-span-12 lg:col-span-3 text-xs tracking-wide text-neutral-500">
@@ -2939,8 +2885,8 @@ function ServicesHero() {
                   onMouseLeave={() => !isMobile && setHoverIndex(null)}
                   className="relative py-10 lg:py-14 border-t border-black/20"
                 >
-                 <div className="flex items-center gap-5 lg:gap-0">
-                    {/* IMAGE */}
+                  <div className="flex items-center gap-5 lg:gap-0">
+                    {/* IMAGE — MOBILE */}
                     {isMobile && (
                       <div className="w-[88px] h-[64px] flex-shrink-0 overflow-hidden rounded-md bg-neutral-200">
                         <img
@@ -2951,6 +2897,7 @@ function ServicesHero() {
                       </div>
                     )}
 
+                    {/* IMAGE — DESKTOP */}
                     {!isMobile && (
                       <div
                         className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
@@ -2995,6 +2942,7 @@ function ServicesHero() {
     </section>
   );
 }
+
 
 
 
