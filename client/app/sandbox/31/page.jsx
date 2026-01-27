@@ -2844,7 +2844,7 @@ function ServicesHero() {
     {
       label: "Social Media Marketing",
       image:
-        "https://i.pinimg.com/736x/20/dc/20/20dc2018ff68b43705e167cfd0452b85.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484492/Screenshot_2026-01-27_at_10.28.02.png",
     },
     {
       label: "Content Production",
@@ -2854,12 +2854,12 @@ function ServicesHero() {
     {
       label: "Brand Strategy",
       image:
-        "https://i.pinimg.com/1200x/f7/91/37/f79137ca724f78b5e0dd7e4820ad13f2.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484710/Screenshot_2026-01-27_at_10.31.37.png",
     },
     {
       label: "Website Development",
       image:
-        "https://i.pinimg.com/736x/ef/82/3e/ef823e9611b89a12bb0503bfb8dc0ec5.jpg",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484844/Screenshot_2026-01-27_at_10.33.52.png",
     },
   ];
 
@@ -3517,11 +3517,14 @@ function ProjectShowcase() {
   const trackRef = useRef(null);
   const progressRef = useRef(null);
   const ctxRef = useRef(null);
+  const cursorRef = useRef(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== "undefined" && window.innerWidth >= 1024
   );
+
+  const [isHoveringTarget, setIsHoveringTarget] = useState(false); // ⬅️ FIX UTAMA
 
   const projects = [
     {
@@ -3530,6 +3533,7 @@ function ProjectShowcase() {
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A property development group delivering residential and hospitality projects with a focus on design, lifestyle, and long-term value",
+      igLink: "https://www.instagram.com/sunnyfamilybali",
     },
     {
       title: "Novo\nAmpang",
@@ -3537,6 +3541,7 @@ function ProjectShowcase() {
       meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MARKETING"],
       desc:
         "A premium residential development in Kuala Lumpur designed for urban living and investment-driven buyers",
+      igLink: "https://www.instagram.com/novo_ampang_kl",
     },
     {
       title: "Shinobi\nSoirée",
@@ -3544,6 +3549,7 @@ function ProjectShowcase() {
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
+      igLink: "https://www.instagram.com/shinobi_soiree",
     },
     {
       title: "Marroosh\nBali",
@@ -3551,6 +3557,7 @@ function ProjectShowcase() {
       meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A Lebanese restaurant in Canggu offering authentic Middle Eastern cuisine in a warm, casual dining setting.",
+      igLink: "https://www.instagram.com/marrooshbali",
     },
     {
       title: "Tender\nTouch",
@@ -3558,6 +3565,7 @@ function ProjectShowcase() {
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A wellness and massage brand in Bali offering premium treatments focused on recovery, relaxation, and holistic care",
+      igLink: "https://www.instagram.com/tendertouch.bali",
     },
   ];
 
@@ -3571,6 +3579,78 @@ function ProjectShowcase() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+
+  /* =========================
+     CUSTOM CURSOR (NO LEAK)
+  ========================= */
+  useEffect(() => {
+    if (!isDesktop || !cursorRef.current) return;
+
+    const cursor = cursorRef.current;
+
+    gsap.set(cursor, {
+      xPercent: -50,
+      yPercent: -50,
+    });
+
+    const move = (e) => {
+      gsap.to(cursor, {
+        x: e.clientX,
+        y: e.clientY,
+        duration: 0.12,
+        ease: "power3.out",
+      });
+    };
+
+    const show = () => {
+      setIsHoveringTarget(true); // ⬅️ GUARD ON
+      gsap.to(cursor, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.2,
+        ease: "power3.out",
+      });
+      document.body.style.cursor = "none";
+    };
+
+    const hide = () => {
+      setIsHoveringTarget(false); // ⬅️ GUARD OFF
+      gsap.to(cursor, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.2,
+        ease: "power3.out",
+      });
+      document.body.style.cursor = "default";
+    };
+
+    const click = () => {
+      if (!isHoveringTarget) return; // ⬅️ FIX ANTI-BOCOR
+      const link = projects[activeIndex]?.igLink;
+      if (link) {
+        window.open(link, "_blank", "noopener,noreferrer");
+      }
+    };
+
+    window.addEventListener("mousemove", move);
+    window.addEventListener("click", click);
+
+    const targets = document.querySelectorAll(".cursor-target");
+    targets.forEach((el) => {
+      el.addEventListener("mouseenter", show);
+      el.addEventListener("mouseleave", hide);
+    });
+
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("click", click);
+      targets.forEach((el) => {
+        el.removeEventListener("mouseenter", show);
+        el.removeEventListener("mouseleave", hide);
+      });
+      document.body.style.cursor = "default";
+    };
+  }, [isDesktop, activeIndex, isHoveringTarget, projects]);
 
   /* =========================
      GSAP SETUP (ISOLATED)
@@ -3650,6 +3730,20 @@ function ProjectShowcase() {
       ref={sectionRef}
       className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
     >
+      {isDesktop && (
+        <div
+          ref={cursorRef}
+          className="fixed top-0 left-0 z-[9999] pointer-events-none
+                     w-[140px] h-[140px] rounded-full bg-white text-black
+                     flex items-center justify-center text-xs tracking-wide
+                     opacity-0 scale-0"
+        >
+          <span className="text-center leading-tight">
+            VIEW<br />ON INSTAGRAM →
+          </span>
+        </div>
+      )}
+
       <div className="relative lg:absolute lg:inset-0">
         <div
           ref={trackRef}
@@ -3677,7 +3771,7 @@ function ProjectShowcase() {
                 </h1>
 
                 <div className="lg:col-span-4 lg:col-start-5 z-10 flex justify-center">
-                  <div className="parallax-image relative w-[clamp(320px,80vw,680px)] lg:w-[clamp(420px,30vw,680px)] aspect-[3/4]">
+                  <div className="cursor-target parallax-image relative w-[clamp(320px,80vw,680px)] lg:w-[clamp(420px,30vw,680px)] aspect-[3/4]">
                     {isVideo(p.image) ? (
                       <video
                         src={p.image}
@@ -3737,6 +3831,9 @@ function ProjectShowcase() {
 
 
 
+
+
+
 function Footer() {
   const emailRef = useRef(null);
   const charsRef = useRef([]);
@@ -3787,7 +3884,7 @@ function Footer() {
     };
   }, []);
 
-  const email = "hello@studio.com";
+  const email = "boson.sma@gmail.com";
 
   return (
     <footer
@@ -3842,7 +3939,7 @@ function Footer() {
           <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
             <a
               ref={emailRef}
-              href="mailto:hello@studio.com"
+              href="mailto:boson.sma@gmail.com"
               className="
                 inline-block font-light tracking-tight text-white cursor-pointer
                 text-[clamp(26px,4.5vw,44px)]
@@ -3880,7 +3977,7 @@ function Footer() {
             "
           >
             <div className="space-y-1 lg:text-right">
-              <div>+62 812 3456 789</div>
+              <div>+62 877 6777 7720</div>
               <div>Bali · Indonesia</div>
             </div>
 

@@ -3782,7 +3782,7 @@ function Footer() {
     };
   }, []);
 
-  const email = "hello@studio.com";
+  const email = "boson.sma@gmail.com";
 
   return (
     <footer
@@ -3825,7 +3825,7 @@ function Footer() {
           <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
             <a
               ref={emailRef}
-              href="mailto:hello@studio.com"
+              href="mailto:boson.sma@gmail.com"
               className="
                 inline-block
                 font-light
@@ -3859,7 +3859,7 @@ function Footer() {
           {/* META — MOBILE FIRST */}
           <div className="col-span-12 lg:col-span-5 flex flex-col lg:items-end gap-5 sm:gap-6 text-[11px] sm:text-xs text-neutral-500 order-1 lg:order-2">
             <div className="space-y-1 lg:text-right">
-              <div>+62 812 3456 789</div>
+              <div>+62 877 6777 7720</div>
               <div>Bali · Indonesia</div>
             </div>
 
