@@ -84,13 +84,13 @@ function Hero() {
         >
           <div className="max-w-5xl">
             <h1
-              className="font-sans text-white font-medium tracking-tight leading-[1.05]"
+              className="  font-[Code_Pro] text-white font-light tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(18px, 2.8vw, 48px)" }}
             >
               <span
                 className="
                   hidden lg:inline-block
-                  mr-80
+                  mr-30
                   text-xs uppercase tracking-widest opacity-70
                   align-top relative
                 "
@@ -98,9 +98,8 @@ function Hero() {
                 about
               </span>
 
-              Designers, engineers and coders. Driven by exceptional design and
-              craftsmanship. We’re digital natives, dedicated heart and soul to
-              strategic branding
+              Designers, engineers and coders. Driven by <span className="font-medium">exceptional</span>  design and
+              craftsmanship. We’re digital natives, dedicated heart and soul to <span className="font-medium">strategic branding</span>
             </h1>
           </div>
 
@@ -285,7 +284,7 @@ function Team() {
                   />
                 </div>
 
-                <div className="mt-6 border-b border-neutral-300 pb-5">
+                <div className="mt-6 border-b font-[Code_Pro] border-neutral-300 pb-5">
                   <h3 className="text-sm font-medium tracking-[0.32em] uppercase">
                     {member.name}
                   </h3>
@@ -338,7 +337,7 @@ function Team() {
           </div>
 
           <div className="mt-6 max-w-[90%] pb-5">
-            <h3 className="text-sm md:text-base font-semibold tracking-[0.32em] uppercase">
+            <h3 className="text-sm md:text-base font-[Code_Pro] font-medium tracking-[0.32em] uppercase">
               {member.name}
             </h3>
             <div className="mt-3 space-y-1">
@@ -550,7 +549,7 @@ function BosonScrollText() {
         }
 
         .bf-header-sub {
-          font-family: Georgia, serif;
+          font-family: Code Pro, serif;
           font-size: 13px;
           font-style: italic;
           opacity: 0.75;
@@ -578,7 +577,7 @@ function BosonScrollText() {
 
         .bf-char {
           display: inline-block;
-          font-family: Inter, sans-serif;
+          font-family: Code Pro, sans-serif;
           font-weight: 1000;
           font-size: clamp(48px, 18vw, 84px);
           line-height: 0.98;
@@ -607,7 +606,7 @@ function BosonScrollText() {
         }
 
         .bf-footer-text {
-          font-family: Georgia, serif;
+          font-family: Code Pro, serif;
           font-size: 14px;
           font-style: italic;
           opacity: 0.85;
@@ -850,7 +849,7 @@ export default function Page() {
       
       <Team/>
       
-      <BosonScrollText/>
+      {/* <BosonScrollText/> */}
        
       
       <Footer/>

@@ -90,7 +90,7 @@ function Hero() {
         >
           <div className="max-w-5xl">
             <h1
-              className="font-sans text-white font-medium tracking-tight leading-[1.05]"
+              className="font-[Code_Pro] text-white font-medium tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(18px, 3.8vw, 58px)" }}
             >
               <span
@@ -158,7 +158,7 @@ function FAQ() {
         {/* LEFT — BIG STATEMENT */}
         <div className="relative"> 
 
-          <h1 className="text-[48px] sm:text-[64px] lg:text-[84px] leading-[1.05] font-normal tracking-tight">
+          <h1 className="text-[48px] font-[Code_Pro] sm:text-[64px] lg:text-[84px] leading-[1.05] font-normal tracking-tight">
             We
             <br />
             would

@@ -109,3 +109,45 @@
   font-style: normal;
   font-display: swap;
 }
+
+
+
+
+/* ================================
+   CODE PRO
+   ================================ */
+   
+   
+   
+   @font-face {
+    font-family: "Code Pro";
+    src: url("/fonts/code-pro/Code-Pro-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Code Pro";
+    src: url("/fonts/code-pro/Code-Pro.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Code Pro";
+    src: url("/fonts/code-pro/Code-Pro-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  @font-face {
+    font-family: "Code Pro";
+    src: url("/fonts/code-pro/Code-Pro-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  

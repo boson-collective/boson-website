@@ -121,7 +121,7 @@ function Hero() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 0.75, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute top-6 sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-sm z-20 tracking-wide text-white"
+          className="absolute top-6  font-[Code_Pro] sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-xs z-20 tracking-wide text-white"
         >
           <div className="flex gap-4 sm:gap-8">
             <Link href="/about" className="hover:opacity-100 transition-opacity">
@@ -147,7 +147,7 @@ function Hero() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 0.6, y: 0 }}
           transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 
+          className="absolute  bottom-[28%] sm:bottom-[22%] left-1/2 sm:left-20 
           -translate-x-1/2 sm:translate-x-0 text-[11px] sm:text-sm leading-relaxed 
           max-w-[240px] text-center sm:text-left z-20 text-white"
         >
@@ -172,16 +172,33 @@ function Hero() {
   
         {/* FOOTER — COORDINATES */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 0.55, y: 0 }}
-          transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-          className="absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20 
-          flex justify-between text-[10px] sm:text-xs tracking-wide z-20 text-white"
-        >
-          <span>{latText}</span>
-          <span>Bali, Indonesia</span>
-          <span>{lonText}</span>
-        </motion.div>
+  initial={{ opacity: 0, y: 10 }}
+  animate={{ opacity: 0.55, y: 0 }}
+  transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+  className="
+    absolute bottom-6 sm:bottom-10 w-full px-6 sm:px-20
+    grid grid-cols-[1fr_auto_1fr]
+    items-center
+    text-[10px] sm:text-xs tracking-wide
+    z-20 text-white
+  "
+>
+  {/* LEFT — LAT */}
+  <span className="justify-self-start font-light">
+    {latText}
+  </span>
+
+  {/* CENTER — LOCATION (LOCKED) */}
+  <span className="justify-self-center font-[Code_Pro] font-medium ">
+    Bali, Indonesia
+  </span>
+
+  {/* RIGHT — LON */}
+  <span className="justify-self-end font-light">
+    {lonText}
+  </span>
+</motion.div>
+
   
         {/* BOSON */}
         <motion.div
@@ -1302,7 +1319,7 @@ function VideoSection() {
         }}
       />
 
-      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
+      <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>Discover</h3>
 
       <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
         Most projects fail because no one really looks at what’s happening day to day.
@@ -1337,7 +1354,7 @@ function VideoSection() {
         }}
       />
 
-      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
+      <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>Create</h3>
 
       <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
         Once things are clear, we focus on structure. We turn ideas into content
@@ -1366,7 +1383,7 @@ function VideoSection() {
         }}
       />
 
-      <h3 style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
+      <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>Deliver</h3>
 
       <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
         Publishing is only part of the work. We test, adjust, and keep things moving
@@ -1891,14 +1908,14 @@ function Galery() {
         <div className="text-center max-w-[90vw] px-6">
           <span
             ref={getStartedRef}
-            className="block text-[11px] tracking-[0.22em] opacity-80 mb-6"
+            className="block font-[Code_Pro] text-[11px] tracking-[0.22em] opacity-80 mb-6"
           >
             GET STARTED
           </span>
 
           <h1
             ref={headlineRef}
-            className="font-base leading-[1.08] text-[clamp(40px,5.4vw,88px)]"
+            className="font-base font-[Code_Pro] leading-[1.08] text-[clamp(40px,5.4vw,68px)]"
           >
             Time to
             <br />
@@ -1963,80 +1980,65 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  const topX = useTransform(scrollYProgress, [0, 1], ["0%", "-9%"]);
-  const bottomX = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
+  // WORK → geser ke kiri (aman)
+  const topX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["0%", "-32%"]
+  );
+
+  // EXPERIENCE → START DARI KANAN
+  const bottomX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    ["-92%", "-5%"] // ⬅️ posisi awal sudah ke kanan
+  );
 
   return (
-    <div
+    <section
       ref={ref}
-      className="relative w-full overflow-hidden bg-[#F3F4F5]  border-black/20 big-heading-container"
-      style={{ height: "150vh" }}
+      className="relative w-full bg-[#F3F4F5] overflow-hidden"
+      style={{ height: "max-content" }}
     >
-      <div
-        className="sticky top-0 w-full h-[150vh] pointer-events-none big-heading-sticky"
-      >
-        {/* TOP */}
-        <div
-          className="flex justify-center items-end overflow-hidden big-heading-top-wrapper"
-          style={{ height: "calc(75vh - 0.5px)" }}
-        >
-          <motion.div
-            className="flex whitespace-nowrap text-black  opacity-100"
-            style={{
-              x: topX,                       // ⛔ TIDAK DIUBAH 
-              fontSize: "clamp(14rem, 50vw, 56rem)"
-,
-              lineHeight: 0.8,
-              gap: "clamp(1rem, 4vw, 4rem)",
-            }}
-          >
-            <span>WORK -</span>
-            <span>WORK -</span>
-            <span>WORK</span>
-          </motion.div>
-        </div>
+      <div className="relative w-full pointer-events-none">
 
-        {/* CENTER BORDER */}
-        <div className="w-full h-px bg-black" />
-
-        {/* BOTTOM */}
-        <div
-          className="flex justify-center items-start overflow-hidden big-heading-bottom-wrapper"
-          style={{ height: "calc(75vh - 0.5px)" }}
+        {/* TOP TEXT */}
+        <motion.div
+          className="whitespace-nowrap text-black"
+          style={{
+            x: topX,
+            fontSize: "clamp(14rem, 50vw, 56rem)",
+            lineHeight: 0.9,
+          }}
         >
-          <motion.div
-            className="flex whitespace-nowrap text-black  opacity-100"
-            style={{
-              x: bottomX,                    // ⛔ TIDAK DIUBAH 
-              fontSize: "clamp(14rem, 50vw, 56rem)"
-,
-              lineHeight: 0.8,
-              gap: "clamp(1rem, 4vw, 4rem)",
-            }}
-          >
-            <span>EXPERIENCES -</span>
-            <span>EXPERIENCES -</span>
-            <span>EXPERIENCES</span>
-          </motion.div>
-        </div>
+          WORK - WORK - WORK
+        </motion.div>
+
+        {/* CENTER LINE */}
+        <div className="w-full h-px bg-black/20" />
+
+        {/* BOTTOM TEXT */}
+        <motion.div
+          className="whitespace-nowrap text-black"
+          style={{
+            x: bottomX,
+            fontSize: "clamp(14rem, 50vw, 56rem)",
+            lineHeight: 0.9,
+          }}
+        >
+          EXPERIENCES - EXPERIENCES - EXPERIENCES
+        </motion.div>
+
       </div>
 
       <style>{`
         @media (max-width: 1023px) {
-          .big-heading-container {
-            height: auto !important;
-          }
-          .big-heading-sticky {
-            position: static !important;
-            height: auto !important;
-          }
-          .big-heading-top-wrapper,
-          .big-heading-bottom-wrapper {
+          section {
             height: auto !important;
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 }
 
@@ -2370,7 +2372,7 @@ function WorksList() {
         className="works-header"
         style={{
           display: "grid",
-          gridTemplateColumns: "1.15fr 0.5fr",
+          gridTemplateColumns: "1.15fr 0.3fr",
           padding: "5vw 7vh",
           color: "white",
           gap: "2vh",
@@ -2378,9 +2380,10 @@ function WorksList() {
       >
         <h2
           ref={leftRef}
+          className="font-[Code_Pro] font-light"
           style={{
             margin: 0,
-            fontSize: "clamp(28px, 2.8vw, 44px)",
+            fontSize: "clamp(28px, 2.8vw, 34px)",
             lineHeight: 1.15,
             display: "inline-flex",
             gap: "0.35em",
@@ -2404,7 +2407,7 @@ function WorksList() {
             opacity: 0.7,
             fontSize: "clamp(13px, 1vw, 16px)",
             lineHeight: 1.6,
-            maxWidth: "42ch",
+            maxWidth: "32ch",
           }}
         >
           This selection represents work developed under different business
@@ -2450,7 +2453,7 @@ function WorksList() {
 
           <div style={{ zIndex: 1, gridColumn: "2 / span 1" }}>
             <div
-              className="works-title"
+              className="works-title font-light "
               style={{
                 textAlign: "center",
                 fontSize: "clamp(32px, 4.5vw, 82px)",
@@ -2837,11 +2840,11 @@ function ServicesHero() {
       <div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
         {/* ================= TOP ================= */}
         <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
-          <div className="col-span-12 lg:col-span-3 text-xs tracking-wide text-neutral-500">
+          <div className="col-span-12 font-[Code_Pro] lg:col-span-3 text-xs tracking-wide text-neutral-500">
             Our Services
           </div>
 
-          <div className="col-span-12 lg:col-span-5 lg:col-start-5">
+          <div className="col-span-12 font-[Code_Pro] lg:col-span-5 lg:col-start-5">
             <h2 className="text-start text-[clamp(26px,5vw,42px)] font-medium leading-[1.05]">
               How we make your
               <br />
@@ -2921,7 +2924,7 @@ function ServicesHero() {
 
                     {/* TITLE */}
                     <h3
-                      className={`flex flex-col tracking-tight transition-colors duration-300 ease-out ${colorState}`}
+                      className={`flex font-[Code_Pro] flex-col tracking-tight transition-colors duration-300 ease-out ${colorState}`}
                     >
                       <span className="text-[13px] lg:text-[26px] font-light opacity-60 mb-1">
                         {firstLine}
@@ -3265,7 +3268,7 @@ function Description() {
         });
 
         gsap.to(titleRef.current, {
-          y: move(-60),
+          y: move(-20),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
@@ -3392,12 +3395,11 @@ function Description() {
         <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-sans font-medium tracking-tight leading-[1.05]"
+            className=" font-[Code_Pro] font-bold tracking-tight leading-[1.05]"
             style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
-            We're a digital agency that helps brands stay consistent online. We
-            keep everything on track so you can stay focused on what{" "}
-            <span className="italic">matters</span>.
+            We're a digital agency that helps brands stay <span className="font-light">consistent</span>  online. We
+            keep everything on track so you can stay <span className="font-light">focused</span>  on what matters
           </h1>
 
           <div
@@ -3407,7 +3409,7 @@ function Description() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-x-20">
-          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]">
+          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]  font-[Code_Pro]">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
               <div data-stat>
                 <div className="text-[22px] font-medium text-neutral-900">100+</div>
@@ -3434,7 +3436,7 @@ function Description() {
 
           <div
             ref={bodyRef}
-            className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[18px] lg:text-[19px] leading-[1.25]"
+            className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[18px] lg:text-[17px] leading-[1.25]"
           >
             <p data-animate className="mb-8 lg:mb-10">
               Boson is an agency based in Bali, working with brands across
@@ -3447,7 +3449,7 @@ function Description() {
             <a
               ref={ctaRef}
               href="#projects"
-              className="inline-flex items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black"
+              className="inline-flex  font-[Code_Pro] items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black"
             >
               DISCOVER ALL PROJECTS →
             </a>
@@ -3608,7 +3610,7 @@ function ProjectShowcase() {
 
     if (!isDesktop) {
       gsap.set(
-        [trackRef.current, ".parallax-title", ".parallax-image", ".parallax-meta"],
+        [trackRef.current,   ".parallax-image", ".parallax-meta"],
         { clearProps: "all" }
       );
       return;
@@ -3665,7 +3667,6 @@ function ProjectShowcase() {
         });
       };
 
-      parallax(".parallax-title", 40, -40);
       parallax(".parallax-image", 90, -90);
       parallax(".parallax-meta", 140, -140);
     }, sectionRef);
@@ -3706,7 +3707,7 @@ function ProjectShowcase() {
               className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
             >
               <div className="relative mx-auto h-full px-[clamp(3rem,6vw,10rem)] pt-24 pb-32 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-0">
-                <span className="lg:col-span-12 text-xs tracking-widest text-white/50">
+                <span className="lg:col-span-12 font-[Code_Pro] text-xs tracking-widest text-white/50">
                   PROJECT 0{i + 1}
                 </span>
 
@@ -3714,7 +3715,7 @@ function ProjectShowcase() {
                   {p.title}
                 </h2>
 
-                <h1 className="parallax-title hidden lg:block absolute left-1/3 top-[25%] -translate-x-1/2 text-[clamp(3.5rem,6vw,6rem)] leading-[0.95] font-light whitespace-pre-line mix-blend-difference pointer-events-none select-none z-30">
+                <h1 className=" font-[Code_Pro] hidden lg:block absolute left-[35%] top-[25%] -translate-x-1/2 text-[clamp(3.5rem,6vw,6rem)] leading-[0.95] font-base whitespace-pre-line mix-blend-difference pointer-events-none select-none z-30">
                   {p.title}
                 </h1>
 
@@ -3742,7 +3743,7 @@ function ProjectShowcase() {
                 <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-6 lg:justify-end">
                   <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
-                      <p key={m} className="underline">
+                      <p key={m} className="underline font-[Code_Pro]">
                         {m}
                       </p>
                     ))}
