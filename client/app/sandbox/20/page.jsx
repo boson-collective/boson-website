@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import React, { useState } from "react";
-const WhoWeAre = dynamic(() => import('../../../components/organisms/WhoWeAre'), { ssr: false });
 
 /* ==========================================================
    PHASE BRIDGE — visual separator
