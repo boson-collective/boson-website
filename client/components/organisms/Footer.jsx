@@ -1,123 +1,184 @@
-'use client'
+"use client"
 
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { FaInstagram, FaLinkedin, FaYoutube, FaBehance } from 'react-icons/fa'
+import { useEffect, useRef } from "react";
+import { gsap } from "../../lib/gsap";
 
-export default function Footer() {
-  const currentYear = new Date().getFullYear()
+function Footer() {
+  const emailRef = useRef(null);
+  const charsRef = useRef([]);
 
-  const quickLinks = [
-    { name: 'Home', href: '/home' },
-    { name: 'Our Story', href: '/story' },
-    { name: 'Services', href: '/services' },
-    { name: 'Projects', href: '/projects' },
-    { name: 'Contact', href: '/contact' },
-  ]
+  useEffect(() => {
+    const el = emailRef.current;
+    if (!el) return;
+
+    charsRef.current = charsRef.current.filter(Boolean);
+    if (!charsRef.current.length) return;
+
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      window.matchMedia("(hover: none)").matches;
+
+    if (isTouchDevice) return;
+
+    gsap.set(charsRef.current, { y: 0, opacity: 1 });
+
+    const tl = gsap.timeline({ paused: true });
+
+    tl.to(charsRef.current, {
+      y: -36,
+      opacity: 0,
+      duration: 0.55,
+      ease: "power4.in",
+      stagger: { amount: 0.22 },
+    })
+      .set(charsRef.current, { y: 36 })
+      .to(charsRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 0.55,
+        ease: "back.out(2.6)",
+        stagger: { amount: 0.22 },
+      });
+
+    const onPointerEnter = (e) => {
+      if (e.pointerType !== "mouse") return;
+      tl.restart();
+    };
+
+    el.addEventListener("pointerenter", onPointerEnter);
+
+    return () => {
+      el.removeEventListener("pointerenter", onPointerEnter);
+      tl.kill();
+    };
+  }, []);
+
+  const email = "boson.sma@gmail.com";
 
   return (
-    <footer className="relative bg-black border-t border-neutral-800 overflow-hidden text-neutral-400">
-      {/* Ambient Glow */}
-      <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-900/70 to-transparent" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[300px] bg-gradient-radial from-yellow-200/10 via-transparent to-transparent blur-[180px]" />
-
-      {/* Container */}
-      <div className="relative max-w-7xl mx-auto px-8 py-20 z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {/* Brand + Philosophy */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="space-y-6"
-          >
-            <Link href="/home" className="flex items-center space-x-3 group">
-              <motion.img
-                src="/boson-white.png"
-                alt="Boson Collective"
-                className="w-9 h-9"
-                whileHover={{ rotate: 12, scale: 1.1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-              />
-              <span className="text-white font-light tracking-[0.15em] text-lg group-hover:tracking-[0.25em] transition-all duration-300">
-                BOSON COLLECTIVE
-              </span>
-            </Link>
-            <p className="text-sm leading-relaxed text-neutral-400 max-w-sm">
-              We architect meaning from chaos — merging technology, design, and emotion
-              to create timeless digital experiences.
-            </p>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
-            className="space-y-6"
-          >
-            <h3 className="text-white uppercase tracking-wide text-sm font-semibold">Quick Links</h3>
-            <div className="flex flex-col space-y-2">
-              {quickLinks.map((link, i) => (
-                <motion.div key={i} whileHover={{ x: 5 }}>
-                  <Link
-                    href={link.href}
-                    className="text-neutral-400 hover:text-white text-sm transition-all duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Social Media Icons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-            className="space-y-6"
-          >
-            <h3 className="text-white uppercase tracking-wide text-sm font-semibold">Connect</h3>
-            <div className="flex space-x-5">
-              {[
-                { name: 'Instagram', icon: FaInstagram, href: 'https://instagram.com/' },
-                { name: 'LinkedIn', icon: FaLinkedin, href: 'https://linkedin.com/' },
-                { name: 'YouTube', icon: FaYoutube, href: 'https://youtube.com/' },
-                { name: 'Behance', icon: FaBehance, href: 'https://behance.net/' },
-              ].map((social, i) => (
-                <motion.a
-                  key={i}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.2, y: -2 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
-                  className="text-neutral-500 hover:text-white transition-all duration-300"
-                >
-                  <social.icon className="w-5 h-5" />
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
+    <footer
+      id="top"
+      className="relative w-full bg-neutral-950 text-white overflow-hidden"
+    >
+      {/* SIGNAL BAR */}
+      <div
+        className="
+          px-[6vw] py-4 sm:py-5
+          flex flex-wrap items-center justify-between
+          tracking-wide border-b border-white/10 gap-y-2
+          text-[clamp(10px,0.7vw,12px)]
+        "
+      >
+        <div className="opacity-50 uppercase">
+          GMT +7 · Operating globally
         </div>
 
-        {/* Divider Line */}
-        <div className="my-12 h-px bg-gradient-to-r from-transparent via-neutral-800 to-transparent" />
+        <div className="flex gap-5 sm:gap-6">
+          <div className="opacity-80">Our Social</div>
+          {["Instagram", "LinkedIn"].map((item) => (
+            <a
+              key={item}
+              href="#"
+              className="opacity-50 hover:opacity-100 transition"
+            >
+              {item}
+            </a>
+          ))}
+        </div>
+      </div>
 
-        {/* Footer Bottom */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 tracking-wide"
-        >
-          <p className="mb-2 md:mb-0">© {currentYear} BOSON COLLECTIVE — All Rights Reserved.</p>
-          <p className="text-neutral-600 hover:text-neutral-300 transition-colors duration-200">
-            Crafted with precision & chaos.
-          </p>
-        </motion.div>
+      {/* CTA */}
+      <div className="relative px-[6vw] py-20 sm:py-28">
+        <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
+          <div className="col-span-12 lg:col-span-6">
+            <p
+              className="
+                text-neutral-500 leading-relaxed
+                max-w-[520px]
+                text-[clamp(14px,1.1vw,17px)]
+              "
+            >
+              We work with teams building thoughtful digital products
+              <br />
+              If you have a project in mind, we would{" "}
+              <span className="italic">looove</span> to hear about it
+            </p>
+          </div>
+
+          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
+            <a
+              ref={emailRef}
+              href="mailto:boson.sma@gmail.com"
+              className="
+                inline-block font-light tracking-tight text-white cursor-pointer
+                text-[clamp(26px,4.5vw,44px)]
+              "
+            >
+              <span className="inline-flex overflow-hidden">
+                {email.split("").map((char, i) => (
+                  <span
+                    key={i}
+                    ref={(el) => (charsRef.current[i] = el)}
+                    className="inline-block will-change-transform"
+                  >
+                    {char === " " ? "\u00A0" : char}
+                  </span>
+                ))}
+              </span>
+              <span className="block h-[1px] w-full bg-white/30 mt-2" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* BRAND MASS */}
+      <div className="relative px-[6vw] pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
+        <div className="grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
+          {/* META */}
+          <div
+            className="
+              col-span-12 lg:col-span-5
+              flex flex-col lg:items-end gap-5 sm:gap-6
+              order-1 lg:order-2
+              text-neutral-500
+              text-[clamp(11px,0.9vw,13px)]
+            "
+          >
+            <div className="space-y-1 lg:text-right">
+              <div>+62 877 6777 7720</div>
+              <div>Bali · Indonesia</div>
+            </div>
+
+            <span>Copyright © {new Date().getFullYear()}</span>
+
+            <div className="flex gap-6 sm:gap-8">
+              <a href="/imprint" className="hover:text-white">
+                Imprint
+              </a>
+              <a href="#top" className="hover:text-white">
+                Back to top ↑
+              </a>
+            </div>
+          </div>
+
+          {/* LOGO */}
+          <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
+            <img
+              src="/png/boson-white3.png"
+              alt="Boson"
+              className="
+                w-full
+                object-contain
+                max-h-[55vh]
+                sm:max-h-[50vh]
+                lg:max-h-[45vh]
+              "
+            />
+          </div>
+        </div>
       </div>
     </footer>
-  )
+  );
 }
+
+export default Footer;

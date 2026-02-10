@@ -127,15 +127,15 @@ function Hero() {
             <Link href="/about" className="hover:opacity-100 transition-opacity">
               About
             </Link>
-            <Link href="/services" className="hover:opacity-100 transition-opacity">
+            {/* <Link href="/services" className="hover:opacity-100 transition-opacity">
               Services
-            </Link>
+            </Link> */}
           </div>
 
           <div className="flex gap-4 sm:gap-8">
-            <Link href="/works" className="hover:opacity-100 transition-opacity">
+            {/* <Link href="/works" className="hover:opacity-100 transition-opacity">
               Works
-            </Link>
+            </Link> */}
             <Link href="/contact" className="hover:opacity-100 transition-opacity">
               Contact
             </Link>
