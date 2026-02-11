@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   motion,
   useScroll,
   useTransform,
 } from "framer-motion";
-
 
 function ImageBurst({ src, motionProps, styleOverrides = {} }) {
   return (
@@ -72,39 +71,69 @@ export default function Projects() {
      IMAGES
   ================================================== */
   const images = [
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-4.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815480/hidden-city-ubud-5.jpg",
     "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-5.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-10.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-7.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-6.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-8.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815566/little-brew-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816466/sunny-family-3.png",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067634/tea-time-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816274/novo-ampang-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816770/alraimi-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817395/terra-auri-2.png",
     "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969071/little-soho-9.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-11.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969069/little-soho-12.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-13.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-14.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-16.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-15.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817596/terra-auri-3.png",
+    
+    
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-4.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-5.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-10.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-7.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-6.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968401/little-soho-8.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969071/little-soho-9.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969070/little-soho-11.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969069/little-soho-12.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-13.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969068/little-soho-14.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-16.jpg",
+    // "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969947/little-soho-15.jpg",
   ];
+
+  /* ==================================================
+     DYNAMIC TIMELINE CALCULATION
+  ================================================== */
+
+  const baseStart = 0.14;
+
+  const windowLen = 0.16;
+
+  // total available scroll space before light mode
+  const availableSpace = 1 - baseStart - windowLen;
+
+  // dynamic step so images stretch properly
+  const step = images.length > 0
+    ? availableSpace / images.length
+    : 0;
 
   /* ==================================================
      IMAGE BURST
   ================================================== */
-  const baseStart = 0.14;
-  const step = 0.04;
-  const windowLen = 0.16;
 
   const bursts = images.map((_, i) =>
     useTransform(
       scrollYProgress,
-      [baseStart + i * step, baseStart + i * step + windowLen],
+      [
+        baseStart + i * step,
+        baseStart + i * step + windowLen,
+      ],
       [0, 1]
     )
   );
 
   const motionPropsList = bursts.map((b, i) => {
     const dir = i % 4;
+
     return {
       x: useTransform(
         b,
@@ -123,8 +152,9 @@ export default function Projects() {
   });
 
   /* ==================================================
-     LIGHT MODE
+     LIGHT MODE (ALWAYS SYNCHRONIZED)
   ================================================== */
+
   const lightProgress = useTransform(
     scrollYProgress,
     [1 - windowLen, 1],
@@ -154,6 +184,7 @@ export default function Projects() {
   /* ==================================================
      ORBITS
   ================================================== */
+
   const c1 = { cx: 425, cy: 350, r: 250 };
   const c2 = { cx: 325, cy: 500, r: 250 };
   const c3 = { cx: 525, cy: 500, r: 250 };
@@ -188,6 +219,7 @@ export default function Projects() {
   /* ==================================================
      INTRO TEXT
   ================================================== */
+
   const { scrollYProgress: introProgress } = useScroll({
     target: scrollRef,
     offset: ["start end", "start start"],
@@ -203,6 +235,7 @@ export default function Projects() {
   /* ==================================================
      RENDER
   ================================================== */
+
   return (
     <motion.div
       ref={scrollRef}
@@ -244,9 +277,11 @@ export default function Projects() {
           <motion.g ref={g1Ref}>
             <motion.circle cx={c1.r} cy={0} r={3} style={{ fill: dotFill }} />
           </motion.g>
+
           <motion.g ref={g2Ref}>
             <motion.circle cx={c2.r} cy={0} r={3} style={{ fill: dotFill }} />
           </motion.g>
+
           <motion.g ref={g3Ref}>
             <motion.circle cx={c3.r} cy={0} r={3} style={{ fill: dotFill }} />
           </motion.g>
