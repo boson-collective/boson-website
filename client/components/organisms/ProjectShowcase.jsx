@@ -1,6 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { gsap, ScrollTrigger } from "../../lib/gsap";
-
 
 function ProjectShowcase() {
   const sectionRef = useRef(null);
@@ -36,13 +35,22 @@ function ProjectShowcase() {
       igLink: "https://www.instagram.com/novo_ampang_kl",
     },
     {
-      title: "Shinobi\nSoirée",
+      title: "Hidden \nCity Ubud",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812920/SHINOBI_-_Imgur_nn6mcd.mp4",
-      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1770884815/hidden-city-ubud-main.mp4",
+      meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
-        "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
-      igLink: "https://www.instagram.com/shinobi_soiree",
+        "A development firm creating distinctive residential and hospitality projects driven by design, lifestyle, and long-term value",
+      igLink: "https://www.instagram.com/hidden_city_ubud",
+    },
+    {
+      title: "Little\nSoho",
+      image:
+        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1770885309/little-soho-main.mp4",
+      meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
+      desc:
+        "A property development firm creating distinctive residential and hospitality destinations, driven by design excellence, elevated living experiences, and enduring investment value",
+      igLink: "https://www.instagram.com/hidden_city_ubud",
     },
     {
       title: "Marroosh\nBali",
@@ -54,6 +62,15 @@ function ProjectShowcase() {
       igLink: "https://www.instagram.com/marrooshbali",
     },
     {
+      title: "Shinobi\nSoirée",
+      image:
+        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812920/SHINOBI_-_Imgur_nn6mcd.mp4",
+      meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
+      desc:
+        "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
+      igLink: "https://www.instagram.com/shinobi_soiree",
+    },
+    {
       title: "Tender\nTouch",
       image:
         "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768899602/tender-touch-main.mp4",
@@ -63,6 +80,18 @@ function ProjectShowcase() {
       igLink: "https://www.instagram.com/tendertouch.bali",
     },
   ];
+
+  /* =========================
+     RANDOM 5 (ONLY CHANGE)
+  ========================= */
+  const randomizedProjects = useMemo(() => {
+    const shuffled = [...projects];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, 5);
+  }, []);
 
   const isVideo = (src) => /\.(mp4|webm|ogg)$/i.test(src);
 
@@ -118,7 +147,7 @@ function ProjectShowcase() {
 
     const click = () => {
       if (!isHoveringTarget) return;
-      const link = projects[activeIndex]?.igLink;
+      const link = randomizedProjects[activeIndex]?.igLink;
       if (link) window.open(link, "_blank", "noopener,noreferrer");
     };
 
@@ -140,7 +169,7 @@ function ProjectShowcase() {
       });
       document.body.style.cursor = "default";
     };
-  }, [isDesktop, activeIndex, isHoveringTarget, projects]);
+  }, [isDesktop, activeIndex, isHoveringTarget, randomizedProjects]);
 
   /* =========================
      GSAP SETUP (ISOLATED)
@@ -157,7 +186,7 @@ function ProjectShowcase() {
     }
 
     ctxRef.current = gsap.context(() => {
-      const slidesCount = projects.length;
+      const slidesCount = randomizedProjects.length;
       const track = trackRef.current;
       const progressBar = progressRef.current;
 
@@ -212,7 +241,7 @@ function ProjectShowcase() {
     }, sectionRef);
 
     return () => ctxRef.current?.revert();
-  }, [isDesktop, projects.length]);
+  }, [isDesktop, randomizedProjects.length]);
 
   return (
     <section
@@ -238,10 +267,10 @@ function ProjectShowcase() {
           ref={trackRef}
           className="flex flex-col lg:flex-row"
           style={{
-            width: isDesktop ? `${projects.length * 100}vw` : "100%",
+            width: isDesktop ? `${randomizedProjects.length * 100}vw` : "100%",
           }}
         >
-          {projects.map((p, i) => (
+          {randomizedProjects.map((p, i) => (
             <div
               key={i}
               className="relative w-full lg:w-screen min-h-screen flex-shrink-0"
@@ -307,7 +336,7 @@ function ProjectShowcase() {
             />
           </div>
           <div className="mt-4 text-sm">
-            [ {activeIndex + 1} — {projects.length} ]
+            [ {activeIndex + 1} — {randomizedProjects.length} ]
           </div>
         </div>
       )}

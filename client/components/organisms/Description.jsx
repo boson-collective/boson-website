@@ -7,7 +7,6 @@ function Description() {
   const bodyRef = useRef(null);
   const dividerRef = useRef(null);
   const statsRef = useRef(null);
-  const ctaRef = useRef(null);
 
   const splitsRef = useRef([]);
   const ctxRef = useRef(null);
@@ -31,13 +30,11 @@ function Description() {
         !titleRef.current ||
         !bodyRef.current ||
         !dividerRef.current ||
-        !statsRef.current ||
-        !ctaRef.current
+        !statsRef.current 
       )
         return;
 
       const PROFILE = getProfile();
-
       const move = (v) => {
         const raw = v * PROFILE.factor;
         return PROFILE.clamp
@@ -156,25 +153,8 @@ function Description() {
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
-
-        // CTA
-        gsap.from(ctaRef.current, {
-          opacity: 0,
-          y: 8,
-          duration: 0.5,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ctaRef.current,
-            start: "top 90%",
-            once: true,
-          },
-        });
-
-        gsap.to(ctaRef.current, {
-          y: move(-18),
-          ease: "none",
-          scrollTrigger: PARALLAX_ST,
-        });
+ 
+ 
       }, sectionRef);
 
       ScrollTrigger.refresh();
@@ -206,13 +186,11 @@ function Description() {
         <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-[Code_Pro] font-bold tracking-tight leading-[1.05]"
+            className=" font-[Code_Pro] font-bold tracking-tight leading-[1.05]"
             style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
-            We're a digital agency that helps brands stay{" "}
-            <span className="font-light">consistent</span> online. We keep
-            everything on track so you can stay{" "}
-            <span className="font-light">focused</span> on what matters
+            We're a digital agency that helps brands stay <span className="font-light">consistent</span>  online. We
+            keep everything on track so you can stay <span className="font-light">focused</span>  on what matters
           </h1>
 
           <div
@@ -222,23 +200,16 @@ function Description() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-x-20">
-          <div
-            ref={statsRef}
-            className="w-full lg:flex-[0_0_42%] font-[Code_Pro]"
-          >
+          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]  font-[Code_Pro]">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">
-                  100+
-                </div>
+                <div className="text-[22px] font-medium text-neutral-900">100+</div>
                 <div className="text-xs uppercase tracking-widest">
                   Projects delivered
                 </div>
               </div>
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">
-                  3
-                </div>
+                <div className="text-[22px] font-medium text-neutral-900">3</div>
                 <div className="text-xs uppercase tracking-widest">
                   Countries served
                 </div>
@@ -262,18 +233,11 @@ function Description() {
               Boson is an agency based in Bali, working with brands across
               Qatar, Malaysia, and beyond. We build digital experiences that stay
               sharp and consistent across every touchpoint — combining design,
-              development, and brand operations into one cohesive system. This
-              means fewer revisions, clearer decisions, and content that keeps
+              development, and brand operations into one cohesive system. This means fewer revisions, clearer decisions, and content that keeps
               working even as your brand scales.
             </p>
 
-            {/* <a
-              ref={ctaRef}
-              href="#projects"
-              className="inline-flex font-[Code_Pro] items-center gap-3 px-7 lg:px-8 py-4 rounded-full border border-black bg-black text-white text-sm font-medium tracking-wide transition-all duration-300 hover:bg-white hover:text-black"
-            >
-              DISCOVER ALL PROJECTS →
-            </a> */}
+           
           </div>
         </div>
       </div>

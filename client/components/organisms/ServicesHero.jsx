@@ -1,17 +1,111 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
 
 function ServicesHero() {
+  const sectionRef = useRef(null);
+  const labelRef = useRef(null);
+  const titleRef = useRef(null);
+  const descRef = useRef(null);
+
+  const splitsRef = useRef([]);
+  const ctxRef = useRef(null);
+  const resizeTimer = useRef(null);
+
   const [hoverIndex, setHoverIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
-  /* =====================
-     DEVICE DETECTION
-  ===================== */
+  /* DEVICE DETECTION */
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  /* GSAP */
+  useLayoutEffect(() => {
+    const build = () => {
+      if (!sectionRef.current) return;
+
+      splitsRef.current.forEach((s) => s.revert());
+      splitsRef.current = [];
+      if (ctxRef.current) ctxRef.current.revert();
+
+      ctxRef.current = gsap.context(() => {
+        /* TOP TEXTS */
+
+        [labelRef.current, titleRef.current, descRef.current].forEach(
+          (el) => {
+            if (!el) return;
+
+            const split = SplitText.create(el, {
+              type: "lines",
+              linesClass: "line",
+              mask: "lines",
+            });
+
+            splitsRef.current.push(split);
+
+            gsap.from(split.lines, {
+              yPercent: 35,
+              opacity: 0,
+              duration: 1,
+              stagger: 0.08,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 85%",
+                once: true,
+              },
+            });
+          }
+        );
+
+        /* SERVICE TITLES — SAFE SPLIT */
+        const titles =
+          sectionRef.current.querySelectorAll("[data-animate]");
+
+        titles.forEach((el) => {
+          const split = SplitText.create(el, {
+            type: "lines",
+            linesClass: "line",
+            mask: "lines",
+          });
+
+          splitsRef.current.push(split);
+
+          gsap.from(split.lines, {
+            yPercent: 30,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.06,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              once: true,
+            },
+          });
+        });
+      }, sectionRef);
+
+      ScrollTrigger.refresh();
+    };
+
+    document.fonts.ready.then(build);
+
+    const onResize = () => {
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(build, 200);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      splitsRef.current.forEach((s) => s.revert());
+      if (ctxRef.current) ctxRef.current.revert();
+    };
   }, []);
 
   const services = [
@@ -38,16 +132,25 @@ function ServicesHero() {
   ];
 
   return (
-    <section className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900">
+    <section
+      ref={sectionRef}
+      className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900"
+    >
       <div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
-        {/* ================= TOP ================= */}
+        {/* TOP */}
         <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
-          <div className="col-span-12 font-[Code_Pro] lg:col-span-3 text-xs tracking-wide text-neutral-500">
+          <div
+            ref={labelRef}
+            className="col-span-12 font-[Code_Pro] lg:col-span-3 text-xs tracking-wide text-neutral-500"
+          >
             Our Services
           </div>
 
           <div className="col-span-12 font-[Code_Pro] lg:col-span-5 lg:col-start-5">
-            <h2 className="text-start text-[clamp(26px,5vw,42px)] font-medium leading-[1.05]">
+            <h2
+              ref={titleRef}
+              className="text-start text-[clamp(26px,5vw,42px)] font-medium leading-[1.05]"
+            >
               How we make your
               <br />
               brands grow and relevant
@@ -55,18 +158,17 @@ function ServicesHero() {
           </div>
 
           <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm text-neutral-600">
-            <p className="max-w-full lg:max-w-[260px] lg:text-right">
+            <p
+              ref={descRef}
+              className="max-w-full lg:max-w-[260px] lg:text-right"
+            >
               We are a digital marketing agency with expertise, and we're on a
               mission to help you take the next step in your business.
             </p>
-
-            {/* <button className="inline-flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full text-xs font-medium w-fit">
-              See all services ↗
-            </button> */}
           </div>
         </div>
 
-        {/* ================= SERVICES ================= */}
+        {/* SERVICES */}
         <div className="grid grid-cols-12">
           <div className="col-span-12 lg:col-span-8 lg:col-start-5">
             {services.map((item, i) => {
@@ -91,7 +193,6 @@ function ServicesHero() {
                   className="relative py-10 lg:py-14 border-t border-black/20"
                 >
                   <div className="flex items-center gap-5 lg:gap-0">
-                    {/* IMAGE — MOBILE */}
                     {isMobile && (
                       <div className="w-[88px] h-[64px] flex-shrink-0 overflow-hidden rounded-md bg-neutral-200">
                         <img
@@ -102,7 +203,6 @@ function ServicesHero() {
                       </div>
                     )}
 
-                    {/* IMAGE — DESKTOP */}
                     {!isMobile && (
                       <div
                         className={`hidden xl:block overflow-hidden transition-all duration-300 ease-out
@@ -124,8 +224,8 @@ function ServicesHero() {
                       </div>
                     )}
 
-                    {/* TITLE */}
                     <h3
+                      data-animate
                       className={`flex font-[Code_Pro] flex-col tracking-tight transition-colors duration-300 ease-out ${colorState}`}
                     >
                       <span className="text-[13px] lg:text-[26px] font-light opacity-60 mb-1">
