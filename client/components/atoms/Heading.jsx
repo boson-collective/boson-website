@@ -186,7 +186,7 @@ function Header() {
           {/* RIGHT — CTA (DESKTOP ONLY) */}
           <div className="hidden md:flex items-center justify-end flex-1">
             <a
-              href="#contact"
+              href="/contact"
               className="
                 relative
                 text-xs sm:text-xs font-medium tracking-wide whitespace-nowrap

@@ -90,21 +90,21 @@ function Hero() {
         >
           <div className="max-w-5xl">
             <h1
-              className="font-[Code_Pro] text-white font-medium tracking-tight leading-[1.05]"
+              className="font-[Code_Pro] text-white font-light tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(18px, 3.8vw, 58px)" }}
             >
               <span
                 className="
                   hidden lg:inline-block
-                  mr-80
+                  mr-40
                   text-xs uppercase tracking-widest opacity-70
-                  align-top relative
+                  align-top relative font-medium
                 "
               >
                 let's talk
               </span>
 
-              You've got it! Lay out all the juicy details for us. Let's see what we can dream up together
+              Let's see  <span className="font-bold">what we can dream up together</span>
             </h1>
           </div>
 
@@ -158,7 +158,7 @@ function FAQ() {
         {/* LEFT — BIG STATEMENT */}
         <div className="relative"> 
 
-          <h1 className="text-[48px] font-[Code_Pro] sm:text-[64px] lg:text-[84px] leading-[1.05] font-normal tracking-tight">
+          <h1 className="text-[48px] font-[Code_Pro] sm:text-[64px] lg:text-[84px] leading-[1.05] font-medium tracking-tight">
             We
             <br />
             would
