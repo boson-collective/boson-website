@@ -55,34 +55,45 @@ function Webglbg() {
    HERO (PURE WEBGL)
 ================================================== */
 function Hero() {
+  const currentYear = new Date().getFullYear().toString();
+  const yearTop = currentYear.slice(0, 2);
+  const yearBottom = currentYear.slice(2);
+
   return (
     <section className="relative w-full h-screen overflow-hidden bg-black">
       {/* WEBGL BACKGROUND */}
       <Webglbg />
 
       <div className="absolute top-0 left-0 w-full z-30 font-[Code_Pro]">
-  <div className="relative mx-auto px-4 sm:px-6 md:px-20 min-h-[64px] md:min-h-[72px] flex items-center text-white translate-y-1">
-    
-    <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0 text-xs font-medium tracking-wide">
-      <a href="/about" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-        About
-      </a>
-    </nav>
+        <div className="relative mx-auto px-4 sm:px-6 md:px-20 min-h-[64px] md:min-h-[72px] flex items-center text-white translate-y-1">
+          
+          <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0 text-xs font-medium tracking-wide">
+            <a href="/about" className="transition-opacity hover:opacity-70 whitespace-nowrap">
+              About
+            </a>
+          </nav>
 
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-      <a href="/" className="pointer-events-auto block">
-        <Image src="/png/boson-white.png" alt="Boson" width={120} height={40} priority className="transition-opacity hover:opacity-70" />
-      </a>
-    </div>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+            <a href="/" className="pointer-events-auto block">
+              <Image
+                src="/png/boson-white.png"
+                alt="Boson"
+                width={120}
+                height={40}
+                priority
+                className="transition-opacity hover:opacity-70"
+              />
+            </a>
+          </div>
 
-    <div className="hidden md:flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
-      <a href="/contact" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-        Contact
-      </a>
-    </div>
+          <div className="hidden md:flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
+            <a href="/contact" className="transition-opacity hover:opacity-70 whitespace-nowrap">
+              Contact
+            </a>
+          </div>
 
-  </div>
-</div>
+        </div>
+      </div>
 
       {/* BOTTOM CONTENT */}
       <div className="absolute bottom-0 left-0 w-full z-20">
@@ -111,7 +122,7 @@ function Hero() {
                 about
               </span>
 
-              Designers, engineers and coders. Driven by{" "}
+              Designers, editors and coders.<br/> Driven by{" "}
               <span className="font-medium">exceptional</span> design and
               craftsmanship. We’re digital natives, dedicated heart and soul to{" "}
               <span className="font-medium">strategic branding</span>
@@ -119,8 +130,8 @@ function Hero() {
           </div>
 
           <div className="w-14 h-14 rounded-full border border-white text-white text-sm font-medium flex flex-col items-center justify-center leading-none">
-            <span>20</span>
-            <span>25</span>
+            <span>{yearTop}</span>
+            <span>{yearBottom}</span>
           </div>
         </div>
       </div>
