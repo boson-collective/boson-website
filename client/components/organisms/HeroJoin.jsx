@@ -96,31 +96,28 @@ function Hero() {
     <div className="relative w-full h-screen overflow-hidden flex justify-center items-center text-gray/80">
       <Webglbg />
 
-      {/* NAV */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 0.75, y: 0 }}
-        transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
-        className="absolute top-6  font-[Code_Pro] sm:top-10 w-full px-6 sm:px-20 flex justify-between text-xs sm:text-xs z-20 tracking-wide text-white"
-      >
-        <div className="flex gap-4 sm:gap-8">
-          <Link href="/about" className="hover:opacity-100 transition-opacity">
-            About
-          </Link>
-          {/* <Link href="/services" className="hover:opacity-100 transition-opacity">
-            Services
-          </Link> */}
-        </div>
+  initial={{ opacity: 0, y: -10 }}
+  animate={{ opacity: 0.75, y: 0 }}
+  transition={{ delay: TEXT_DELAY, duration: 0.6, ease: "easeOut" }}
+  className="absolute top-0 left-0 w-full z-20 font-[Code_Pro]"
+>
+  <div className="relative mx-auto px-6 sm:px-20 min-h-[64px] md:min-h-[72px] flex items-center justify-between text-xs font-medium tracking-wide text-white translate-y-1">
+    
+    <div className="flex gap-4 sm:gap-8">
+      <Link href="/about" className="transition-opacity hover:opacity-100">
+        About
+      </Link>
+    </div>
 
-        <div className="flex gap-4 sm:gap-8">
-          {/* <Link href="/works" className="hover:opacity-100 transition-opacity">
-            Works
-          </Link> */}
-          <Link href="/contact" className="hover:opacity-100 transition-opacity">
-            Contact
-          </Link>
-        </div>
-      </motion.div>
+    <div className="flex gap-4 sm:gap-8">
+      <Link href="/contact" className="transition-opacity hover:opacity-100">
+        Contact
+      </Link>
+    </div>
+
+  </div>
+</motion.div>
 
       {/* SIDE LEFT */}
       <motion.div

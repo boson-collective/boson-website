@@ -20,11 +20,11 @@ function Galery() {
       speed: -160,
       items: [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972563/sunny-family-logo-bg.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png",
           top: "220vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768972964/little-brew-logo-bg.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png",
           top: "380vh",
         },
       ],
@@ -34,11 +34,11 @@ function Galery() {
       speed: 120,
       items: [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980001/sunny-family-2.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png",
           top: "80vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768980263/hey-yolo-logo-bg.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png",
           top: "300vh",
         },
       ],
@@ -48,15 +48,15 @@ function Galery() {
       speed: -140,
       items: [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png",
           top: "160vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768898519/marroosh-4.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png",
           top: "280vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768973018/newminatis-logo-bg.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png",
           top: "420vh",
         },
       ],
@@ -66,11 +66,11 @@ function Galery() {
       speed: 100,
       items: [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899597/tender-touch-7.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png",
           top: "120vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768981020/hidden-city-ubud-logo-bg.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png",
           top: "340vh",
         },
       ],
@@ -80,11 +80,11 @@ function Galery() {
       speed: -160,
       items: [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-main.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png",
           top: "250vh",
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768970811/logo.jpg",
+          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png",
           top: "430vh",
         },
       ],

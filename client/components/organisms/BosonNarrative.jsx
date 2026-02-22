@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 function BosonNarrative() {
   const wrap = useRef(null);
+  const textLayer = useRef(null); // <<< IMPORTANT
 
   const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
@@ -20,7 +21,7 @@ function BosonNarrative() {
   }, []);
 
   /* =========================
-     SMOOTH MOUSE FOLLOW (DESKTOP ONLY)
+     SMOOTH FOLLOW
   ========================= */
   useEffect(() => {
     if (isMobile) {
@@ -30,16 +31,19 @@ function BosonNarrative() {
     }
 
     let frame;
+
     const animate = () => {
       setPos((prev) => {
         const dx = targetPos.current.x - prev.x;
         const dy = targetPos.current.y - prev.y;
-        const speed = 0.06;
+        const speed = 0.1;
+
         return {
           x: prev.x + dx * speed,
           y: prev.y + dy * speed,
         };
       });
+
       frame = requestAnimationFrame(animate);
     };
 
@@ -48,11 +52,13 @@ function BosonNarrative() {
   }, [isMobile]);
 
   /* =========================
-     MOUSE MOVE (DESKTOP ONLY)
+     MOUSE MOVE (FIXED TARGET)
   ========================= */
   const handleMove = (e) => {
-    if (!wrap.current || isMobile) return;
-    const rect = wrap.current.getBoundingClientRect();
+    if (!textLayer.current || isMobile) return;
+
+    const rect = textLayer.current.getBoundingClientRect();
+
     targetPos.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
@@ -61,9 +67,6 @@ function BosonNarrative() {
 
   const text = `In the beginning, there is only possibility, a space where uncertainty sharpens into clarity, and the first contours of meaning begin to form, tracing the subtle forces that shape everything that follows`;
 
-  /* =========================
-     BASE TEXT STYLE (DESKTOP)
-  ========================= */
   const baseTextStyle = {
     width: "100%",
     whiteSpace: "pre-wrap",
@@ -76,9 +79,6 @@ function BosonNarrative() {
     hyphens: "auto",
   };
 
-  /* =========================
-     MOBILE OVERRIDE
-  ========================= */
   const mobileTextOverride = isMobile
     ? {
         fontSize: "clamp(34px, 4.5vw, 104px)",
@@ -93,17 +93,15 @@ function BosonNarrative() {
     <div
       ref={wrap}
       onMouseMove={handleMove}
-      className="boson-narrative-container bg-black w-full relative overflow-hidden flex"
+      className="bg-black w-full relative overflow-hidden flex"
       style={{
         minHeight: isMobile ? "auto" : "100vh",
         alignItems: isMobile ? "flex-start" : "center",
         padding: isMobile ? "72px 6vw" : "120px 6vw",
       }}
     >
-      {/* =========================
-          BASE TEXT (DIM)
-      ========================= */}
       <div
+        ref={textLayer} // <<< anchor disini
         style={{
           position: "relative",
           color: isMobile
@@ -115,9 +113,6 @@ function BosonNarrative() {
       >
         {text}
 
-        {/* =========================
-            MASKED TEXT (DESKTOP ONLY)
-        ========================= */}
         {!isMobile && (
           <div
             style={{
@@ -126,6 +121,7 @@ function BosonNarrative() {
               inset: 0,
               color: "rgba(255,255,255,0.96)",
               ...baseTextStyle,
+
               WebkitMaskImage: `
                 radial-gradient(
                   900px circle at ${pos.x}px ${pos.y}px,
