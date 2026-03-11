@@ -178,8 +178,7 @@ function MarqueeOverlay({ item, active }) {
   );
 }
 
-export default  function WorksList() {
-
+export default function WorksList() {
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
   const leftRef = useRef(null);
@@ -189,8 +188,6 @@ export default  function WorksList() {
   const splitsRef = useRef([]);
   const resizeTimer = useRef(null);
   const lastWidth = useRef(0);
-
-  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const items = [
     {
@@ -252,18 +249,15 @@ export default  function WorksList() {
     },
   ];
 
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const totalIndex = String(items.length).padStart(2, "0");
 
   useLayoutEffect(() => {
-
-    ScrollTrigger.config({
-      ignoreMobileResize: true
-    });
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
     lastWidth.current = window.innerWidth;
 
     const build = () => {
-
       const isMobile = window.innerWidth <= 768;
 
       splitsRef.current.forEach((s) => s.revert());
@@ -272,8 +266,6 @@ export default  function WorksList() {
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-
-        /* ================= HEADER ================= */
 
         if (isMobile) {
 
@@ -285,8 +277,8 @@ export default  function WorksList() {
             scrollTrigger: {
               trigger: headerRef.current,
               start: "top 85%",
-              once: true
-            }
+              once: true,
+            },
           });
 
           gsap.from(rightRef.current, {
@@ -298,8 +290,8 @@ export default  function WorksList() {
             scrollTrigger: {
               trigger: headerRef.current,
               start: "top 85%",
-              once: true
-            }
+              once: true,
+            },
           });
 
         } else {
@@ -321,7 +313,7 @@ export default  function WorksList() {
             scrollTrigger: {
               trigger: headerRef.current,
               start: "top 75%",
-              once: true
+              once: true,
             },
           });
 
@@ -342,46 +334,25 @@ export default  function WorksList() {
             scrollTrigger: {
               trigger: headerRef.current,
               start: "top 75%",
-              once: true
+              once: true,
             },
           });
 
         }
 
-        /* ================= LIST ================= */
-
-        const rows = gsap.utils.toArray(".works-row");
-
-        gsap.from(rows, {
-          y: 40,
-          opacity: 0,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-            once: true
-          }
-        });
-
       }, sectionRef);
-
     };
 
     document.fonts.ready.then(build);
 
     const onResize = () => {
-
       const w = window.innerWidth;
-
       if (w === lastWidth.current) return;
 
       lastWidth.current = w;
 
       clearTimeout(resizeTimer.current);
       resizeTimer.current = setTimeout(build, 200);
-
     };
 
     window.addEventListener("resize", onResize);
@@ -401,9 +372,6 @@ export default  function WorksList() {
       className="bg-black"
       style={{ padding: "6vh 0" }}
     >
-
-      {/* HEADER */}
-
       <div
         ref={headerRef}
         className="works-header"
@@ -415,7 +383,6 @@ export default  function WorksList() {
           gap: "2vh",
         }}
       >
-
         <h2
           ref={leftRef}
           className="font-[Code_Pro] font-light"
@@ -432,7 +399,6 @@ export default  function WorksList() {
             style={{
               fontSize: "0.45em",
               opacity: 0.7,
-              fontFeatureSettings: "'lnum' 1, 'tnum' 1",
             }}
           >
             {totalIndex}
@@ -452,10 +418,7 @@ export default  function WorksList() {
           contexts, where constraints, scale, and objectives vary from project
           to project.
         </p>
-
       </div>
-
-      {/* LIST */}
 
       {items.map((item, i) => (
         <div
@@ -475,6 +438,22 @@ export default  function WorksList() {
           }}
         >
 
+          <motion.div
+            className="hover-overlay"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "white",
+              zIndex: 1,
+              transformOrigin: "center",
+            }}
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: hoveredIndex === i ? 1 : 0 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          />
+
+          <MarqueeOverlay item={item} active={hoveredIndex === i} />
+
           <div style={{ zIndex: 1, gridColumn: "2 / span 1" }}>
             <div
               className="works-title font-light"
@@ -492,7 +471,40 @@ export default  function WorksList() {
         </div>
       ))}
 
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .works-header {
+            grid-template-columns: 1fr !important;
+            padding: 0 6vw 4vh !important;
+            gap: 2vh;
+          }
+
+          .works-header h2 {
+            font-size: 30px !important;
+          }
+
+          .works-header p {
+            font-size: 14px !important;
+            max-width: 100% !important;
+          }
+
+          .works-row {
+            grid-template-columns: 1fr !important;
+            padding: 4vh 6vw !important;
+          }
+
+          .works-title {
+            font-size: 34px !important;
+            text-align: left !important;
+          }
+
+          .hover-overlay {
+            display: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }
+
 
