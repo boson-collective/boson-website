@@ -52,17 +52,14 @@ function Description() {
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-
         const PARALLAX_ST = {
           trigger: sectionRef.current,
           start: "top bottom",
           end: "bottom top",
           scrub: PROFILE.scrub,
-          fastScrollEnd: true,
         };
 
         // TITLE
-
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -71,20 +68,23 @@ function Description() {
 
         splitsRef.current.push(titleSplit);
 
-        gsap.from(titleSplit.lines, {
-          yPercent: 35,
-          opacity: 0,
-          duration: 1.1,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-            once: true,
-            toggleActions: "play none none none",
-            fastScrollEnd: true,
-          },
-        });
+        gsap.fromTo(
+          titleSplit.lines,
+          { yPercent: 35, opacity: 0 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.1,
+            stagger: 0.1,
+            ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 75%",
+              once: true,
+            },
+          }
+        );
 
         gsap.to(titleRef.current, {
           y: move(-20),
@@ -93,7 +93,6 @@ function Description() {
         });
 
         // DIVIDER
-
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -101,12 +100,11 @@ function Description() {
             scaleX: 1,
             duration: 0.9,
             ease: "power2.out",
+            immediateRender: false,
             scrollTrigger: {
               trigger: dividerRef.current,
               start: "top 85%",
               once: true,
-              toggleActions: "play none none none",
-              fastScrollEnd: true,
             },
           }
         );
@@ -118,7 +116,6 @@ function Description() {
         });
 
         // BODY
-
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
           const split = SplitText.create(p, {
             type: "lines",
@@ -128,20 +125,23 @@ function Description() {
 
           splitsRef.current.push(split);
 
-          gsap.from(split.lines, {
-            yPercent: 26,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.05,
-            ease: "power1.out",
-            scrollTrigger: {
-              trigger: p,
-              start: "top 85%",
-              once: true,
-              toggleActions: "play none none none",
-              fastScrollEnd: true,
-            },
-          });
+          gsap.fromTo(
+            split.lines,
+            { yPercent: 26, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 1,
+              stagger: 0.05,
+              ease: "power1.out",
+              immediateRender: false,
+              scrollTrigger: {
+                trigger: p,
+                start: "top 85%",
+                once: true,
+              },
+            }
+          );
 
           gsap.to(p, {
             y: move(-40),
@@ -151,36 +151,37 @@ function Description() {
         });
 
         // STATS
-
         const stats = statsRef.current.querySelectorAll("[data-stat]");
 
-        gsap.from(stats, {
-          opacity: 0,
-          y: 8,
-          duration: 0.5,
-          stagger: 0.12,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: statsRef.current,
-            start: "top 85%",
-            once: true,
-            toggleActions: "play none none none",
-            fastScrollEnd: true,
-          },
-        });
+        gsap.fromTo(
+          stats,
+          { opacity: 0, y: 8 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            stagger: 0.12,
+            ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: {
+              trigger: statsRef.current,
+              start: "top 85%",
+              once: true,
+            },
+          }
+        );
 
         gsap.to(stats, {
           y: move(-22),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
-
       }, sectionRef);
 
       ScrollTrigger.refresh();
     };
 
-    document.fonts.ready.then(build);
+    build();
 
     const onResize = () => {
       clearTimeout(resizeTimer.current);
