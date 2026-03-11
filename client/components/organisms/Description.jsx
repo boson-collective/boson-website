@@ -29,6 +29,7 @@ function Description() {
     };
 
     const build = () => {
+
       if (
         !sectionRef.current ||
         !titleRef.current ||
@@ -61,10 +62,11 @@ function Description() {
           scrub: PROFILE.scrub,
         };
 
-        // TITLE
-        let titleLines = [titleRef.current];
-
+        // =========================
+        // TITLE (NO ANIMATION MOBILE)
+        // =========================
         if (!isMobile) {
+
           const titleSplit = SplitText.create(titleRef.current, {
             type: "lines",
             linesClass: "line",
@@ -72,29 +74,31 @@ function Description() {
           });
 
           splitsRef.current.push(titleSplit);
-          titleLines = titleSplit.lines;
+
+          gsap.from(titleSplit.lines, {
+            yPercent: 35,
+            opacity: 0,
+            duration: 1.1,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 75%",
+              once: true,
+            },
+          });
+
+          gsap.to(titleRef.current, {
+            y: move(-20),
+            ease: "none",
+            scrollTrigger: PARALLAX_ST,
+          });
+
         }
 
-        gsap.from(titleLines, {
-          yPercent: 35,
-          opacity: 0,
-          duration: 1.1,
-          stagger: 0.1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-            once: true,
-          },
-        });
-
-        gsap.to(titleRef.current, {
-          y: move(-20),
-          ease: "none",
-          scrollTrigger: PARALLAX_ST,
-        });
-
+        // =========================
         // DIVIDER
+        // =========================
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
@@ -116,7 +120,9 @@ function Description() {
           scrollTrigger: PARALLAX_ST,
         });
 
+        // =========================
         // BODY
+        // =========================
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
 
           let lines = [p];
@@ -153,7 +159,9 @@ function Description() {
 
         });
 
+        // =========================
         // STATS
+        // =========================
         const stats = statsRef.current.querySelectorAll("[data-stat]");
 
         gsap.from(stats, {
@@ -176,6 +184,7 @@ function Description() {
         });
 
       }, sectionRef);
+
     };
 
     document.fonts.ready.then(build);
