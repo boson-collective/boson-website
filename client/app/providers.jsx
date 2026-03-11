@@ -5,7 +5,7 @@ import useLenis from "../hooks/useLenis";
 import { initAnalytics } from "../lib/analytics";
 
 export default function Providers({ children }) {
-  // useLenis();
+  useLenis();
   useEffect(() => {
     try {
       initAnalytics();
