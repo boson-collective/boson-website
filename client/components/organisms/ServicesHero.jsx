@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
 
 function ServicesHero() {
+
   const sectionRef = useRef(null);
   const labelRef = useRef(null);
   const titleRef = useRef(null);
@@ -10,6 +11,7 @@ function ServicesHero() {
   const splitsRef = useRef([]);
   const ctxRef = useRef(null);
   const resizeTimer = useRef(null);
+  const lastWidth = useRef(0);
 
   const [hoverIndex, setHoverIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -24,52 +26,101 @@ function ServicesHero() {
 
   /* GSAP */
   useLayoutEffect(() => {
+
+    ScrollTrigger.config({
+      ignoreMobileResize: true
+    });
+
+    lastWidth.current = window.innerWidth;
+
     const build = () => {
+
       if (!sectionRef.current) return;
 
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
+
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
-        /* TOP TEXTS */
 
-        [labelRef.current, titleRef.current, descRef.current].forEach(
-          (el) => {
-            if (!el) return;
+        /* ===================== */
+        /* TOP TEXTS             */
+        /* ===================== */
 
-            const split = SplitText.create(el, {
-              type: "lines",
-              linesClass: "line",
-              mask: "lines",
-            });
+        [labelRef.current, titleRef.current, descRef.current].forEach((el) => {
 
-            splitsRef.current.push(split);
+          if (!el) return;
 
-            gsap.from(split.lines, {
-              yPercent: 35,
+          if (window.innerWidth <= 768) {
+
+            gsap.from(el, {
+              y: 30,
               opacity: 0,
-              duration: 1,
-              stagger: 0.08,
+              duration: 0.9,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
                 start: "top 85%",
-                once: true,
-              },
+                once: true
+              }
             });
+
+            return;
           }
-        );
 
-        /* SERVICE TITLES — SAFE SPLIT */
-        const titles =
-          sectionRef.current.querySelectorAll("[data-animate]");
-
-        titles.forEach((el) => {
           const split = SplitText.create(el, {
             type: "lines",
             linesClass: "line",
-            mask: "lines",
+            mask: "lines"
+          });
+
+          splitsRef.current.push(split);
+
+          gsap.from(split.lines, {
+            yPercent: 35,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.08,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 85%",
+              once: true
+            }
+          });
+
+        });
+
+        /* ===================== */
+        /* SERVICE TITLES        */
+        /* ===================== */
+
+        const titles = sectionRef.current.querySelectorAll("[data-animate]");
+
+        titles.forEach((el) => {
+
+          if (window.innerWidth <= 768) {
+
+            gsap.from(el, {
+              y: 24,
+              opacity: 0,
+              duration: 0.9,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 88%",
+                once: true
+              }
+            });
+
+            return;
+          }
+
+          const split = SplitText.create(el, {
+            type: "lines",
+            linesClass: "line",
+            mask: "lines"
           });
 
           splitsRef.current.push(split);
@@ -83,20 +134,29 @@ function ServicesHero() {
             scrollTrigger: {
               trigger: el,
               start: "top 85%",
-              once: true,
-            },
+              once: true
+            }
           });
+
         });
+
       }, sectionRef);
 
-      ScrollTrigger.refresh();
     };
 
     document.fonts.ready.then(build);
 
     const onResize = () => {
+
+      const w = window.innerWidth;
+
+      if (w === lastWidth.current) return;
+
+      lastWidth.current = w;
+
       clearTimeout(resizeTimer.current);
       resizeTimer.current = setTimeout(build, 200);
+
     };
 
     window.addEventListener("resize", onResize);
@@ -106,6 +166,7 @@ function ServicesHero() {
       splitsRef.current.forEach((s) => s.revert());
       if (ctxRef.current) ctxRef.current.revert();
     };
+
   }, []);
 
   const services = [
@@ -137,8 +198,11 @@ function ServicesHero() {
       className="relative w-full min-h-screen bg-[#F3F4F5] text-neutral-900"
     >
       <div className="w-full px-6 sm:px-10 lg:px-20 pt-20 pb-20 md:pb-0 lg:pt-24">
+
         {/* TOP */}
+
         <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
+
           <div
             ref={labelRef}
             className="col-span-12 font-[Code_Pro] lg:col-span-3 text-xs tracking-wide text-neutral-500"
@@ -166,12 +230,17 @@ function ServicesHero() {
               mission to help you take the next step in your business.
             </p>
           </div>
+
         </div>
 
         {/* SERVICES */}
+
         <div className="grid grid-cols-12">
+
           <div className="col-span-12 lg:col-span-8 lg:col-start-5">
+
             {services.map((item, i) => {
+
               const isHovering = hoverIndex !== null;
               const isActive = hoverIndex === i;
 
@@ -192,7 +261,9 @@ function ServicesHero() {
                   onMouseLeave={() => !isMobile && setHoverIndex(null)}
                   className="relative py-10 lg:py-14 border-t border-black/20"
                 >
+
                   <div className="flex items-center gap-5 lg:gap-0">
+
                     {isMobile && (
                       <div className="w-[88px] h-[64px] flex-shrink-0 overflow-hidden rounded-md bg-neutral-200">
                         <img
@@ -235,14 +306,20 @@ function ServicesHero() {
                         {lastWord}
                       </span>
                     </h3>
+
                   </div>
+
                 </div>
               );
+
             })}
 
             <div className="border-t border-black/20" />
+
           </div>
+
         </div>
+
       </div>
     </section>
   );
