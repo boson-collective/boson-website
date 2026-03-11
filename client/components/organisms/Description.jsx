@@ -1,35 +1,47 @@
 import { useLayoutEffect, useRef } from "react";
-import { ScrollTrigger, gsap } from "../../lib/gsap";
+import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
 
 function Description() {
 
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
+  const bodyRef = useRef(null);
   const dividerRef = useRef(null);
   const statsRef = useRef(null);
-  const bodyRef = useRef(null);
+
+  const splitsRef = useRef([]);
+  const ctxRef = useRef(null);
 
   useLayoutEffect(() => {
 
     if (
       !sectionRef.current ||
       !titleRef.current ||
+      !bodyRef.current ||
       !dividerRef.current ||
-      !statsRef.current ||
-      !bodyRef.current
+      !statsRef.current
     ) return;
 
-    const ctx = gsap.context(()=>{
+    ctxRef.current = gsap.context(()=>{
 
-      // TITLE ANIMATION
+      // TITLE
+
+      const titleSplit = SplitText.create(titleRef.current,{
+        type:"lines",
+        linesClass:"line",
+        mask:"lines"
+      });
+
+      splitsRef.current.push(titleSplit);
 
       const titleTween = gsap.fromTo(
-        titleRef.current,
-        {y:60,opacity:0},
+        titleSplit.lines,
+        {yPercent:35,opacity:0},
         {
-          y:0,
+          yPercent:0,
           opacity:1,
-          duration:1.2,
+          duration:1.1,
+          stagger:0.1,
           ease:"power2.out",
           paused:true
         }
@@ -72,14 +84,23 @@ function Description() {
 
       bodyRef.current.querySelectorAll("[data-animate]").forEach((p)=>{
 
+        const split = SplitText.create(p,{
+          type:"lines",
+          linesClass:"line",
+          mask:"lines"
+        });
+
+        splitsRef.current.push(split);
+
         const tween = gsap.fromTo(
-          p,
-          {y:30,opacity:0},
+          split.lines,
+          {yPercent:26,opacity:0},
           {
-            y:0,
+            yPercent:0,
             opacity:1,
             duration:1,
-            ease:"power2.out",
+            stagger:0.05,
+            ease:"power1.out",
             paused:true
           }
         );
@@ -102,11 +123,11 @@ function Description() {
 
       const statsTween = gsap.fromTo(
         stats,
-        {opacity:0,y:10},
+        {opacity:0,y:8},
         {
           opacity:1,
           y:0,
-          duration:0.6,
+          duration:0.5,
           stagger:0.12,
           ease:"power2.out",
           paused:true
@@ -125,7 +146,10 @@ function Description() {
 
     },sectionRef);
 
-    return ()=>ctx.revert();
+    return ()=>{
+      splitsRef.current.forEach((s)=>s.revert());
+      if(ctxRef.current) ctxRef.current.revert();
+    };
 
   },[]);
 
@@ -134,7 +158,6 @@ function Description() {
       ref={sectionRef}
       className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
     >
-
       <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
 
         <div className="mb-10 lg:mb-14">
@@ -209,7 +232,6 @@ function Description() {
         </div>
 
       </div>
-
     </section>
   );
 }
