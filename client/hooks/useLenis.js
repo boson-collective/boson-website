@@ -4,6 +4,10 @@ import Lenis from "@studio-freight/lenis";
 
 export default function useLenis() {
   useEffect(() => {
+
+    // disable lenis on mobile
+    if (window.innerWidth <= 768) return;
+
     const lenis = new Lenis({
       smooth: true,
 
@@ -21,15 +25,18 @@ export default function useLenis() {
     });
 
     let rafId;
+
     const raf = (time) => {
       lenis.raf(time);
       rafId = requestAnimationFrame(raf);
     };
+
     rafId = requestAnimationFrame(raf);
 
     return () => {
       cancelAnimationFrame(rafId);
       lenis.destroy();
     };
+
   }, []);
 }
