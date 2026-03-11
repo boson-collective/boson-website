@@ -14,6 +14,11 @@ function Description() {
   const lastWidth = useRef(0);
 
   useLayoutEffect(() => {
+
+    ScrollTrigger.config({
+      ignoreMobileResize: true
+    });
+
     lastWidth.current = window.innerWidth;
 
     const getProfile = () => {
@@ -171,14 +176,13 @@ function Description() {
         });
 
       }, sectionRef);
-
-      ScrollTrigger.refresh();
     };
 
     document.fonts.ready.then(build);
 
     const onResize = () => {
       const w = window.innerWidth;
+
       if (w === lastWidth.current) return;
 
       lastWidth.current = w;
@@ -204,6 +208,7 @@ function Description() {
       className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
     >
       <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
+
         <div className="mb-10 lg:mb-14">
 
           <h1
@@ -227,6 +232,7 @@ function Description() {
         <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-x-20">
 
           <div ref={statsRef} className="w-full lg:flex-[0_0_42%] font-[Code_Pro]">
+
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
 
               <div data-stat>
@@ -253,6 +259,7 @@ function Description() {
               </div>
 
             </div>
+
           </div>
 
           <div
