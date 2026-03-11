@@ -14,139 +14,161 @@ function Description() {
 
   useLayoutEffect(() => {
 
-    if (
-      !sectionRef.current ||
-      !titleRef.current ||
-      !bodyRef.current ||
-      !dividerRef.current ||
-      !statsRef.current
-    ) return;
+    const build = () => {
 
-    ctxRef.current = gsap.context(() => {
+      if (
+        !sectionRef.current ||
+        !titleRef.current ||
+        !bodyRef.current ||
+        !dividerRef.current ||
+        !statsRef.current
+      ) return;
 
-      // TITLE
+      splitsRef.current.forEach((s)=>s.revert());
+      splitsRef.current=[];
 
-      const titleSplit = SplitText.create(titleRef.current,{
-        type:"lines",
-        linesClass:"line",
-        mask:"lines"
-      });
+      if (ctxRef.current) ctxRef.current.revert();
 
-      splitsRef.current.push(titleSplit);
+      ctxRef.current = gsap.context(()=>{
 
-      const titleTween = gsap.fromTo(
-        titleSplit.lines,
-        {yPercent:35,opacity:0},
-        {
-          yPercent:0,
-          opacity:1,
-          duration:1.1,
-          stagger:0.1,
-          ease:"power2.out",
-          paused:true
-        }
-      );
+        // TITLE
 
-      ScrollTrigger.create({
-        trigger:sectionRef.current,
-        start:"top 75%",
-        once:true,
-        onEnter:(self)=>{
-          titleTween.play();
-          self.kill();
-        }
-      });
-
-      // DIVIDER
-
-      const dividerTween = gsap.fromTo(
-        dividerRef.current,
-        {scaleX:0,transformOrigin:"left center"},
-        {
-          scaleX:1,
-          duration:0.9,
-          ease:"power2.out",
-          paused:true
-        }
-      );
-
-      ScrollTrigger.create({
-        trigger:dividerRef.current,
-        start:"top 85%",
-        once:true,
-        onEnter:(self)=>{
-          dividerTween.play();
-          self.kill();
-        }
-      });
-
-      // BODY
-
-      bodyRef.current.querySelectorAll("[data-animate]").forEach((p)=>{
-
-        const split = SplitText.create(p,{
+        const titleSplit = SplitText.create(titleRef.current,{
           type:"lines",
           linesClass:"line",
           mask:"lines"
         });
 
-        splitsRef.current.push(split);
+        splitsRef.current.push(titleSplit);
 
-        const tween = gsap.fromTo(
-          split.lines,
-          {yPercent:26,opacity:0},
+        const titleTween = gsap.fromTo(
+          titleSplit.lines,
+          {yPercent:35,opacity:0},
           {
             yPercent:0,
             opacity:1,
-            duration:1,
-            stagger:0.05,
-            ease:"power1.out",
+            duration:1.1,
+            stagger:0.1,
+            ease:"power2.out",
             paused:true
           }
         );
 
         ScrollTrigger.create({
-          trigger:p,
-          start:"top 85%",
+          trigger:sectionRef.current,
+          start:"top 75%",
           once:true,
           onEnter:(self)=>{
-            tween.play();
+            titleTween.play();
             self.kill();
           }
         });
 
-      });
+        // DIVIDER
 
-      // STATS
+        const dividerTween = gsap.fromTo(
+          dividerRef.current,
+          {scaleX:0,transformOrigin:"left center"},
+          {
+            scaleX:1,
+            duration:0.9,
+            ease:"power2.out",
+            paused:true
+          }
+        );
 
-      const stats = statsRef.current.querySelectorAll("[data-stat]");
+        ScrollTrigger.create({
+          trigger:dividerRef.current,
+          start:"top 85%",
+          once:true,
+          onEnter:(self)=>{
+            dividerTween.play();
+            self.kill();
+          }
+        });
 
-      const statsTween = gsap.fromTo(
-        stats,
-        {opacity:0,y:8},
-        {
-          opacity:1,
-          y:0,
-          duration:0.5,
-          stagger:0.12,
-          ease:"power2.out",
-          paused:true
-        }
-      );
+        // BODY
 
-      ScrollTrigger.create({
-        trigger:statsRef.current,
-        start:"top 85%",
-        once:true,
-        onEnter:(self)=>{
-          statsTween.play();
-          self.kill();
-        }
-      });
+        bodyRef.current.querySelectorAll("[data-animate]").forEach((p)=>{
 
-    },sectionRef);
+          const split = SplitText.create(p,{
+            type:"lines",
+            linesClass:"line",
+            mask:"lines"
+          });
+
+          splitsRef.current.push(split);
+
+          const tween = gsap.fromTo(
+            split.lines,
+            {yPercent:26,opacity:0},
+            {
+              yPercent:0,
+              opacity:1,
+              duration:1,
+              stagger:0.05,
+              ease:"power1.out",
+              paused:true
+            }
+          );
+
+          ScrollTrigger.create({
+            trigger:p,
+            start:"top 85%",
+            once:true,
+            onEnter:(self)=>{
+              tween.play();
+              self.kill();
+            }
+          });
+
+        });
+
+        // STATS
+
+        const stats = statsRef.current.querySelectorAll("[data-stat]");
+
+        const statsTween = gsap.fromTo(
+          stats,
+          {opacity:0,y:8},
+          {
+            opacity:1,
+            y:0,
+            duration:0.5,
+            stagger:0.12,
+            ease:"power2.out",
+            paused:true
+          }
+        );
+
+        ScrollTrigger.create({
+          trigger:statsRef.current,
+          start:"top 85%",
+          once:true,
+          onEnter:(self)=>{
+            statsTween.play();
+            self.kill();
+          }
+        });
+
+      },sectionRef);
+
+      ScrollTrigger.refresh();
+
+    };
+
+    // BUILD
+    build();
+
+    // REFRESH SPLITTEXT ketika layout berubah
+    ScrollTrigger.addEventListener("refreshInit", () => {
+      splitsRef.current.forEach((s)=>s.revert());
+    });
+
+    window.addEventListener("resize", ScrollTrigger.refresh);
 
     return ()=>{
+      window.removeEventListener("resize", ScrollTrigger.refresh);
       splitsRef.current.forEach((s)=>s.revert());
       if(ctxRef.current) ctxRef.current.revert();
     };
@@ -169,8 +191,8 @@ function Description() {
             style={{fontSize:"clamp(32px,4.9vw,134px)"}}
           >
             We're a digital agency that helps brands stay
-            <span className="font-light"> consistent</span> online.
-            We keep everything on track so you can stay
+            <span className="font-light"> consistent</span> online. We
+            keep everything on track so you can stay
             <span className="font-light"> focused</span> on what matters
           </h1>
 
