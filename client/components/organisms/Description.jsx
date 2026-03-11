@@ -1,182 +1,140 @@
 import { useLayoutEffect, useRef } from "react";
-import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
+import { ScrollTrigger, gsap } from "../../lib/gsap";
 
 function Description() {
 
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
-  const bodyRef = useRef(null);
   const dividerRef = useRef(null);
   const statsRef = useRef(null);
-
-  const splitsRef = useRef([]);
-  const ctxRef = useRef(null);
+  const bodyRef = useRef(null);
 
   useLayoutEffect(() => {
 
-    const build = () => {
+    if (
+      !sectionRef.current ||
+      !titleRef.current ||
+      !dividerRef.current ||
+      !statsRef.current ||
+      !bodyRef.current
+    ) return;
 
-      if (
-        !sectionRef.current ||
-        !titleRef.current ||
-        !bodyRef.current ||
-        !dividerRef.current ||
-        !statsRef.current
-      ) return;
+    const ctx = gsap.context(()=>{
 
-      splitsRef.current.forEach((s)=>s.revert());
-      splitsRef.current=[];
+      // TITLE ANIMATION
 
-      if (ctxRef.current) ctxRef.current.revert();
+      const titleTween = gsap.fromTo(
+        titleRef.current,
+        {y:60,opacity:0},
+        {
+          y:0,
+          opacity:1,
+          duration:1.2,
+          ease:"power2.out",
+          paused:true
+        }
+      );
 
-      ctxRef.current = gsap.context(()=>{
+      ScrollTrigger.create({
+        trigger:sectionRef.current,
+        start:"top 75%",
+        once:true,
+        onEnter:(self)=>{
+          titleTween.play();
+          self.kill();
+        }
+      });
 
-        // TITLE
+      // DIVIDER
 
-        const titleSplit = SplitText.create(titleRef.current,{
-          type:"lines",
-          linesClass:"line",
-          mask:"lines"
-        });
+      const dividerTween = gsap.fromTo(
+        dividerRef.current,
+        {scaleX:0,transformOrigin:"left center"},
+        {
+          scaleX:1,
+          duration:0.9,
+          ease:"power2.out",
+          paused:true
+        }
+      );
 
-        const titleTween = gsap.fromTo(
-          titleSplit.lines,
-          {yPercent:35,opacity:0},
+      ScrollTrigger.create({
+        trigger:dividerRef.current,
+        start:"top 85%",
+        once:true,
+        onEnter:(self)=>{
+          dividerTween.play();
+          self.kill();
+        }
+      });
+
+      // BODY
+
+      bodyRef.current.querySelectorAll("[data-animate]").forEach((p)=>{
+
+        const tween = gsap.fromTo(
+          p,
+          {y:30,opacity:0},
           {
-            yPercent:0,
-            opacity:1,
-            duration:1.1,
-            stagger:0.1,
-            ease:"power2.out",
-            paused:true
-          }
-        );
-
-        ScrollTrigger.create({
-          trigger:sectionRef.current,
-          start:"top 75%",
-          once:true,
-          onEnter:(self)=>{
-            titleTween.play();
-            self.kill();
-          }
-        });
-
-        // DIVIDER
-
-        const dividerTween = gsap.fromTo(
-          dividerRef.current,
-          {scaleX:0,transformOrigin:"left center"},
-          {
-            scaleX:1,
-            duration:0.9,
-            ease:"power2.out",
-            paused:true
-          }
-        );
-
-        ScrollTrigger.create({
-          trigger:dividerRef.current,
-          start:"top 85%",
-          once:true,
-          onEnter:(self)=>{
-            dividerTween.play();
-            self.kill();
-          }
-        });
-
-        // BODY
-
-        bodyRef.current.querySelectorAll("[data-animate]").forEach((p)=>{
-
-          const split = SplitText.create(p,{
-            type:"lines",
-            linesClass:"line",
-            mask:"lines"
-          });
-
-          splitsRef.current.push(split);
-
-          const tween = gsap.fromTo(
-            split.lines,
-            {yPercent:26,opacity:0},
-            {
-              yPercent:0,
-              opacity:1,
-              duration:1,
-              stagger:0.05,
-              ease:"power1.out",
-              paused:true
-            }
-          );
-
-          ScrollTrigger.create({
-            trigger:p,
-            start:"top 85%",
-            once:true,
-            onEnter:(self)=>{
-              tween.play();
-              self.kill();
-            }
-          });
-
-        });
-
-        // STATS
-
-        const stats = statsRef.current.querySelectorAll("[data-stat]");
-
-        const statsTween = gsap.fromTo(
-          stats,
-          {opacity:0,y:8},
-          {
-            opacity:1,
             y:0,
-            duration:0.5,
-            stagger:0.12,
+            opacity:1,
+            duration:1,
             ease:"power2.out",
             paused:true
           }
         );
 
         ScrollTrigger.create({
-          trigger:statsRef.current,
+          trigger:p,
           start:"top 85%",
           once:true,
           onEnter:(self)=>{
-            statsTween.play();
+            tween.play();
             self.kill();
           }
         });
 
-      },sectionRef);
+      });
 
-      ScrollTrigger.refresh();
+      // STATS
 
-    };
+      const stats = statsRef.current.querySelectorAll("[data-stat]");
 
-    build();
+      const statsTween = gsap.fromTo(
+        stats,
+        {opacity:0,y:10},
+        {
+          opacity:1,
+          y:0,
+          duration:0.6,
+          stagger:0.12,
+          ease:"power2.out",
+          paused:true
+        }
+      );
 
-    ScrollTrigger.addEventListener("refreshInit",()=>{
-      splitsRef.current.forEach((s)=>s.revert());
-    });
+      ScrollTrigger.create({
+        trigger:statsRef.current,
+        start:"top 85%",
+        once:true,
+        onEnter:(self)=>{
+          statsTween.play();
+          self.kill();
+        }
+      });
 
-    window.addEventListener("resize",ScrollTrigger.refresh);
+    },sectionRef);
 
-    return ()=>{
-      window.removeEventListener("resize",ScrollTrigger.refresh);
-      splitsRef.current.forEach((s)=>s.revert());
-      if(ctxRef.current) ctxRef.current.revert();
-    };
+    return ()=>ctx.revert();
 
   },[]);
 
   return (
     <section
       ref={sectionRef}
-      data-theme="light"
       className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
     >
+
       <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
 
         <div className="mb-10 lg:mb-14">
@@ -187,8 +145,8 @@ function Description() {
             style={{fontSize:"clamp(32px,4.9vw,134px)"}}
           >
             We're a digital agency that helps brands stay
-            <span className="font-light"> consistent</span> online. We
-            keep everything on track so you can stay
+            <span className="font-light"> consistent</span> online.
+            We keep everything on track so you can stay
             <span className="font-light"> focused</span> on what matters
           </h1>
 
@@ -220,7 +178,9 @@ function Description() {
               </div>
 
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">2.5m+</div>
+                <div className="text-[22px] font-medium text-neutral-900">
+                  2.5m+
+                </div>
                 <div className="text-xs uppercase tracking-widest">
                   Total audience reach
                 </div>
@@ -249,6 +209,7 @@ function Description() {
         </div>
 
       </div>
+
     </section>
   );
 }
