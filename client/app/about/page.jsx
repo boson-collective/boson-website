@@ -60,40 +60,101 @@ function Hero() {
   const yearBottom = currentYear.slice(2);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black">
+    <section
+      className="
+        relative w-full
+        min-h-[100svh] md:min-h-screen
+        bg-black
+      "
+    >
       {/* WEBGL BACKGROUND */}
-      <Webglbg />
-
-      <div className="absolute top-0 left-0 w-full z-30 font-[Code_Pro]">
-        <div className="relative mx-auto px-4 sm:px-6 md:px-20 min-h-[64px] md:min-h-[72px] flex items-center text-white translate-y-1">
-          
-          <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0 text-xs font-medium tracking-wide">
-            <a href="/about" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-              About
-            </a>
-          </nav>
-
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-            <a href="/" className="pointer-events-auto block">
-              <Image
-                src="/png/boson-white.png"
-                alt="Boson"
-                width={120}
-                height={40}
-                priority
-                className="transition-opacity hover:opacity-70"
-              />
-            </a>
-          </div>
-
-          <div className="hidden md:flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
-            <a href="/contact" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-              Contact
-            </a>
-          </div>
-
-        </div>
+      <div className="absolute inset-0 z-0">
+        <Webglbg />
       </div>
+ 
+{/* NAVBAR */}
+<div className="absolute top-0 left-0 w-full z-30 font-[Code_Pro]">
+
+  <div
+    className="
+      mx-auto
+      px-6 md:px-20
+      min-h-[64px] md:min-h-[72px]
+      flex items-center
+      text-white
+    "
+  >
+
+    {/* MOBILE LAYOUT */}
+    <div className="flex md:hidden w-full items-center justify-between text-xs font-medium tracking-wide">
+
+      <a
+        href="/about"
+        className="transition-opacity hover:opacity-70"
+      >
+        About
+      </a>
+
+      <a href="/" className="block">
+        <Image
+          src="/png/boson-white.png"
+          alt="Boson"
+          width={96}
+          height={32}
+          priority
+          className="transition-opacity hover:opacity-70"
+        />
+      </a>
+
+      <a
+        href="/contact"
+        className="transition-opacity hover:opacity-70"
+      >
+        Contact
+      </a>
+
+    </div>
+
+
+    {/* DESKTOP LAYOUT */}
+    <div className="hidden md:flex w-full items-center">
+
+      <nav className="flex items-center gap-6 flex-1 min-w-0 text-xs font-medium tracking-wide">
+        <a
+          href="/about"
+          className="transition-opacity hover:opacity-70 whitespace-nowrap"
+        >
+          About
+        </a>
+      </nav>
+
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <a href="/" className="block">
+          <Image
+            src="/png/boson-white.png"
+            alt="Boson"
+            width={120}
+            height={40}
+            priority
+            className="transition-opacity hover:opacity-70"
+          />
+        </a>
+      </div>
+
+      <div className="flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
+        <a
+          href="/contact"
+          className="transition-opacity hover:opacity-70 whitespace-nowrap"
+        >
+          Contact
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
       {/* BOTTOM CONTENT */}
       <div className="absolute bottom-0 left-0 w-full z-20">
@@ -103,18 +164,20 @@ function Hero() {
             mb-4 sm:mb-6
             flex items-center justify-between
             rounded-2xl
-            px-12 py-2
+            px-6 sm:px-10 md:px-12 py-4
           "
         >
+
           <div className="max-w-5xl">
             <h1
               className="font-[Code_Pro] text-white font-light tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(18px, 2.8vw, 48px)" }}
             >
+
               <span
                 className="
                   hidden lg:inline-block
-                  mr-30
+                  mr-24
                   text-xs uppercase tracking-widest opacity-70
                   align-top relative
                 "
@@ -122,17 +185,29 @@ function Hero() {
                 about
               </span>
 
-              Designers, editors and coders.<br/> Driven by{" "}
-              <span className="font-medium">exceptional</span> design and
-              craftsmanship. We’re digital natives, dedicated heart and soul to{" "}
+              Designers, editors and coders.<br />
+              Driven by <span className="font-medium">exceptional</span> design
+              and craftsmanship. We’re digital natives, dedicated heart and
+              soul to{" "}
               <span className="font-medium">strategic branding</span>
+
             </h1>
           </div>
 
-          <div className="w-14 h-14 rounded-full border border-white text-white text-sm font-medium flex flex-col items-center justify-center leading-none">
+          <div
+            className="
+              w-14 h-14
+              rounded-full border border-white
+              text-white text-sm font-medium
+              flex flex-col items-center justify-center
+              leading-none
+              shrink-0
+            "
+          >
             <span>{yearTop}</span>
             <span>{yearBottom}</span>
           </div>
+
         </div>
       </div>
     </section>
@@ -185,146 +260,158 @@ function Team() {
   const [isMobile, setIsMobile] = useState(false)
 
   /* =========================
-     VIEWPORT CHECK
+     VIEWPORT CHECK (STABLE)
   ========================= */
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
+    const mq = window.matchMedia("(max-width: 767px)")
+    const handle = (e) => setIsMobile(e.matches)
+
+    setIsMobile(mq.matches)
+    mq.addEventListener("change", handle)
+
+    return () => mq.removeEventListener("change", handle)
   }, [])
 
   const team = [
     {
-      name: 'BRAHMA SATYA CARYA',
-      roles: ['ACCOUNT MANAGER'],
+      name: "BRAHMA SATYA CARYA",
+      roles: ["ACCOUNT MANAGER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png",
     },
     {
-      name: 'PINGKAN',
-      roles: ['PRODUCTION AND CREATIVE DIRECTOR'],
+      name: "PINGKAN",
+      roles: ["PRODUCTION AND CREATIVE DIRECTOR"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png",
     },
     {
-      name: 'DEWI ICHSANI',
-      roles: ['HUMAN RELATION AND GENERAL AFFAIRS'],
+      name: "DEWI ICHSANI",
+      roles: ["HUMAN RELATION AND GENERAL AFFAIRS"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png",
     },
     {
-      name: 'DIPSY',
-      roles: ['VIDEOGRAPHER'],
+      name: "DIPSY",
+      roles: ["VIDEOGRAPHER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dipsy.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dipsy.png",
     },
     {
-      name: 'RAHMAT',
-      roles: ['VIDEO EDITOR'],
+      name: "RAHMAT",
+      roles: ["VIDEO EDITOR"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896206/Rahmat.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896206/Rahmat.png",
     },
     {
-      name: 'LINTANG',
-      roles: ['WEB DEVELOPER'],
+      name: "LINTANG",
+      roles: ["WEB DEVELOPER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896208/Lintang.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896208/Lintang.png",
     },
     {
-      name: 'BAGAS',
-      roles: ['VIDEOGRAPHER'],
+      name: "BAGAS",
+      roles: ["VIDEOGRAPHER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896202/Arli.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896202/Arli.png",
     },
     {
-      name: 'FLAOUDIA',
-      roles: ['SOCIAL MEDIA MANAGER'],
+      name: "FLAOUDIA",
+      roles: ["SOCIAL MEDIA MANAGER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896201/Flaudia.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896201/Flaudia.png",
     },
     {
-      name: 'DIMAS',
-      roles: ['GRAPHIC DESIGNER'],
+      name: "DIMAS",
+      roles: ["GRAPHIC DESIGNER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896211/Dimas.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896211/Dimas.png",
     },
     {
-      name: 'BAGAS',
-      roles: ['SOCIAL MEDIA MANAGER'],
+      name: "BAGAS",
+      roles: ["SOCIAL MEDIA MANAGER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896207/Bagas.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896207/Bagas.png",
     },
     {
-      name: 'FAUZI',
-      roles: ['VIDEO EDITOR'],
+      name: "FAUZI",
+      roles: ["VIDEO EDITOR"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Fauzi.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Fauzi.png",
     },
     {
-      name: 'EKATERINA BELIAEVA',
-      roles: ['CHIEF EXECUTIVE OFFICER'],
+      name: "EKATERINA BELIAEVA",
+      roles: ["CHIEF EXECUTIVE OFFICER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png",
     },
     {
-      name: 'MAHMOUD TURKOMANY',
-      roles: ['FOUNDER'],
+      name: "MAHMOUD TURKOMANY",
+      roles: ["FOUNDER"],
       image:
-        'https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png',
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png",
     },
   ]
 
   const desktopLayout = [
-    { left: '6vw', top: '10vh', width: 30 },
-    { left: '58vw', top: '44vh', width: 26 },
-    { left: '10vw', top: '106vh', width: 22 },
-    { left: '60vw', top: '126vh', width: 34 },
-    { left: '5vw', top: '198vh', width: 28 },
-    { left: '58vw', top: '232vh', width: 22 },
-    { left: '12vw', top: '292vh', width: 34 },
-    { left: '54vw', top: '326vh', width: 24 },
-    { left: '6vw', top: '392vh', width: 30 },
-    { left: '62vw', top: '424vh', width: 22 },
-    { left: '10vw', top: '482vh', width: 26 },
-    { left: '56vw', top: '516vh', width: 32 },
-    { left: '6vw', top: '582vh', width: 28 },
+    { left: "6vw", top: "10vh", width: 30 },
+    { left: "58vw", top: "44vh", width: 26 },
+    { left: "10vw", top: "106vh", width: 22 },
+    { left: "60vw", top: "126vh", width: 34 },
+    { left: "5vw", top: "198vh", width: 28 },
+    { left: "58vw", top: "232vh", width: 22 },
+    { left: "12vw", top: "292vh", width: 34 },
+    { left: "54vw", top: "326vh", width: 24 },
+    { left: "6vw", top: "392vh", width: 30 },
+    { left: "62vw", top: "424vh", width: 22 },
+    { left: "10vw", top: "482vh", width: 26 },
+    { left: "56vw", top: "516vh", width: 32 },
+    { left: "6vw", top: "582vh", width: 28 },
   ]
 
   /* =========================
-     MOBILE (NO PARALLAX)
+     MOBILE (FIXED LAYOUT)
   ========================= */
   if (isMobile) {
     return (
       <section className="w-full bg-[#f3f4f5] text-black px-4 py-20">
-        <div className="flex flex-col space-y-28">
+        <div className="flex flex-col space-y-24">
           {team.map((member, index) => (
-            <div key={index} className="flex justify-end">
-              <div className="w-[82%]">
+            <div
+              key={index}
+              className={`flex ${
+                index % 2 === 0 ? "justify-start" : "justify-end"
+              }`}
+            >
+              <div className="w-[74%]">
+
                 <div className="relative w-full aspect-[3/4] overflow-hidden">
                   <Image
                     src={member.image}
                     alt={member.name}
                     fill
-                    sizes="(max-width: 768px) 82vw"
+                    sizes="(max-width:768px) 74vw"
                     className="object-cover grayscale contrast-125 brightness-95"
                   />
                 </div>
 
-                <div className="mt-6 border-b font-[Code_Pro] border-neutral-300 pb-5">
-                  <h3 className="text-sm font-medium tracking-[0.32em] uppercase">
+                <div className="mt-5 border-b border-neutral-300 pb-5 font-[Code_Pro]">
+
+                  <h3 className="text-[12px] font-medium tracking-[0.28em] uppercase">
                     {member.name}
                   </h3>
+
                   <div className="mt-3 space-y-1">
                     {member.roles.map((role, i) => (
                       <p
                         key={i}
-                        className="text-[11px] tracking-[0.45em] text-neutral-500 uppercase"
+                        className="text-[11px] tracking-[0.25em] text-neutral-500 uppercase"
                       >
                         {role}
                       </p>
                     ))}
                   </div>
+
                 </div>
               </div>
             </div>
@@ -335,13 +422,13 @@ function Team() {
   }
 
   /* =========================
-     DESKTOP (PARALLAX)
+     DESKTOP (UNCHANGED)
   ========================= */
   return (
     <section
       ref={sectionRef}
       className="relative w-screen bg-[#f3f4f5] text-black"
-      style={{ height: '670vh' }}
+      style={{ height: "670vh" }}
     >
       {team.map((member, index) => (
         <div
@@ -367,6 +454,7 @@ function Team() {
             <h3 className="text-sm md:text-base font-[Code_Pro] font-medium tracking-[0.32em] uppercase">
               {member.name}
             </h3>
+
             <div className="mt-3 space-y-1">
               {member.roles.map((role, i) => (
                 <p

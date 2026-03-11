@@ -61,73 +61,115 @@ function Webglbg() {
 ========================== */
 function Hero() {
   return (
-    <section className="relative w-full h-[65vh] overflow-hidden bg-black">
-      {/* WEBGL BACKGROUND */}
-      <Webglbg />
+    <section className="relative w-full min-h-[85svh] md:h-[65vh] bg-black overflow-hidden">
 
+      {/* WEBGL */}
+      <div className="absolute inset-0">
+        <Webglbg />
+      </div>
+
+      {/* NAVBAR */}
       <div className="absolute top-0 left-0 w-full z-30 font-[Code_Pro]">
-  <div className="relative mx-auto px-4 sm:px-6 md:px-20 min-h-[64px] md:min-h-[72px] flex items-center text-white translate-y-1">
-    
-    <nav className="hidden md:flex items-center gap-6 flex-1 min-w-0 text-xs font-medium tracking-wide">
-      <a href="/about" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-        About
-      </a>
-    </nav>
+        <div className="relative mx-auto px-6 md:px-20 min-h-[64px] md:min-h-[72px] flex items-center text-white">
 
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-      <a href="/" className="pointer-events-auto block">
-        <Image src="/png/boson-white.png" alt="Boson" width={120} height={40} priority className="transition-opacity hover:opacity-70" />
-      </a>
-    </div>
+          {/* MOBILE NAV */}
+          <div className="flex md:hidden w-full items-center justify-between text-xs font-medium tracking-wide">
 
-    <div className="hidden md:flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
-      <a href="/contact" className="transition-opacity hover:opacity-70 whitespace-nowrap">
-        Contact
-      </a>
-    </div>
+            <a
+              href="/about"
+              className="transition-opacity hover:opacity-70"
+            >
+              About
+            </a>
 
-  </div>
-</div>
+            <a href="/" className="block">
+              <Image
+                src="/png/boson-white.png"
+                alt="Boson"
+                width={90}
+                height={32}
+                priority
+                className="transition-opacity hover:opacity-70"
+              />
+            </a>
 
-      {/* BOTTOM CONTENT */}
+            <a
+              href="/contact"
+              className="transition-opacity hover:opacity-70"
+            >
+              Contact
+            </a>
+
+          </div>
+
+
+          {/* DESKTOP NAV */}
+          <div className="hidden md:flex w-full items-center">
+
+            <nav className="flex items-center gap-6 flex-1 text-xs font-medium tracking-wide">
+              <a
+                href="/about"
+                className="transition-opacity hover:opacity-70"
+              >
+                About
+              </a>
+            </nav>
+
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+              <a href="/" className="pointer-events-auto block">
+                <Image
+                  src="/png/boson-white.png"
+                  alt="Boson"
+                  width={120}
+                  height={40}
+                  priority
+                  className="transition-opacity hover:opacity-70"
+                />
+              </a>
+            </div>
+
+            <div className="flex items-center justify-end flex-1 text-xs font-medium tracking-wide">
+              <a
+                href="/contact"
+                className="transition-opacity hover:opacity-70"
+              >
+                Contact
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* CONTENT */}
       <div className="absolute bottom-0 left-0 w-full z-20">
-        <div
-          className="
-            mx-4 sm:mx-6
-            mb-4 sm:mb-6
-            flex items-center justify-between
-            rounded-2xl
-            px-12 py-2
-          "
-        >
-          <div className="max-w-5xl">
+        <div className="mx-6 md:mx-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6 px-0 md:px-12">
+
+          <div className="max-w-3xl">
+
             <h1
               className="font-[Code_Pro] text-white font-light tracking-tight leading-[1.05]"
-              style={{ fontSize: "clamp(18px, 3.8vw, 58px)" }}
+              style={{ fontSize: "clamp(22px,5vw,58px)" }}
             >
-              <span
-                className="
-                  hidden lg:inline-block
-                  mr-40
-                  text-xs uppercase tracking-widest opacity-70
-                  align-top relative font-medium
-                "
-              >
+
+              <span className="hidden lg:inline-block mr-16 text-xs uppercase tracking-widest opacity-70 font-medium">
                 let's talk
               </span>
 
-              Let's see  <span className="font-normal">what we can dream up together</span>
+              Let's see <span className="font-normal">
+                what we can dream up together
+              </span>
+
             </h1>
+
           </div>
 
-          <div className="w-14 h-14 rounded-full border border-white text-white text-sm font-medium flex flex-col items-center justify-center leading-none">
-            <span>20</span>
-            <span>25</span>
-          </div>
         </div>
       </div>
+
     </section>
-  );
+  )
 }
 
 /* =========================
@@ -164,13 +206,24 @@ function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="px-6 lg:px-20 pb-40 max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
-        
-        {/* LEFT — BIG STATEMENT */}
-        <div className="relative"> 
+    <section className="px-6 lg:px-20 pb-32 max-w-7xl mx-auto">
 
-          <h1 className="text-[48px] font-[Code_Pro] sm:text-[64px] lg:text-[84px] leading-[1.05] font-medium tracking-tight">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+
+        {/* LEFT */}
+        <div className="flex justify-center lg:justify-start">
+
+          <h1
+            className="
+              max-w-[14ch]
+              text-center lg:text-left
+              text-[34px] sm:text-[48px] lg:text-[84px]
+              font-[Code_Pro]
+              leading-[1.05]
+              font-medium
+              tracking-tight
+            "
+          >
             We
             <br />
             would
@@ -181,76 +234,90 @@ function FAQ() {
             <br />
             from
             <br />
-            <span className="inline-flex items-center gap-4">
+            <span className="inline-flex items-center justify-center lg:justify-start gap-3">
               <span className="text-[0.9em]">→</span>
               you.
             </span>
           </h1>
+
         </div>
 
-        {/* RIGHT — FAQ */}
-        <div className="max-w-2xl ml-auto">
-          <h2 className="text-sm text-black/40 mb-12">
+        {/* RIGHT */}
+        <div className="max-w-2xl">
+
+          <h2 className="text-sm text-black/40 mb-10">
             FAQ
           </h2>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
+
             {faqs.map((item, index) => {
+
               const isOpen = openIndex === index;
 
               return (
                 <div
                   key={index}
-                  className="border-b border-black/10 pb-6"
+                  className="border-b border-black/10 pb-5"
                 >
-                  {/* QUESTION */}
+
                   <button
                     type="button"
                     onClick={() =>
                       setOpenIndex(isOpen ? null : index)
                     }
-                    className="w-full flex items-center justify-between text-left text-lg font-medium group"
+                    className="w-full flex items-start justify-between text-left text-[16px] lg:text-lg font-medium"
                   >
-                    <span>{item.q}</span>
 
-                    {/* ICON */}
+                    <span className="pr-6">
+                      {item.q}
+                    </span>
+
                     <span
                       className={`
-                        text-black/40 text-xl
+                        text-lg text-black/40
                         transition-transform duration-200 ease-out
                         ${isOpen ? "rotate-45" : "rotate-0"}
                       `}
                     >
                       +
                     </span>
+
                   </button>
 
-                  {/* ANSWER */}
                   <div
                     className={`
-                      grid transition-all duration-300 ease-out
+                      grid transition-all duration-200 ease-out
                       ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}
                     `}
                   >
+
                     <div className="overflow-hidden">
+
                       <p
                         className={`
                           mt-4 text-sm text-black/60 max-w-prose
-                          transition-all duration-300 ease-out
+                          transition-all duration-200 ease-out
                           ${isOpen ? "translate-y-0" : "-translate-y-2"}
                         `}
                       >
                         {item.a}
                       </p>
+
                     </div>
+
                   </div>
+
                 </div>
               );
             })}
+
           </div>
+
         </div>
 
       </div>
+
     </section>
   );
 }
@@ -330,19 +397,25 @@ function TextArea({ placeholder, onFocus, onBlur, anchorRefs }) {
 
 function TopInfo({ baliTime, blink }) {
   return (
-    <div className="w-full border-b border-black/10 text-[10px] uppercase tracking-wide">
-      <div className="max-w-7xl mx-auto px-6 lg:px-20 py-3 grid sm:grid-cols-3 gap-y-2">
-        <div className="opacity-50">
+    <div className="w-full border-b border-black/10 text-[11px] uppercase tracking-[0.08em]">
+      <div className="mx-auto px-6 md:px-20 py-3 grid gap-y-3 sm:grid-cols-3 items-center">
+
+        <div className="text-black/60 text-center sm:text-left">
           Bali · {baliTime.hour}
-          <span className={blink ? "opacity-100" : "opacity-0"}>:</span>
+          <span className={`inline-block w-[0.5ch] ${blink ? "opacity-100" : "opacity-30"}`}>
+            :
+          </span>
           {baliTime.minute} (UTC+8)
         </div>
-        <div className="sm:text-center text-black/60">
+
+        <div className="text-black/70 text-center">
           WhatsApp · +62 877 6777 7720
         </div>
-        <div className="sm:text-right text-black/50">
+
+        <div className="text-black/50 text-center sm:text-right">
           Replies in 1–2 working days
         </div>
+
       </div>
     </div>
   );
@@ -400,7 +473,8 @@ function ContactForm({ anchorRefs, onFocus, onBlur }) {
 
 function FormAction({ anchorRefs, submitButtonRef, onHover }) {
   return (
-    <div className="pt-32 flex flex-col items-end gap-6">
+    <div className="pt-24 lg:pt-32 flex flex-col items-center lg:items-end gap-6 text-center lg:text-right">
+
       <button
         ref={(el) => {
           submitButtonRef.current = el;
@@ -416,19 +490,21 @@ function FormAction({ anchorRefs, submitButtonRef, onHover }) {
         "
       >
         <span>Send Request</span>
+
         <span className="inline-block ml-3 transition-transform duration-300 group-hover:translate-x-3">
           →
         </span>
       </button>
 
-      <p className="text-[11px] text-black/40 max-w-xs text-right">
+      <p className="text-[11px] text-black/40 max-w-xs">
         Submitted information is used for communication related to this request.
       </p>
 
-      <p className="text-[11px] text-black/35 text-right">
+      <p className="text-[11px] text-black/35">
         By submitting, you agree to our{" "}
         <span className="underline">Privacy Policy</span>.
       </p>
+
     </div>
   );
 }
