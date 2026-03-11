@@ -39,8 +39,6 @@ function Description() {
           mask:"lines"
         });
 
-        splitsRef.current.push(titleSplit);
-
         const titleTween = gsap.fromTo(
           titleSplit.lines,
           {yPercent:35,opacity:0},
@@ -157,18 +155,16 @@ function Description() {
 
     };
 
-    // BUILD
     build();
 
-    // REFRESH SPLITTEXT ketika layout berubah
-    ScrollTrigger.addEventListener("refreshInit", () => {
+    ScrollTrigger.addEventListener("refreshInit",()=>{
       splitsRef.current.forEach((s)=>s.revert());
     });
 
-    window.addEventListener("resize", ScrollTrigger.refresh);
+    window.addEventListener("resize",ScrollTrigger.refresh);
 
     return ()=>{
-      window.removeEventListener("resize", ScrollTrigger.refresh);
+      window.removeEventListener("resize",ScrollTrigger.refresh);
       splitsRef.current.forEach((s)=>s.revert());
       if(ctxRef.current) ctxRef.current.revert();
     };
