@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef } from "react";
-import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
+import { useLayoutEffect, useRef } from "react"; 
+import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap"; 
 
 function Description() {
   const sectionRef = useRef(null);
@@ -11,26 +11,16 @@ function Description() {
   const splitsRef = useRef([]);
   const ctxRef = useRef(null);
   const resizeTimer = useRef(null);
-  const lastWidth = useRef(0);
 
   useLayoutEffect(() => {
-    ScrollTrigger.config({
-      ignoreMobileResize: true,
-    });
-
-    lastWidth.current = window.innerWidth;
-
     const getProfile = () => {
       const w = window.innerWidth;
-
       if (w < 640) {
         return { factor: 0.12, clamp: 12, scrub: 0.1 };
       }
-
       if (w < 1024) {
         return { factor: 0.4, clamp: 28, scrub: 0.4 };
       }
-
       return { factor: 1, clamp: null, scrub: 0.6 };
     };
 
@@ -40,12 +30,11 @@ function Description() {
         !titleRef.current ||
         !bodyRef.current ||
         !dividerRef.current ||
-        !statsRef.current
+        !statsRef.current 
       )
         return;
 
       const PROFILE = getProfile();
-
       const move = (v) => {
         const raw = v * PROFILE.factor;
         return PROFILE.clamp
@@ -55,7 +44,6 @@ function Description() {
 
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
-
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
@@ -71,9 +59,7 @@ function Description() {
           type: "lines",
           linesClass: "line",
           mask: "lines",
-          autoSplit: true,
         });
-
         splitsRef.current.push(titleSplit);
 
         gsap.from(titleSplit.lines, {
@@ -86,7 +72,6 @@ function Description() {
             trigger: sectionRef.current,
             start: "top 75%",
             once: true,
-            toggleActions: "play none none none",
           },
         });
 
@@ -108,7 +93,6 @@ function Description() {
               trigger: dividerRef.current,
               start: "top 85%",
               once: true,
-              toggleActions: "play none none none",
             },
           }
         );
@@ -125,9 +109,7 @@ function Description() {
             type: "lines",
             linesClass: "line",
             mask: "lines",
-            autoSplit: true,
           });
-
           splitsRef.current.push(split);
 
           gsap.from(split.lines, {
@@ -140,7 +122,6 @@ function Description() {
               trigger: p,
               start: "top 85%",
               once: true,
-              toggleActions: "play none none none",
             },
           });
 
@@ -164,7 +145,6 @@ function Description() {
             trigger: statsRef.current,
             start: "top 85%",
             once: true,
-            toggleActions: "play none none none",
           },
         });
 
@@ -173,6 +153,8 @@ function Description() {
           ease: "none",
           scrollTrigger: PARALLAX_ST,
         });
+ 
+ 
       }, sectionRef);
 
       ScrollTrigger.refresh();
@@ -181,23 +163,15 @@ function Description() {
     document.fonts.ready.then(build);
 
     const onResize = () => {
-      const w = window.innerWidth;
-
-      if (w !== lastWidth.current) {
-        lastWidth.current = w;
-
-        clearTimeout(resizeTimer.current);
-        resizeTimer.current = setTimeout(build, 200);
-      }
+      clearTimeout(resizeTimer.current);
+      resizeTimer.current = setTimeout(build, 200);
     };
 
     window.addEventListener("resize", onResize);
 
     return () => {
       window.removeEventListener("resize", onResize);
-
       splitsRef.current.forEach((s) => s.revert());
-
       if (ctxRef.current) ctxRef.current.revert();
     };
   }, []);
@@ -212,13 +186,11 @@ function Description() {
         <div className="mb-10 lg:mb-14">
           <h1
             ref={titleRef}
-            className="font-[Code_Pro] font-bold tracking-tight leading-[1.05]"
-            style={{ fontSize: "clamp(32px, calc(3vw + 1rem), 134px)" }}
+            className=" font-[Code_Pro] font-bold tracking-tight leading-[1.05]"
+            style={{ fontSize: "clamp(32px, 4.9vw, 134px)" }}
           >
-            We're a digital agency that helps brands stay{" "}
-            <span className="font-light">consistent</span> online. We keep
-            everything on track so you can stay{" "}
-            <span className="font-light">focused</span> on what matters
+            We're a digital agency that helps brands stay <span className="font-light">consistent</span>  online. We
+            keep everything on track so you can stay <span className="font-light">focused</span>  on what matters
           </h1>
 
           <div
@@ -228,29 +200,20 @@ function Description() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-y-14 lg:gap-x-20">
-          <div
-            ref={statsRef}
-            className="w-full lg:flex-[0_0_42%] font-[Code_Pro]"
-          >
+          <div ref={statsRef} className="w-full lg:flex-[0_0_42%]  font-[Code_Pro]">
             <div className="flex flex-col sm:flex-row sm:flex-wrap gap-6 lg:gap-8 text-neutral-600">
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">
-                  100+
-                </div>
+                <div className="text-[22px] font-medium text-neutral-900">100+</div>
                 <div className="text-xs uppercase tracking-widest">
                   Projects delivered
                 </div>
               </div>
-
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">
-                  3
-                </div>
+                <div className="text-[22px] font-medium text-neutral-900">3</div>
                 <div className="text-xs uppercase tracking-widest">
                   Countries served
                 </div>
               </div>
-
               <div data-stat>
                 <div className="text-[22px] font-medium text-neutral-900">
                   2.5m+
@@ -268,12 +231,13 @@ function Description() {
           >
             <p data-animate className="mb-8 lg:mb-10">
               Boson is an agency based in Bali, working with brands across
-              Qatar, Malaysia, and beyond. We build digital experiences that
-              stay sharp and consistent across every touchpoint — combining
-              design, development, and brand operations into one cohesive
-              system. This means fewer revisions, clearer decisions, and
-              content that keeps working even as your brand scales.
+              Qatar, Malaysia, and beyond. We build digital experiences that stay
+              sharp and consistent across every touchpoint — combining design,
+              development, and brand operations into one cohesive system. This means fewer revisions, clearer decisions, and content that keeps
+              working even as your brand scales.
             </p>
+
+           
           </div>
         </div>
       </div>
