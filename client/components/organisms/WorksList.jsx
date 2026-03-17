@@ -372,53 +372,40 @@ export default function WorksList() {
       className="bg-black"
       style={{ padding: "6vh 0" }}
     >
-      <div
-        ref={headerRef}
-        className="works-header"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1.15fr 0.3fr",
-          padding: "5vw 7vh",
-          color: "white",
-          gap: "2vh",
-        }}
-      >
-        <h2
-          ref={leftRef}
-          className="font-[Code_Pro] font-light"
-          style={{
-            margin: 0,
-            fontSize: "clamp(28px, 2.8vw, 34px)",
-            lineHeight: 1.15,
-            display: "inline-flex",
-            gap: "0.35em",
-          }}
-        >
-          <span>Industry Experience</span>
-          <sup
-            style={{
-              fontSize: "0.45em",
-              opacity: 0.7,
-            }}
-          >
-            {totalIndex}
-          </sup>
-        </h2>
+<div
+  ref={headerRef}
+  className="grid grid-cols-12 items-start gap-y-6 mb-5 lg:mb-32 px-[6vw] py-[4vh] text-white"
+>
+  {/* LEFT LABEL */}
+  <div
+    ref={leftRef}
+    className="col-span-12 lg:col-span-3 font-[Code_Pro] font-light text-xs tracking-wide opacity-70"
+  >
+    Industry Experience{" "}
+    <sup className="text-[0.6em] opacity-70">{totalIndex}</sup>
+  </div>
 
-        <p
-          ref={rightRef}
-          style={{
-            opacity: 0.7,
-            fontSize: "clamp(13px, 1vw, 16px)",
-            lineHeight: 1.6,
-            maxWidth: "32ch",
-          }}
-        >
-          This selection represents work developed under different business
-          contexts, where constraints, scale, and objectives vary from project
-          to project.
-        </p>
-      </div>
+  {/* MIDDLE HEADLINE */}
+  <div className="col-span-12 lg:col-span-5 lg:col-start-5">
+    <h2 className="font-[Code_Pro] font-normal text-[clamp(28px,2.8vw,34px)] leading-[1.15]">
+      Built across industries,
+      <br />
+      designed to scale.
+    </h2>
+  </div>
+
+  {/* RIGHT DESCRIPTION */}
+  <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm opacity-70">
+    <p
+      ref={rightRef}
+      className="max-w-full lg:max-w-[32ch] lg:text-right"
+    >
+      This selection represents work developed under different business
+      contexts, where constraints, scale, and objectives vary from project
+      to project.
+    </p>
+  </div>
+</div>
 
       {items.map((item, i) => (
         <div
@@ -454,16 +441,8 @@ export default function WorksList() {
 
           <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
-          <div style={{ zIndex: 1, gridColumn: "2 / span 1" }}>
-            <div
-              className="works-title font-light"
-              style={{
-                textAlign: "center",
-                fontSize: "clamp(32px, 4.5vw, 82px)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.02em",
-              }}
-            >
+          <div className="works-title-wrapper">
+            <div className="works-title font-light">
               {item.name}
             </div>
           </div>
@@ -472,6 +451,20 @@ export default function WorksList() {
       ))}
 
       <style jsx>{`
+        .works-title-wrapper {
+          z-index: 1;
+          grid-column: 2 / span 1;
+          display: flex;
+          justify-content: center;
+        }
+
+        .works-title {
+          text-align: center;
+          font-size: clamp(32px, 4.5vw, 82px);
+          line-height: 1.05;
+          letter-spacing: -0.02em;
+        }
+
         @media (max-width: 768px) {
           .works-header {
             grid-template-columns: 1fr !important;
@@ -479,18 +472,14 @@ export default function WorksList() {
             gap: 2vh;
           }
 
-          .works-header h2 {
-            font-size: 30px !important;
-          }
-
-          .works-header p {
-            font-size: 14px !important;
-            max-width: 100% !important;
-          }
-
           .works-row {
             grid-template-columns: 1fr !important;
             padding: 4vh 6vw !important;
+          }
+
+          .works-title-wrapper {
+            grid-column: auto !important;
+            justify-content: flex-start !important;
           }
 
           .works-title {
