@@ -1,35 +1,40 @@
 import { useRef, useEffect } from "react";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useMotionValue,
-} from "framer-motion";
+import { useScroll } from "framer-motion";
 
 function BigHeading() {
   const ref = useRef(null);
+  const topRef = useRef(null);
+  const bottomRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start 80%", "end start"],
   });
 
-  // 🔥 manual smooth value
-  const smoothProgress = useMotionValue(0);
-
   useEffect(() => {
     let raf;
+
+    let current = 0;
 
     const lerp = (a, b, n) => a + (b - a) * n;
 
     const update = () => {
-      const current = smoothProgress.get();
       const target = scrollYProgress.get();
 
-      // angka ini kunci (semakin kecil = semakin smooth tapi delay)
-      const next = lerp(current, target, 0.08);
+      // smooth progress
+      current = lerp(current, target, 0.08);
 
-      smoothProgress.set(next);
+      // convert ke %
+      const top = current * -32;
+      const bottom = -92 + current * (87); // -92 → -5
+
+      if (topRef.current) {
+        topRef.current.style.transform = `translate3d(${top}%,0,0)`;
+      }
+
+      if (bottomRef.current) {
+        bottomRef.current.style.transform = `translate3d(${bottom}%,0,0)`;
+      }
 
       raf = requestAnimationFrame(update);
     };
@@ -37,11 +42,7 @@ function BigHeading() {
     update();
 
     return () => cancelAnimationFrame(raf);
-  }, [scrollYProgress, smoothProgress]);
-
-  // tetap pakai %
-  const topX = useTransform(smoothProgress, [0, 1], ["0%", "-32%"]);
-  const bottomX = useTransform(smoothProgress, [0, 1], ["-92%", "-5%"]);
+  }, [scrollYProgress]);
 
   return (
     <section
@@ -51,10 +52,10 @@ function BigHeading() {
     >
       <div className="relative w-full pointer-events-none">
         {/* TOP */}
-        <motion.div
+        <div
+          ref={topRef}
           className="whitespace-nowrap text-black"
           style={{
-            x: topX,
             fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
             willChange: "transform",
@@ -63,15 +64,15 @@ function BigHeading() {
           }}
         >
           WORK - WORK - WORK
-        </motion.div>
+        </div>
 
         <div className="w-full h-px bg-black/20" />
 
         {/* BOTTOM */}
-        <motion.div
+        <div
+          ref={bottomRef}
           className="whitespace-nowrap text-black"
           style={{
-            x: bottomX,
             fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
             willChange: "transform",
@@ -80,7 +81,7 @@ function BigHeading() {
           }}
         >
           EXPERIENCES - EXPERIENCES - EXPERIENCES
-        </motion.div>
+        </div>
       </div>
 
       <style>{`
