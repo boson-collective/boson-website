@@ -14,6 +14,8 @@ function Description() {
   const lastWidth = useRef(0);
 
   useLayoutEffect(() => {
+    const isMobile = () => window.innerWidth < 768;
+
     ScrollTrigger.config({
       ignoreMobileResize: true,
       autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
@@ -40,6 +42,13 @@ function Description() {
       });
     };
 
+    const clean = () => {
+      splitsRef.current.forEach((s) => s.revert());
+      splitsRef.current = [];
+      if (ctxRef.current) ctxRef.current.revert();
+      ctxRef.current = null;
+    };
+
     const build = () => {
       if (
         !sectionRef.current ||
@@ -50,7 +59,12 @@ function Description() {
       )
         return;
 
-      const isMobile = window.innerWidth < 768;
+      // 🔥 CORE FIX: MOBILE = SKIP TOTAL
+      if (isMobile()) {
+        clean();
+        return;
+      }
+
       const PROFILE = getProfile();
 
       const move = (v) => {
@@ -60,9 +74,7 @@ function Description() {
           : raw;
       };
 
-      splitsRef.current.forEach((s) => s.revert());
-      splitsRef.current = [];
-      if (ctxRef.current) ctxRef.current.revert();
+      clean();
 
       ctxRef.current = gsap.context(() => {
         const PARALLAX_ST = {
@@ -72,59 +84,41 @@ function Description() {
           scrub: PROFILE.scrub,
         };
 
-        // =========================
         // TITLE
-        // =========================
-        if (isMobile) {
-          gsap.from(titleRef.current, {
-            y: 20,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: titleRef.current,
-              start: getStart(),
-              once: true,
-            },
-          });
-        } else {
-          const titleSplit = SplitText.create(titleRef.current, {
-            type: "lines",
-            linesClass: "line",
-            mask: "lines",
-          });
+        const titleSplit = SplitText.create(titleRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
 
-          splitsRef.current.push(titleSplit);
+        splitsRef.current.push(titleSplit);
 
-          gsap.from(titleSplit.lines, {
-            yPercent: 35,
-            opacity: 0,
-            duration: 1.1,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 75%",
-              once: true,
-            },
-          });
+        gsap.from(titleSplit.lines, {
+          yPercent: 35,
+          opacity: 0,
+          duration: 1.1,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        });
 
-          gsap.to(titleRef.current, {
-            y: move(-20),
-            ease: "none",
-            scrollTrigger: PARALLAX_ST,
-          });
-        }
+        gsap.to(titleRef.current, {
+          y: move(-20),
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
 
-        // =========================
         // DIVIDER
-        // =========================
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
           {
             scaleX: 1,
-            duration: isMobile ? 0.6 : 0.9,
+            duration: 0.9,
             ease: "power2.out",
             scrollTrigger: {
               trigger: dividerRef.current,
@@ -134,62 +128,44 @@ function Description() {
           }
         );
 
-        // =========================
-        // BODY (trigger sendiri)
-        // =========================
+        // BODY
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
-          if (isMobile) {
-            gsap.from(p, {
-              y: 20,
-              opacity: 0,
-              duration: 0.6,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: p,
-                start: getStart(),
-                once: true,
-              },
-            });
-          } else {
-            const split = SplitText.create(p, {
-              type: "lines",
-              linesClass: "line",
-              mask: "lines",
-            });
+          const split = SplitText.create(p, {
+            type: "lines",
+            linesClass: "line",
+            mask: "lines",
+          });
 
-            splitsRef.current.push(split);
+          splitsRef.current.push(split);
 
-            gsap.from(split.lines, {
-              yPercent: 26,
-              opacity: 0,
-              duration: 1,
-              stagger: 0.05,
-              ease: "power1.out",
-              scrollTrigger: {
-                trigger: p,
-                start: "top 85%",
-                once: true,
-              },
-            });
+          gsap.from(split.lines, {
+            yPercent: 26,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.05,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: p,
+              start: "top 85%",
+              once: true,
+            },
+          });
 
-            gsap.to(p, {
-              y: move(-40),
-              ease: "none",
-              scrollTrigger: PARALLAX_ST,
-            });
-          }
+          gsap.to(p, {
+            y: move(-40),
+            ease: "none",
+            scrollTrigger: PARALLAX_ST,
+          });
         });
 
-        // =========================
-        // STATS (trigger terakhir)
-        // =========================
+        // STATS
         const stats = statsRef.current.querySelectorAll("[data-stat]");
 
         gsap.from(stats, {
           opacity: 0,
-          y: isMobile ? 18 : 8,
+          y: 8,
           duration: 0.5,
-          stagger: isMobile ? 0.08 : 0.12,
+          stagger: 0.12,
           ease: "power2.out",
           scrollTrigger: {
             trigger: statsRef.current,
@@ -198,20 +174,19 @@ function Description() {
           },
         });
 
-        if (!isMobile) {
-          gsap.to(stats, {
-            y: move(-22),
-            ease: "none",
-            scrollTrigger: PARALLAX_ST,
-          });
-        }
+        gsap.to(stats, {
+          y: move(-22),
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
       }, sectionRef);
 
       safeRefresh();
     };
 
-    if (window.innerWidth < 768) {
-      build();
+    // 🔥 INIT LOGIC
+    if (isMobile()) {
+      build(); // langsung skip (no GSAP)
     } else {
       document.fonts.ready.then(build);
     }
@@ -230,8 +205,7 @@ function Description() {
 
     return () => {
       window.removeEventListener("resize", onResize);
-      splitsRef.current.forEach((s) => s.revert());
-      if (ctxRef.current) ctxRef.current.revert();
+      clean();
     };
   }, []);
 
@@ -264,7 +238,6 @@ function Description() {
           />
         </div>
 
-        {/* 🔥 GRID MOBILE REORDER */}
         <div className="grid gap-y-12 lg:flex lg:gap-x-20
           [grid-template-areas:'body''stats']
           lg:[grid-template-areas:none]">

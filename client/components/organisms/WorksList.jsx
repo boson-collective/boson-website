@@ -267,78 +267,54 @@ export default function WorksList() {
 
       ctxRef.current = gsap.context(() => {
 
-        if (isMobile) {
+        // 🔥 MOBILE: NO GSAP AT ALL
+        if (isMobile) return;
 
-          gsap.from(leftRef.current, {
-            y: 30,
-            opacity: 0,
-            duration: 0.9,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: "top 85%",
-              once: true,
-            },
-          });
+        // =========================
+        // DESKTOP (UNCHANGED)
+        // =========================
 
-          gsap.from(rightRef.current, {
-            y: 30,
-            opacity: 0,
-            duration: 0.9,
-            delay: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: "top 85%",
-              once: true,
-            },
-          });
+        const leftSplit = SplitText.create(leftRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
 
-        } else {
+        splitsRef.current.push(leftSplit);
 
-          const leftSplit = SplitText.create(leftRef.current, {
-            type: "lines",
-            linesClass: "line",
-            mask: "lines",
-          });
+        gsap.from(leftSplit.lines, {
+          yPercent: 40,
+          opacity: 0,
+          duration: 1.1,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        });
 
-          splitsRef.current.push(leftSplit);
+        const rightSplit = SplitText.create(rightRef.current, {
+          type: "lines",
+          linesClass: "line",
+          mask: "lines",
+        });
 
-          gsap.from(leftSplit.lines, {
-            yPercent: 40,
-            opacity: 0,
-            duration: 1.1,
-            stagger: 0.1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: "top 75%",
-              once: true,
-            },
-          });
+        splitsRef.current.push(rightSplit);
 
-          const rightSplit = SplitText.create(rightRef.current, {
-            type: "lines",
-            linesClass: "line",
-            mask: "lines",
-          });
-
-          splitsRef.current.push(rightSplit);
-
-          gsap.from(rightSplit.lines, {
-            yPercent: 28,
-            opacity: 0,
-            duration: 0.9,
-            stagger: 0.08,
-            ease: "power1.out",
-            scrollTrigger: {
-              trigger: headerRef.current,
-              start: "top 75%",
-              once: true,
-            },
-          });
-
-        }
+        gsap.from(rightSplit.lines, {
+          yPercent: 28,
+          opacity: 0,
+          duration: 0.9,
+          stagger: 0.08,
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 75%",
+            once: true,
+          },
+        });
 
       }, sectionRef);
     };
@@ -362,7 +338,6 @@ export default function WorksList() {
       splitsRef.current.forEach((s) => s.revert());
       if (ctxRef.current) ctxRef.current.revert();
     };
-
   }, []);
 
   return (
@@ -372,40 +347,37 @@ export default function WorksList() {
       className="bg-black "
       style={{ padding: "6vh 0" }}
     >
-<div
-  ref={headerRef}
-  className="grid grid-cols-12 items-start border-t border-white/20 gap-y-6 mb-5 lg:mb-32 px-[6vw] py-[4vh] text-white"
->
-  {/* LEFT LABEL */}
-  <div
-    ref={leftRef}
-    className="col-span-12 lg:col-span-3 font-[Code_Pro] font-light text-xs tracking-wide opacity-70"
-  >
-    Industry Experience{" "}
-    <sup className="text-[0.6em] opacity-70">{totalIndex}</sup>
-  </div>
+      <div
+        ref={headerRef}
+        className="grid grid-cols-12 items-start border-t border-white/20 gap-y-6 mb-5 lg:mb-32 px-[6vw] py-[4vh] text-white"
+      >
+        <div
+          ref={leftRef}
+          className="col-span-12 lg:col-span-3 font-[Code_Pro] font-light text-xs tracking-wide opacity-70"
+        >
+          Industry Experience{" "}
+          <sup className="text-[0.6em] opacity-70">{totalIndex}</sup>
+        </div>
 
-  {/* MIDDLE HEADLINE */}
-  <div className="col-span-12 lg:col-span-5 lg:col-start-5">
-    <h2 className="font-[Code_Pro] font-normal text-[clamp(28px,2.8vw,34px)] leading-[1.15]">
-      Built across industries,
-      <br />
-      designed to scale.
-    </h2>
-  </div>
+        <div className="col-span-12 lg:col-span-5 lg:col-start-5">
+          <h2 className="font-[Code_Pro] font-normal text-[clamp(28px,2.8vw,34px)] leading-[1.15]">
+            Built across industries,
+            <br />
+            designed to scale.
+          </h2>
+        </div>
 
-  {/* RIGHT DESCRIPTION */}
-  <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm opacity-70">
-    <p
-      ref={rightRef}
-      className="max-w-full lg:max-w-[32ch] lg:text-right"
-    >
-      This selection represents work developed under different business
-      contexts, where constraints, scale, and objectives vary from project
-      to project.
-    </p>
-  </div>
-</div>
+        <div className="col-span-12 lg:col-span-3 flex flex-col lg:items-end gap-4 text-sm opacity-70">
+          <p
+            ref={rightRef}
+            className="max-w-full lg:max-w-[32ch] lg:text-right"
+          >
+            This selection represents work developed under different business
+            contexts, where constraints, scale, and objectives vary from project
+            to project.
+          </p>
+        </div>
+      </div>
 
       {items.map((item, i) => (
         <div
@@ -424,7 +396,6 @@ export default function WorksList() {
             overflow: "hidden",
           }}
         >
-
           <motion.div
             className="hover-overlay"
             style={{
@@ -446,7 +417,6 @@ export default function WorksList() {
               {item.name}
             </div>
           </div>
-
         </div>
       ))}
 
