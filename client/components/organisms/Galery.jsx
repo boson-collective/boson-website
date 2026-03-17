@@ -1,6 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"; 
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
- 
 
 function Galery() {
   const FRAME_GAP = 10;
@@ -11,85 +10,87 @@ function Galery() {
   const getGridColumns = () => (window.innerWidth < 640 ? 3 : 5);
   const [gridCols, setGridCols] = useState(getGridColumns());
 
+  const isMobile = gridCols <= 3;
+
   /* =========================
-     DATA
+     DATA (RESPONSIVE LANES)
   ========================= */
-  const LANES = [
-    {
-      col: 1,
-      speed: -160,
-      items: [
+  const LANES = isMobile
+    ? [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png",
-          top: "220vh",
+          col: 1,
+          speed: -140,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png", top: "60vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "160vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png", top: "260vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png", top: "360vh" },
+          ],
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png",
-          top: "380vh",
-        },
-      ],
-    },
-    {
-      col: 2,
-      speed: 120,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png",
-          top: "80vh",
+          col: 2,
+          speed: 120,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png", top: "100vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png", top: "200vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png", top: "300vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png", top: "400vh" },
+          ],
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png",
-          top: "300vh",
+          col: 3,
+          speed: -130,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png", top: "80vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png", top: "180vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png", top: "280vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "380vh" },
+          ],
         },
-      ],
-    },
-    {
-      col: 3,
-      speed: -140,
-      items: [
+      ]
+    : [
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png",
-          top: "160vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png",
-          top: "280vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png",
-          top: "420vh",
-        },
-      ],
-    },
-    {
-      col: 4,
-      speed: 100,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png",
-          top: "120vh",
+          col: 1,
+          speed: -160,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png", top: "220vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "380vh" },
+          ],
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png",
-          top: "340vh",
-        },
-      ],
-    },
-    {
-      col: 5,
-      speed: -160,
-      items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png",
-          top: "250vh",
+          col: 2,
+          speed: 120,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png", top: "80vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png", top: "300vh" },
+          ],
         },
         {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png",
-          top: "430vh",
+          col: 3,
+          speed: -140,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png", top: "160vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png", top: "280vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png", top: "420vh" },
+          ],
         },
-      ],
-    },
-  ];
+        {
+          col: 4,
+          speed: 100,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png", top: "120vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png", top: "340vh" },
+          ],
+        },
+        {
+          col: 5,
+          speed: -160,
+          items: [
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png", top: "250vh" },
+            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png", top: "430vh" },
+          ],
+        },
+      ];
 
   /* =========================
      REFS
@@ -104,8 +105,6 @@ function Galery() {
   const laneRefs = useRef([]);
 
   const resizeTimer = useRef(null);
-
-  /* === FLAG PLAY ONCE === */
   const textPlayedRef = useRef(false);
 
   /* =========================
@@ -147,7 +146,6 @@ function Galery() {
 
       gsap.set([headlineRef.current, getStartedRef.current], { opacity: 0 });
 
-      /* --- BORDER MORPH --- */
       gsap.to(sectionRef.current, {
         borderBottomLeftRadius: "0vw",
         borderBottomRightRadius: "0vw",
@@ -160,7 +158,6 @@ function Galery() {
         },
       });
 
-      /* --- PARALLAX LANES --- */
       laneRefs.current.forEach((lane, i) => {
         if (!lane) return;
         gsap.fromTo(
@@ -180,7 +177,6 @@ function Galery() {
         );
       });
 
-      /* --- PIN + TEXT (PLAY ONCE) --- */
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
@@ -230,7 +226,6 @@ function Galery() {
         },
       });
 
-      /* --- COLOR SHIFT --- */
       gsap
         .timeline({
           scrollTrigger: {
