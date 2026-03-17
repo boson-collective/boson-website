@@ -1,5 +1,10 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+} from "framer-motion";
 
 function BigHeading() {
   const ref = useRef(null);
@@ -9,19 +14,22 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  // WORK → geser ke kiri
-  const topX = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ["0%", "-32%"]
-  );
+  // tetap pakai % (jangan diubah)
+  const topXRaw = useTransform(scrollYProgress, [0, 1], ["0%", "-32%"]);
+  const bottomXRaw = useTransform(scrollYProgress, [0, 1], ["-92%", "-5%"]);
 
-  // EXPERIENCE → start dari kanan
-  const bottomX = useTransform(
-    scrollYProgress,
-    [0, 1],
-    ["-92%", "-5%"]
-  );
+  // 🔥 smoothing (ini kunci mobile)
+  const topX = useSpring(topXRaw, {
+    stiffness: 80,
+    damping: 25,
+    mass: 0.6,
+  });
+
+  const bottomX = useSpring(bottomXRaw, {
+    stiffness: 80,
+    damping: 25,
+    mass: 0.6,
+  });
 
   return (
     <section
@@ -30,28 +38,33 @@ function BigHeading() {
       style={{ height: "max-content" }}
     >
       <div className="relative w-full pointer-events-none">
-        {/* TOP TEXT */}
+        {/* TOP */}
         <motion.div
           className="whitespace-nowrap text-black"
           style={{
             x: topX,
             fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
+            willChange: "transform",
+            transform: "translate3d(0,0,0)",
+            backfaceVisibility: "hidden",
           }}
         >
           WORK - WORK - WORK
         </motion.div>
 
-        {/* CENTER LINE */}
         <div className="w-full h-px bg-black/20" />
 
-        {/* BOTTOM TEXT */}
+        {/* BOTTOM */}
         <motion.div
           className="whitespace-nowrap text-black"
           style={{
             x: bottomX,
             fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
+            willChange: "transform",
+            transform: "translate3d(0,0,0)",
+            backfaceVisibility: "hidden",
           }}
         >
           EXPERIENCES - EXPERIENCES - EXPERIENCES
