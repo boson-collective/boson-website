@@ -27,6 +27,10 @@ function Description() {
       return { factor: 1, clamp: null, scrub: 0.6 };
     };
 
+    const getStart = () => {
+      return window.innerWidth < 768 ? "top 92%" : "top 85%";
+    };
+
     const build = () => {
       if (
         !sectionRef.current ||
@@ -60,18 +64,20 @@ function Description() {
           scrub: PROFILE.scrub,
         };
 
+        const baseTrigger = isMobile ? sectionRef.current : null;
+
         // =========================
         // TITLE
         // =========================
         if (isMobile) {
           gsap.from(titleRef.current, {
-            y: 24,
+            y: 20,
             opacity: 0,
-            duration: 0.8,
+            duration: 0.6,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: titleRef.current,
-              start: "top 85%",
+              trigger: baseTrigger,
+              start: getStart(),
               once: true,
             },
           });
@@ -112,11 +118,11 @@ function Description() {
           { scaleX: 0, transformOrigin: "left center" },
           {
             scaleX: 1,
-            duration: 0.9,
+            duration: isMobile ? 0.6 : 0.9,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: dividerRef.current,
-              start: "top 85%",
+              trigger: isMobile ? baseTrigger : dividerRef.current,
+              start: getStart(),
               once: true,
             },
           }
@@ -129,13 +135,13 @@ function Description() {
 
         gsap.from(stats, {
           opacity: 0,
-          y: isMobile ? 20 : 8,
-          duration: isMobile ? 0.6 : 0.5,
-          stagger: 0.12,
+          y: isMobile ? 18 : 8,
+          duration: isMobile ? 0.5 : 0.5,
+          stagger: isMobile ? 0.08 : 0.12,
           ease: "power2.out",
           scrollTrigger: {
-            trigger: statsRef.current,
-            start: "top 85%",
+            trigger: isMobile ? baseTrigger : statsRef.current,
+            start: getStart(),
             once: true,
           },
         });
@@ -154,13 +160,13 @@ function Description() {
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
           if (isMobile) {
             gsap.from(p, {
-              y: 24,
+              y: 20,
               opacity: 0,
-              duration: 0.9,
+              duration: 0.6,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: p,
-                start: "top 85%",
+                trigger: baseTrigger,
+                start: getStart(),
                 once: true,
               },
             });
@@ -193,10 +199,18 @@ function Description() {
             });
           }
         });
+
+        // SAFETY REFRESH
+        ScrollTrigger.refresh();
       }, sectionRef);
     };
 
-    document.fonts.ready.then(build);
+    // 🔥 MOBILE: NO FONT BLOCK
+    if (window.innerWidth < 768) {
+      build();
+    } else {
+      document.fonts.ready.then(build);
+    }
 
     const onResize = () => {
       const w = window.innerWidth;
@@ -225,14 +239,12 @@ function Description() {
     >
       <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
 
-        {/* TITLE */}
         <div className="mb-10 lg:mb-14">
-
           <h1
             ref={titleRef}
             className="font-[Code_Pro] font-bold tracking-tight leading-[1.05] sm:leading-[1.08]"
             style={{
-              fontSize: "clamp(32px, 4.9vw, 134px)", // 🔥 balik ke original (desktop aman)
+              fontSize: "clamp(32px, 4.9vw, 134px)",
               maxWidth: "100%",
             }}
           >
@@ -248,10 +260,8 @@ function Description() {
           />
         </div>
 
-        {/* CONTENT */}
         <div className="flex flex-col gap-y-12 lg:flex-row lg:gap-x-20">
 
-          {/* STATS */}
           <div
             ref={statsRef}
             className="w-full lg:flex-[0_0_42%] font-[Code_Pro]"
@@ -284,7 +294,6 @@ function Description() {
             </div>
           </div>
 
-          {/* BODY */}
           <div
             ref={bodyRef}
             className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[17px] leading-[1.5] sm:leading-[1.6]"
