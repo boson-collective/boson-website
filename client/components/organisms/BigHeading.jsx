@@ -9,19 +9,16 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  const isMobile =
-    typeof window !== "undefined" && window.innerWidth < 768;
+  // smoothing pakai spring (bukan lerp manual)
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    mass: 0.5,
+  });
 
-  const progress = isMobile
-    ? scrollYProgress
-    : useSpring(scrollYProgress, {
-        stiffness: 100,
-        damping: 30,
-      });
-
-  // pakai PIXEL bukan %
-  const topX = useTransform(progress, [0, 1], [0, -300]);
-  const bottomX = useTransform(progress, [0, 1], [-800, -50]);
+  // mapping values
+  const topX = useTransform(smooth, [0, 1], [0, -32]);
+  const bottomX = useTransform(smooth, [0, 1], [-92, -5]);
 
   return (
     <section
@@ -30,16 +27,14 @@ function BigHeading() {
     >
       <div className="relative w-full pointer-events-none">
 
+        {/* TOP */}
         <motion.div
           className="whitespace-nowrap text-black"
           style={{
             x: topX,
-            fontSize: "clamp(8rem, 30vw, 24rem)",
+            fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
             willChange: "transform",
-            transform: "translateZ(0)",
-            WebkitFontSmoothing: "antialiased",
-            textRendering: "optimizeSpeed",
           }}
         >
           WORK - WORK - WORK
@@ -47,19 +42,17 @@ function BigHeading() {
 
         <div className="w-full h-px bg-black/20" />
 
+        {/* BOTTOM */}
         <motion.div
           className="whitespace-nowrap text-black"
           style={{
             x: bottomX,
-            fontSize: "clamp(8rem, 30vw, 24rem)",
+            fontSize: "clamp(14rem, 50vw, 56rem)",
             lineHeight: 0.9,
             willChange: "transform",
-            transform: "translateZ(0)",
-            WebkitFontSmoothing: "antialiased",
-            textRendering: "optimizeSpeed",
           }}
         >
-          EXPERIENCES - EXPERIENCES
+          EXPERIENCES - EXPERIENCES - EXPERIENCES
         </motion.div>
 
       </div>
