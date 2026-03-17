@@ -369,12 +369,12 @@ export default function WorksList() {
     <section
       ref={sectionRef}
       data-theme="dark"
-      className="bg-black"
+      className="bg-black "
       style={{ padding: "6vh 0" }}
     >
 <div
   ref={headerRef}
-  className="grid grid-cols-12 items-start gap-y-6 mb-5 lg:mb-32 px-[6vw] py-[4vh] text-white"
+  className="grid grid-cols-12 items-start border-t border-white/20 gap-y-6 mb-5 lg:mb-32 px-[6vw] py-[4vh] text-white"
 >
   {/* LEFT LABEL */}
   <div
