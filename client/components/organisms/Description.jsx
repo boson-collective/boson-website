@@ -16,6 +16,7 @@ function Description() {
   useLayoutEffect(() => {
     ScrollTrigger.config({
       ignoreMobileResize: true,
+      autoRefreshEvents: "visibilitychange,DOMContentLoaded,load",
     });
 
     lastWidth.current = window.innerWidth;
@@ -29,6 +30,14 @@ function Description() {
 
     const getStart = () => {
       return window.innerWidth < 768 ? "top 92%" : "top 85%";
+    };
+
+    const safeRefresh = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+        });
+      });
     };
 
     const build = () => {
@@ -53,7 +62,6 @@ function Description() {
 
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
-
       if (ctxRef.current) ctxRef.current.revert();
 
       ctxRef.current = gsap.context(() => {
@@ -63,8 +71,6 @@ function Description() {
           end: "bottom 45%",
           scrub: PROFILE.scrub,
         };
-
-        const baseTrigger = isMobile ? sectionRef.current : null;
 
         // =========================
         // TITLE
@@ -76,7 +82,7 @@ function Description() {
             duration: 0.6,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: baseTrigger,
+              trigger: titleRef.current,
               start: getStart(),
               once: true,
             },
@@ -121,7 +127,7 @@ function Description() {
             duration: isMobile ? 0.6 : 0.9,
             ease: "power2.out",
             scrollTrigger: {
-              trigger: isMobile ? baseTrigger : dividerRef.current,
+              trigger: dividerRef.current,
               start: getStart(),
               once: true,
             },
@@ -129,33 +135,7 @@ function Description() {
         );
 
         // =========================
-        // STATS
-        // =========================
-        const stats = statsRef.current.querySelectorAll("[data-stat]");
-
-        gsap.from(stats, {
-          opacity: 0,
-          y: isMobile ? 18 : 8,
-          duration: isMobile ? 0.5 : 0.5,
-          stagger: isMobile ? 0.08 : 0.12,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: isMobile ? baseTrigger : statsRef.current,
-            start: getStart(),
-            once: true,
-          },
-        });
-
-        if (!isMobile) {
-          gsap.to(stats, {
-            y: move(-22),
-            ease: "none",
-            scrollTrigger: PARALLAX_ST,
-          });
-        }
-
-        // =========================
-        // BODY
+        // BODY (trigger sendiri)
         // =========================
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
           if (isMobile) {
@@ -165,7 +145,7 @@ function Description() {
               duration: 0.6,
               ease: "power2.out",
               scrollTrigger: {
-                trigger: baseTrigger,
+                trigger: p,
                 start: getStart(),
                 once: true,
               },
@@ -200,12 +180,36 @@ function Description() {
           }
         });
 
-        // SAFETY REFRESH
-        ScrollTrigger.refresh();
+        // =========================
+        // STATS (trigger terakhir)
+        // =========================
+        const stats = statsRef.current.querySelectorAll("[data-stat]");
+
+        gsap.from(stats, {
+          opacity: 0,
+          y: isMobile ? 18 : 8,
+          duration: 0.5,
+          stagger: isMobile ? 0.08 : 0.12,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statsRef.current,
+            start: getStart(),
+            once: true,
+          },
+        });
+
+        if (!isMobile) {
+          gsap.to(stats, {
+            y: move(-22),
+            ease: "none",
+            scrollTrigger: PARALLAX_ST,
+          });
+        }
       }, sectionRef);
+
+      safeRefresh();
     };
 
-    // 🔥 MOBILE: NO FONT BLOCK
     if (window.innerWidth < 768) {
       build();
     } else {
@@ -260,11 +264,14 @@ function Description() {
           />
         </div>
 
-        <div className="flex flex-col gap-y-12 lg:flex-row lg:gap-x-20">
+        {/* 🔥 GRID MOBILE REORDER */}
+        <div className="grid gap-y-12 lg:flex lg:gap-x-20
+          [grid-template-areas:'body''stats']
+          lg:[grid-template-areas:none]">
 
           <div
             ref={statsRef}
-            className="w-full lg:flex-[0_0_42%] font-[Code_Pro]"
+            className="[grid-area:stats] w-full lg:flex-[0_0_42%] font-[Code_Pro]"
           >
             <div className="flex flex-wrap gap-x-8 gap-y-6 text-neutral-600">
 
@@ -296,7 +303,7 @@ function Description() {
 
           <div
             ref={bodyRef}
-            className="w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[17px] leading-[1.5] sm:leading-[1.6]"
+            className="[grid-area:body] w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[17px] leading-[1.5] sm:leading-[1.6]"
           >
             <p data-animate>
               Boson is an agency based in Bali, working with brands across

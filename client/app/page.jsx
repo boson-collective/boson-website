@@ -146,6 +146,10 @@ export default function Page() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <Projects />
       </div>
+      
+      {/* <div style={{ position: "relative", zIndex: 2 }}>
+        <ServicesHero />
+      </div> */}
 
       {/* ==================================================
          DESCRIPTION
