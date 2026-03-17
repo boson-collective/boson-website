@@ -1,9 +1,9 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
+  useMotionValue,
 } from "framer-motion";
 
 function BigHeading() {
@@ -14,22 +14,34 @@ function BigHeading() {
     offset: ["start 80%", "end start"],
   });
 
-  // tetap pakai % (jangan diubah)
-  const topXRaw = useTransform(scrollYProgress, [0, 1], ["0%", "-32%"]);
-  const bottomXRaw = useTransform(scrollYProgress, [0, 1], ["-92%", "-5%"]);
+  // 🔥 manual smooth value
+  const smoothProgress = useMotionValue(0);
 
-  // 🔥 smoothing (ini kunci mobile)
-  const topX = useSpring(topXRaw, {
-    stiffness: 80,
-    damping: 25,
-    mass: 0.6,
-  });
+  useEffect(() => {
+    let raf;
 
-  const bottomX = useSpring(bottomXRaw, {
-    stiffness: 80,
-    damping: 25,
-    mass: 0.6,
-  });
+    const lerp = (a, b, n) => a + (b - a) * n;
+
+    const update = () => {
+      const current = smoothProgress.get();
+      const target = scrollYProgress.get();
+
+      // angka ini kunci (semakin kecil = semakin smooth tapi delay)
+      const next = lerp(current, target, 0.08);
+
+      smoothProgress.set(next);
+
+      raf = requestAnimationFrame(update);
+    };
+
+    update();
+
+    return () => cancelAnimationFrame(raf);
+  }, [scrollYProgress, smoothProgress]);
+
+  // tetap pakai %
+  const topX = useTransform(smoothProgress, [0, 1], ["0%", "-32%"]);
+  const bottomX = useTransform(smoothProgress, [0, 1], ["-92%", "-5%"]);
 
   return (
     <section
