@@ -1,6 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react"; 
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
- 
 
 function Galery() {
   const FRAME_GAP = 10;
@@ -12,81 +11,48 @@ function Galery() {
   const [gridCols, setGridCols] = useState(getGridColumns());
 
   /* =========================
-     DATA
+     DATA (DEPTH FIXED)
   ========================= */
   const LANES = [
     {
       col: 1,
-      speed: -160,
+      speed: -200, // lebih dekat → lebih agresif
       items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png",
-          top: "220vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png",
-          top: "380vh",
-        },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png", top: "200vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "360vh" },
       ],
     },
     {
       col: 2,
-      speed: 120,
+      speed: 110,
       items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png",
-          top: "80vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png",
-          top: "300vh",
-        },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png", top: "90vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png", top: "300vh" },
       ],
     },
     {
       col: 3,
-      speed: -140,
+      speed: -80, // tengah → paling subtle (depth jauh)
       items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png",
-          top: "160vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png",
-          top: "280vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png",
-          top: "420vh",
-        },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png", top: "160vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png", top: "280vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png", top: "420vh" },
       ],
     },
     {
       col: 4,
-      speed: 100,
+      speed: 110,
       items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png",
-          top: "120vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png",
-          top: "340vh",
-        },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png", top: "120vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png", top: "340vh" },
       ],
     },
     {
       col: 5,
-      speed: -160,
+      speed: -200,
       items: [
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png",
-          top: "250vh",
-        },
-        {
-          src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png",
-          top: "430vh",
-        },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png", top: "240vh" },
+        { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png", top: "420vh" },
       ],
     },
   ];
@@ -104,8 +70,6 @@ function Galery() {
   const laneRefs = useRef([]);
 
   const resizeTimer = useRef(null);
-
-  /* === FLAG PLAY ONCE === */
   const textPlayedRef = useRef(false);
 
   /* =========================
@@ -147,44 +111,55 @@ function Galery() {
 
       gsap.set([headlineRef.current, getStartedRef.current], { opacity: 0 });
 
-      /* --- BORDER MORPH --- */
-      gsap.to(sectionRef.current, {
-        borderBottomLeftRadius: "0vw",
-        borderBottomRightRadius: "0vw",
-        ease: "none",
+      /* =========================
+         MASTER TIMELINE (FIX CORE)
+      ========================= */
+      const master = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "bottom bottom",
-          end: "top+=35% top",
-          scrub: 2,
+          start: "top top",
+          end: "bottom top",
+          scrub: 1,
         },
       });
 
-      /* --- PARALLAX LANES --- */
+      /* --- BORDER MORPH (DIMAJUKAN) --- */
+      master.to(
+        sectionRef.current,
+        {
+          borderBottomLeftRadius: "0vw",
+          borderBottomRightRadius: "0vw",
+          ease: "none",
+        },
+        0 // mulai dari awal scroll
+      );
+
+      /* --- PARALLAX LANES (SYNC KE MASTER) --- */
       laneRefs.current.forEach((lane, i) => {
         if (!lane) return;
+
         gsap.fromTo(
           lane,
-          { y: LANES[i].speed * -0.35 },
+          { y: LANES[i].speed * -0.25 },
           {
             y: LANES[i].speed,
             ease: "none",
             scrollTrigger: {
               trigger: sectionRef.current,
-              start: "top bottom",
+              start: "top+=10% bottom", // delay dikit → kasih ruang text dulu
               end: "bottom top",
-              scrub: 0.8,
+              scrub: 1,
               invalidateOnRefresh: true,
             },
           }
         );
       });
 
-      /* --- PIN + TEXT (PLAY ONCE) --- */
+      /* --- PIN TEXT (UNCHANGED STRUCTURE, BETTER TIMING) --- */
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top top",
-        end: "70% top",
+        end: "65% top",
         pin: textPinRef.current,
         pinSpacing: true,
         invalidateOnRefresh: true,
@@ -230,13 +205,13 @@ function Galery() {
         },
       });
 
-      /* --- COLOR SHIFT --- */
+      /* --- COLOR SHIFT (DISESUAIKAN SAMA FLOW) --- */
       gsap
         .timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "55% bottom",
-            end: "85% bottom",
+            start: "60% bottom",
+            end: "90% bottom",
             scrub: true,
           },
         })
@@ -251,7 +226,11 @@ function Galery() {
           { borderColor: "rgba(0,0,0,0.15)", ease: "none" },
           0
         )
-        .to([fadeTopRef.current, fadeBottomRef.current], { opacity: 0 }, 0);
+        .to(
+          [fadeTopRef.current, fadeBottomRef.current],
+          { opacity: 0, duration: 0.3 },
+          0
+        );
     }, sectionRef);
 
     return () => {
@@ -334,16 +313,16 @@ function Galery() {
         ))}
       </div>
 
-      {/* FADES */}
+      {/* FADES (DIKURANGIN DOMINANCE) */}
       <div
         ref={fadeTopRef}
-        className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40
-                   bg-gradient-to-b from-black via-black/90 to-transparent"
+        className="pointer-events-none absolute top-0 left-0 w-full h-[180px] z-40
+                   bg-gradient-to-b from-black via-black/80 to-transparent"
       />
       <div
         ref={fadeBottomRef}
-        className="pointer-events-none absolute bottom-0 left-0 w-full h-[360px] z-40
-                   bg-gradient-to-t from-black via-black/90 to-transparent"
+        className="pointer-events-none absolute bottom-0 left-0 w-full h-[240px] z-40
+                   bg-gradient-to-t from-black via-black/80 to-transparent"
       />
     </section>
   );

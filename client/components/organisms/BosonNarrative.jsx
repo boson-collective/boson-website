@@ -2,11 +2,10 @@ import { useEffect, useRef, useState } from "react";
 
 function BosonNarrative() {
   const wrap = useRef(null);
-  const textLayer = useRef(null);
+  const textLayer = useRef(null); // <<< IMPORTANT
 
-  const pos = useRef({ x: -9999, y: -9999 });
+  const [pos, setPos] = useState({ x: -9999, y: -9999 });
   const targetPos = useRef({ x: -9999, y: -9999 });
-  const rectRef = useRef(null);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -22,27 +21,11 @@ function BosonNarrative() {
   }, []);
 
   /* =========================
-     CACHE BOUNDS (NO THRASH)
-  ========================= */
-  useEffect(() => {
-    if (!textLayer.current) return;
-
-    const updateRect = () => {
-      rectRef.current = textLayer.current.getBoundingClientRect();
-    };
-
-    updateRect();
-    window.addEventListener("resize", updateRect);
-
-    return () => window.removeEventListener("resize", updateRect);
-  }, []);
-
-  /* =========================
-     SMOOTH FOLLOW (NO RE-RENDER)
+     SMOOTH FOLLOW
   ========================= */
   useEffect(() => {
     if (isMobile) {
-      pos.current = { x: -9999, y: -9999 };
+      setPos({ x: -9999, y: -9999 });
       targetPos.current = { x: -9999, y: -9999 };
       return;
     }
@@ -50,34 +33,35 @@ function BosonNarrative() {
     let frame;
 
     const animate = () => {
-      const dx = targetPos.current.x - pos.current.x;
-      const dy = targetPos.current.y - pos.current.y;
+      setPos((prev) => {
+        const dx = targetPos.current.x - prev.x;
+        const dy = targetPos.current.y - prev.y;
+        const speed = 0.1;
 
-      pos.current.x += dx * 0.1;
-      pos.current.y += dy * 0.1;
-
-      if (textLayer.current) {
-        textLayer.current.style.setProperty("--x", `${pos.current.x}px`);
-        textLayer.current.style.setProperty("--y", `${pos.current.y}px`);
-      }
+        return {
+          x: prev.x + dx * speed,
+          y: prev.y + dy * speed,
+        };
+      });
 
       frame = requestAnimationFrame(animate);
     };
 
     animate();
-
     return () => cancelAnimationFrame(frame);
   }, [isMobile]);
 
   /* =========================
-     MOUSE MOVE (NO LAYOUT HIT)
+     MOUSE MOVE (FIXED TARGET)
   ========================= */
   const handleMove = (e) => {
-    if (!rectRef.current || isMobile) return;
+    if (!textLayer.current || isMobile) return;
+
+    const rect = textLayer.current.getBoundingClientRect();
 
     targetPos.current = {
-      x: e.clientX - rectRef.current.left,
-      y: e.clientY - rectRef.current.top,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     };
   };
 
@@ -114,13 +98,10 @@ function BosonNarrative() {
         minHeight: isMobile ? "auto" : "100vh",
         alignItems: isMobile ? "flex-start" : "center",
         padding: isMobile ? "72px 6vw" : "120px 6vw",
-
-        /* 🔥 isolate dari layout global */
-        contain: "layout paint",
       }}
     >
       <div
-        ref={textLayer}
+        ref={textLayer} // <<< anchor disini
         style={{
           position: "relative",
           color: isMobile
@@ -141,12 +122,9 @@ function BosonNarrative() {
               color: "rgba(255,255,255,0.96)",
               ...baseTextStyle,
 
-              /* 🔥 GPU hint */
-              willChange: "mask-image",
-
               WebkitMaskImage: `
                 radial-gradient(
-                  900px circle at var(--x) var(--y),
+                  900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
                   rgba(255,255,255,0.10) 30%,
                   rgba(255,255,255,0.02) 55%,
@@ -155,7 +133,7 @@ function BosonNarrative() {
               `,
               maskImage: `
                 radial-gradient(
-                  900px circle at var(--x) var(--y),
+                  900px circle at ${pos.x}px ${pos.y}px,
                   rgba(255,255,255,1) 0%,
                   rgba(255,255,255,0.10) 30%,
                   rgba(255,255,255,0.02) 55%,

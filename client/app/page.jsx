@@ -30,6 +30,23 @@ export default function Page() {
   const footerRef = useRef(null);
 
   const [footerHeight, setFooterHeight] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  /* ==================================================
+     DETECT MOBILE
+  ================================================== */
+  useEffect(() => {
+    const check = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    check();
+    window.addEventListener("resize", check);
+
+    return () => {
+      window.removeEventListener("resize", check);
+    };
+  }, []);
 
   /* ==================================================
      RESET SCROLL
@@ -39,10 +56,11 @@ export default function Page() {
   }, []);
 
   /* ==================================================
-     MEASURE FOOTER HEIGHT (ROBUST + DETERMINISTIC)
+     MEASURE FOOTER HEIGHT (ONLY DESKTOP)
   ================================================== */
   useLayoutEffect(() => {
     if (!ready) return;
+    if (isMobile) return; // 🚫 kill di mobile
 
     const footer = footerRef.current;
     if (!footer) return;
@@ -52,7 +70,6 @@ export default function Page() {
       setFooterHeight(rect.height);
     };
 
-    // initial sync (post layout)
     requestAnimationFrame(() => {
       requestAnimationFrame(measure);
     });
@@ -68,21 +85,21 @@ export default function Page() {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [ready]);
+  }, [ready, isMobile]);
 
   /* ==================================================
-     SCROLL-DRIVEN FOOTER REVEAL (PURE, MANUAL)
+     SCROLL-DRIVEN FOOTER REVEAL (DESKTOP ONLY)
   ================================================== */
   useEffect(() => {
     if (!ready) return;
     if (!footerHeight) return;
+    if (isMobile) return; // 🚫 kill di mobile
 
     const footer = footerRef.current;
     if (!footer) return;
 
     const OFFSET = window.innerHeight * 0.5;
 
-    // INIT STATE
     footer.style.transform = `translateY(${OFFSET}px)`;
 
     const onScroll = () => {
@@ -106,7 +123,7 @@ export default function Page() {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [ready, footerHeight]);
+  }, [ready, footerHeight, isMobile]);
 
   if (!ready) return null;
 
@@ -146,10 +163,7 @@ export default function Page() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <Projects />
       </div>
-      
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
-        <ServicesHero />
-      </div> */}
+ 
 
       {/* ==================================================
          DESCRIPTION
@@ -181,25 +195,33 @@ export default function Page() {
       {/* ==================================================
          GALERY
       ================================================== */}
-      <div style={{ position: "relative", zIndex: 2 }}>
+      <div className="bg-neutral-950" style={{ position: "relative", zIndex: 2 }}>
         <Galery />
       </div>
 
       {/* ==================================================
-         EXTRA SCROLL DEPTH (DYNAMIC BUFFER)
+         EXTRA SCROLL DEPTH (DESKTOP ONLY)
       ================================================== */}
-      <div style={{ height: footerHeight }} />
+      {!isMobile && <div style={{ height: footerHeight }} />}
 
       {/* ==================================================
-         FOOTER — FIXED, PURE SCROLL-DRIVEN
+         FOOTER
+         - MOBILE: normal flow
+         - DESKTOP: fixed + reveal
       ================================================== */}
-      <div
-        ref={footerRef}
-        className="fixed bottom-0 left-0 w-full z-0"
-        style={{ willChange: "transform" }}
-      >
-        <Footer />
-      </div>
+      {isMobile ? (
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <Footer />
+        </div>
+      ) : (
+        <div
+          ref={footerRef}
+          className="fixed bottom-0 left-0 w-full z-0"
+          style={{ willChange: "transform" }}
+        >
+          <Footer />
+        </div>
+      )}
 
       {/* ==================================================
          GLOBAL STYLE

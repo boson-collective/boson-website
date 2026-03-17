@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useRef } from "react";
 import { gsap } from "../../lib/gsap";
@@ -88,9 +88,10 @@ function Footer() {
       </div>
 
       {/* CTA */}
-      <div className="relative px-[6vw] py-20 sm:py-28">
-        <div className="grid grid-cols-12 gap-y-12 sm:gap-y-14">
-          <div className="col-span-12 lg:col-span-6">
+      <div className="relative px-[6vw] py-16 sm:py-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 sm:gap-y-14">
+          {/* TEXT */}
+          <div className="lg:col-span-6">
             <p
               className="
                 text-neutral-500 leading-relaxed
@@ -105,16 +106,24 @@ function Footer() {
             </p>
           </div>
 
-          <div className="col-span-12 lg:col-span-6 flex lg:justify-end items-start lg:items-end">
+          {/* EMAIL */}
+          <div
+            className="
+              lg:col-span-6
+              flex justify-start lg:justify-end
+              items-start lg:items-end
+            "
+          >
             <a
               ref={emailRef}
               href="mailto:boson.sma@gmail.com"
               className="
                 inline-block font-light tracking-tight text-white cursor-pointer
                 text-[clamp(26px,4.5vw,44px)]
+                break-words
               "
             >
-              <span className="inline-flex overflow-hidden">
+              <span className="inline-flex overflow-hidden flex-wrap">
                 {email.split("").map((char, i) => (
                   <span
                     key={i}
@@ -132,16 +141,31 @@ function Footer() {
       </div>
 
       {/* BRAND MASS */}
-      <div className="relative px-[6vw] pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
-        <div className="grid grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
+      <div className="relative px-[6vw] pt-12 pb-16 sm:pb-24 border-t border-neutral-800">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
+          {/* LOGO */}
+          <div className="lg:col-span-7 order-1 lg:order-1">
+            <img
+              src="/png/boson-white3.png"
+              alt="Boson"
+              className="
+                w-full object-contain
+                max-h-[32vh]
+                sm:max-h-[45vh]
+                lg:max-h-[45vh]
+              "
+            />
+          </div>
+
           {/* META */}
           <div
             className="
-              col-span-12 lg:col-span-5
-              flex flex-col lg:items-end gap-5 sm:gap-6
-              order-1 lg:order-2
+              lg:col-span-5
+              flex flex-col gap-5 sm:gap-6
               text-neutral-500
               text-[clamp(11px,0.9vw,13px)]
+              order-2 lg:order-2
+              lg:items-end
             "
           >
             <div className="space-y-1 lg:text-right">
@@ -159,21 +183,6 @@ function Footer() {
                 Back to top ↑
               </a>
             </div>
-          </div>
-
-          {/* LOGO */}
-          <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
-            <img
-              src="/png/boson-white3.png"
-              alt="Boson"
-              className="
-                w-full
-                object-contain
-                max-h-[55vh]
-                sm:max-h-[50vh]
-                lg:max-h-[45vh]
-              "
-            />
           </div>
         </div>
       </div>

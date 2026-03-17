@@ -98,10 +98,14 @@ function ProjectShowcase() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  /* =========================
+     CUSTOM CURSOR (ADDED)
+  ========================= */
   useEffect(() => {
     if (!isDesktop || !cursorRef.current) return;
 
     const cursor = cursorRef.current;
+
     gsap.set(cursor, { xPercent: -50, yPercent: -50 });
 
     const move = (e) => {
@@ -115,13 +119,21 @@ function ProjectShowcase() {
 
     const show = () => {
       setIsHoveringTarget(true);
-      gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.2 });
+      gsap.to(cursor, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.2,
+      });
       document.body.style.cursor = "none";
     };
 
     const hide = () => {
       setIsHoveringTarget(false);
-      gsap.to(cursor, { scale: 0, opacity: 0, duration: 0.2 });
+      gsap.to(cursor, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.2,
+      });
       document.body.style.cursor = "default";
     };
 
@@ -179,6 +191,8 @@ function ProjectShowcase() {
           end: () => `+=${getScrollDistance()}`,
           scrub: true,
           pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate(self) {
             gsap.set(progressBar, {
               scaleX: self.progress,
@@ -193,21 +207,17 @@ function ProjectShowcase() {
 
       const parallax = (selector, fromX, toX) => {
         gsap.utils.toArray(selector).forEach((el) => {
-          gsap.fromTo(
-            el,
-            { x: fromX },
-            {
-              x: toX,
-              ease: "none",
-              scrollTrigger: {
-                trigger: el,
-                containerAnimation: mainTween,
-                start: "left right",
-                end: "right left",
-                scrub: 0.6,
-              },
-            }
-          );
+          gsap.fromTo(el, { x: fromX }, {
+            x: toX,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              containerAnimation: mainTween,
+              start: "left right",
+              end: "right left",
+              scrub: 0.6,
+            },
+          });
         });
       };
 
@@ -219,17 +229,16 @@ function ProjectShowcase() {
   }, [isDesktop, randomizedProjects.length]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full bg-black text-white overflow-hidden lg:h-screen"
-    >
+    <section ref={sectionRef} className="relative w-full bg-black text-white overflow-hidden lg:h-screen">
+
+      {/* ================= CURSOR UI (ADDED) ================= */}
       {isDesktop && (
         <div
           ref={cursorRef}
           className="fixed top-0 left-0 z-[9999] pointer-events-none
-          w-[140px] h-[140px] rounded-full bg-white text-black
-          flex items-center justify-center text-xs tracking-wide
-          opacity-0 scale-0"
+                     w-[140px] h-[140px] rounded-full bg-white text-black
+                     flex items-center justify-center text-xs tracking-wide
+                     opacity-0 scale-0"
         >
           <span className="text-center leading-tight">
             VIEW<br />ON INSTAGRAM →
@@ -242,95 +251,85 @@ function ProjectShowcase() {
           ref={trackRef}
           className="flex flex-col lg:flex-row"
           style={{
-            width: isDesktop
-              ? `${randomizedProjects.length * 100}vw`
-              : "100%",
+            width: isDesktop ? `${randomizedProjects.length * 100}vw` : "100%",
           }}
         >
           {randomizedProjects.map((p, i) => (
-            <div
-              key={i}
-              className="relative w-full lg:w-screen min-h-screen   flex-shrink-0"
-            >
-              <div
-                className="
-                relative mx-auto h-full
-                px-5 pt-16 pb-10
-                lg:px-[clamp(3rem,6vw,10rem)] lg:pt-24 lg:pb-32
-                grid grid-cols-1 lg:grid-cols-12
-                gap-8 lg:gap-0
-              "
-              >
-                {/* INDEX */}
-                <span className="lg:col-span-12 text-[10px] tracking-widest text-white/40 font-[Code_Pro]">
+            <div key={i} className="relative w-full lg:w-screen min-h-screen flex-shrink-0">
+
+              {/* ================= MOBILE ================= */}
+              <div className="block lg:hidden px-5 pt-16 pb-12">
+                <div className="w-full max-w-[420px] mx-auto flex flex-col items-start gap-6">
+
+                  <span className="text-xs tracking-widest text-white/50 font-[Code_Pro]">
+                    PROJECT 0{i + 1}
+                  </span>
+
+                  <h2 className="text-[42px] leading-[0.95] whitespace-pre-line">
+                    {p.title}
+                  </h2>
+
+                  <div className="cursor-target parallax-image relative w-full aspect-[3/4]">
+                    {isVideo(p.image) ? (
+                      <video src={p.image} className="absolute inset-0 w-full h-full object-cover" muted loop playsInline autoPlay />
+                    ) : (
+                      <img src={p.image} className="absolute inset-0 w-full h-full object-cover" alt="" />
+                    )}
+                  </div>
+
+                  <div className="parallax-meta flex flex-col gap-4">
+                    <div className="space-y-2 text-xs">
+                      {p.meta.map((m) => (
+                        <p key={m} className="underline font-[Code_Pro]">{m}</p>
+                      ))}
+                    </div>
+                    <p className="text-sm text-white/60 leading-relaxed max-w-[34ch]">
+                      {p.desc}
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ================= DESKTOP ================= */}
+              <div className="hidden lg:grid relative mx-auto h-full px-[clamp(3rem,6vw,10rem)] pt-24 pb-32 grid-cols-12 gap-0">
+
+                <span className="col-span-12 font-[Code_Pro] text-xs tracking-widest text-white/50">
                   PROJECT 0{i + 1}
                 </span>
 
-                {/* MOBILE TITLE */}
-                <h2 className="lg:hidden text-[50px] leading-[0.9] tracking-tight whitespace-pre-line">
-                  {p.title}
-                </h2>
-
-                {/* DESKTOP TITLE (UNCHANGED) */}
-                <h1 className="font-[Code_Pro] hidden lg:block absolute left-[35%] top-[25%] -translate-x-1/2 text-[clamp(3.5rem,6vw,6rem)] leading-[0.95] whitespace-pre-line mix-blend-difference pointer-events-none z-30">
+                <h1 className="font-[Code_Pro] absolute left-[35%] top-[25%] -translate-x-1/2 text-[clamp(3.5rem,6vw,6rem)] leading-[0.95] whitespace-pre-line mix-blend-difference pointer-events-none select-none z-30">
                   {p.title}
                 </h1>
 
-                {/* IMAGE */}
-                <div className="lg:col-span-4 lg:col-start-5 z-10 flex justify-start lg:justify-center">
-                  <div className="cursor-target parallax-image relative w-[88vw] max-w-[420px] lg:w-[clamp(420px,30vw,680px)] aspect-[3/4]">
+                <div className="col-span-4 col-start-5 z-10 flex justify-center">
+                  <div className="cursor-target parallax-image relative w-[clamp(420px,30vw,680px)] aspect-[3/4]">
                     {isVideo(p.image) ? (
-                      <video
-                        src={p.image}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                      />
+                      <video src={p.image} className="absolute inset-0 w-full h-full object-cover" muted loop playsInline autoPlay />
                     ) : (
-                      <img
-                        src={p.image}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        alt=""
-                      />
+                      <img src={p.image} className="absolute inset-0 w-full h-full object-cover" alt="" />
                     )}
                   </div>
                 </div>
 
-                {/* META + DESC */}
-                <div className="parallax-meta lg:col-span-3 lg:col-start-9 flex flex-col gap-4 lg:gap-6 mt-2 lg:mt-0">
-                  <div className="space-y-1 text-[11px] lg:text-xs">
+                <div className="parallax-meta col-span-3 col-start-9 flex flex-col gap-6 justify-end">
+                  <div className="space-y-2 text-xs">
                     {p.meta.map((m) => (
-                      <p key={m} className="underline font-[Code_Pro]">
-                        {m}
-                      </p>
+                      <p key={m} className="underline font-[Code_Pro]">{m}</p>
                     ))}
                   </div>
-
-                  <p className="text-[13px] lg:text-sm text-white/60 leading-snug lg:leading-relaxed max-w-[28ch] lg:max-w-[34ch]">
+                  <p className="text-sm text-white/60 leading-relaxed max-w-[34ch]">
                     {p.desc}
                   </p>
                 </div>
+
               </div>
+
             </div>
           ))}
         </div>
       </div>
 
-      {isDesktop && (
-        <div className="absolute bottom-0 left-0 right-0 px-28 pb-6">
-          <div className="h-px bg-white/20">
-            <div
-              ref={progressRef}
-              className="h-full bg-white origin-left scale-x-0"
-            />
-          </div>
-          <div className="mt-4 text-sm">
-            [ {activeIndex + 1} — {randomizedProjects.length} ]
-          </div>
-        </div>
-      )}
     </section>
   );
 }
