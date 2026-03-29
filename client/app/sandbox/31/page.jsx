@@ -2816,7 +2816,7 @@ function ServicesHero() {
     {
       label: "Social Media Marketing",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484492/Screenshot_2026-01-27_at_10.28.02.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1774779072/Screenshot_2026-01-27_at_10.28.02.png",
     },
     {
       label: "Content Production",

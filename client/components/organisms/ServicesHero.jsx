@@ -1,6 +1,34 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
 
+/* =========================
+   IMAGE OPTIMIZER (INJECTED)
+========================= */
+const IMAGE_CONFIG = {
+  quality: "auto",
+  format: "auto",
+  width: {
+    mobile: 480,
+    desktop: 800,
+  },
+};
+
+const buildImageUrl = (url, { isMobile }) => {
+  if (!url.includes("cloudinary")) return url;
+
+  const width = isMobile
+    ? IMAGE_CONFIG.width.mobile
+    : IMAGE_CONFIG.width.desktop;
+
+  const transform = [
+    `f_${IMAGE_CONFIG.format}`,
+    `q_${IMAGE_CONFIG.quality}`,
+    `w_${width}`,
+  ].join(",");
+
+  return url.replace("/upload/", `/upload/${transform}/`);
+};
+
 function ServicesHero() {
 
   const sectionRef = useRef(null);
@@ -173,7 +201,7 @@ function ServicesHero() {
     {
       label: "Social Media Marketing",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484492/Screenshot_2026-01-27_at_10.28.02.png",
+        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1774779072/Screenshot_2026-01-27_at_10.28.02.png",
     },
     {
       label: "Content Production",
@@ -267,7 +295,7 @@ function ServicesHero() {
                     {isMobile && (
                       <div className="w-[88px] h-[64px] flex-shrink-0 overflow-hidden rounded-md bg-neutral-200">
                         <img
-                          src={item.image}
+                          src={buildImageUrl(item.image, { isMobile })}
                           alt=""
                           className="w-full h-full object-cover"
                         />
@@ -282,7 +310,7 @@ function ServicesHero() {
                         `}
                       >
                         <img
-                          src={item.image}
+                          src={buildImageUrl(item.image, { isMobile })}
                           alt=""
                           className={`h-[120px] w-full object-cover rounded-md transition-all duration-300
                             ${
