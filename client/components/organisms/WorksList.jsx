@@ -178,6 +178,34 @@ function MarqueeOverlay({ item, active }) {
   );
 }
 
+/* =========================
+   IMAGE OPTIMIZER (INJECTED)
+========================= */
+const IMAGE_CONFIG = {
+  quality: "auto",
+  format: "auto",
+  width: {
+    mobile: 480,
+    desktop: 900,
+  },
+};
+
+const buildImageUrl = (url, { isMobile }) => {
+  if (!url.includes("cloudinary")) return url;
+
+  const width = isMobile
+    ? IMAGE_CONFIG.width.mobile
+    : IMAGE_CONFIG.width.desktop;
+
+  const transform = [
+    `f_${IMAGE_CONFIG.format}`,
+    `q_${IMAGE_CONFIG.quality}`,
+    `w_${width}`,
+  ].join(",");
+
+  return url.replace("/upload/", `/upload/${transform}/`);
+};
+
 export default function WorksList() {
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
@@ -252,6 +280,9 @@ export default function WorksList() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const totalIndex = String(items.length).padStart(2, "0");
 
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth <= 768;
+
   useLayoutEffect(() => {
     ScrollTrigger.config({ ignoreMobileResize: true });
 
@@ -267,12 +298,7 @@ export default function WorksList() {
 
       ctxRef.current = gsap.context(() => {
 
-        // 🔥 MOBILE: NO GSAP AT ALL
         if (isMobile) return;
-
-        // =========================
-        // DESKTOP (UNCHANGED)
-        // =========================
 
         const leftSplit = SplitText.create(leftRef.current, {
           type: "lines",
@@ -410,7 +436,7 @@ export default function WorksList() {
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           />
 
-          <MarqueeOverlay item={item} active={hoveredIndex === i} />
+          <MarqueeOverlay item={item} active={hoveredIndex === i} buildImageUrl={buildImageUrl} isMobile={isMobile} />
 
           <div className="works-title-wrapper">
             <div className="works-title font-light">

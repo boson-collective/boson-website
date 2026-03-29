@@ -1,29 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   motion,
   useScroll,
   useTransform,
 } from "framer-motion";
 
-/* ==================================================
-   IMAGE BURST (UPDATED FOR HORIZONTAL LOGOS)
-================================================== */
-function ImageBurst({ src, motionProps, styleOverrides = {} }) {
+/* =========================
+   IMAGE OPTIMIZER (INJECTED)
+========================= */
+const IMAGE_CONFIG = {
+  quality: "auto",
+  format: "auto",
+  width: {
+    mobile: 480,
+    desktop: 900,
+  },
+};
+
+const buildImageUrl = (url, { isMobile }) => {
+  if (!url.includes("cloudinary")) return url;
+
+  const width = isMobile
+    ? IMAGE_CONFIG.width.mobile
+    : IMAGE_CONFIG.width.desktop;
+
+  const transform = [
+    `f_${IMAGE_CONFIG.format}`,
+    `q_${IMAGE_CONFIG.quality}`,
+    `w_${width}`,
+  ].join(",");
+
+  return url.replace("/upload/", `/upload/${transform}/`);
+};
+
+function ImageBurst({ src, motionProps, styleOverrides = {}, isMobile }) {
   return (
     <motion.div
       style={{
         position: "absolute",
         inset: 0,
         margin: "auto",
-
-        // RESPONSIVE HORIZONTAL CONTAINER
-        width: "clamp(300px, 42vw, 620px)",
-        height: "clamp(120px, 18vw, 220px)",
-
+        width: "260px",
+        height: "260px",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-
         transformStyle: "preserve-3d",
 
         translateZ: motionProps.z,
@@ -35,16 +56,7 @@ function ImageBurst({ src, motionProps, styleOverrides = {} }) {
         ...styleOverrides,
       }}
     >
-      <img
-        src={src}
-        alt=""
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          pointerEvents: "none",
-        }}
-      />
+      <img src={buildImageUrl(src, { isMobile })} style={{ width: "100%" }} />
     </motion.div>
   );
 }
@@ -87,26 +99,27 @@ export default function Projects() {
      IMAGES
   ================================================== */
   const images = [
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771768818/sunny-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068787/hidden-city-ubud-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771768640/yolo-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771768740/solace-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771768694/novo-ampang-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068279/the-linea-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768898518/marroosh-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769066430/hairaholic-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067253/newminatis-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069228/petra-logo.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899596/tender-touch-logo.png",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815480/hidden-city-ubud-5.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-5.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815566/little-brew-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816466/sunny-family-3.png",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067634/tea-time-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816274/novo-ampang-3.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816770/alraimi-2.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817395/terra-auri-2.png",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969071/little-soho-9.jpg",
+    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817596/terra-auri-3.png",
   ];
 
   /* ==================================================
-     DYNAMIC TIMELINE
+     DYNAMIC TIMELINE CALCULATION
   ================================================== */
 
   const baseStart = 0.14;
   const windowLen = 0.16;
   const availableSpace = 1 - baseStart - windowLen;
+
   const step = images.length > 0
     ? availableSpace / images.length
     : 0;
@@ -133,18 +146,15 @@ export default function Projects() {
       x: useTransform(
         b,
         [0, 0.85, 1],
-        [0, dir % 2 === 0 ? 220 : -220, dir % 2 === 0 ? 260 : -260]
+        [0, dir % 2 === 0 ? 200 : -200, dir % 2 === 0 ? 240 : -240]
       ),
       y: useTransform(
         b,
         [0, 0.85, 1],
-        [0, dir < 2 ? -180 : 180, dir < 2 ? -220 : 220]
+        [0, dir < 2 ? -170 : 170, dir < 2 ? -200 : 200]
       ),
       z: useTransform(b, [0, 1], [-2000, 3000]),
-
-      // INCREASED SCALE FOR VISUAL WEIGHT
-      scale: useTransform(b, [0, 1], [0.6, 1.35]),
-
+      scale: useTransform(b, [0, 1], [0.4, 1.1]),
       opacity: useTransform(b, [0, 0.05, 1], [0, 1, 1]),
     };
   });
@@ -310,6 +320,7 @@ export default function Projects() {
             key={i}
             src={src}
             motionProps={motionPropsList[i]}
+            isMobile={isMobile}
           />
         ))}
       </div>

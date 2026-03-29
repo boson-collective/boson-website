@@ -15,6 +15,36 @@ function ProjectShowcase() {
 
   const [isHoveringTarget, setIsHoveringTarget] = useState(false);
 
+  /* =========================
+     VIDEO OPTIMIZER (INJECTED)
+  ========================= */
+  const VIDEO_CONFIG = {
+    quality: "auto",
+    format: "auto",
+    codec: "auto",
+    width: {
+      mobile: 480,
+      desktop: 960,
+    },
+  };
+
+  const buildVideoUrl = (url, { isDesktop }) => {
+    if (!url.includes("cloudinary")) return url;
+
+    const width = isDesktop
+      ? VIDEO_CONFIG.width.desktop
+      : VIDEO_CONFIG.width.mobile;
+
+    const transform = [
+      `f_${VIDEO_CONFIG.format}`,
+      `q_${VIDEO_CONFIG.quality}`,
+      `vc_${VIDEO_CONFIG.codec}`,
+      `w_${width}`,
+    ].join(",");
+
+    return url.replace("/upload/", `/upload/${transform}/`);
+  };
+
   const projects = [
     {
       title: "Sunny\nDevelopment",
@@ -271,7 +301,14 @@ function ProjectShowcase() {
 
                   <div className="cursor-target parallax-image relative w-full aspect-[3/4]">
                     {isVideo(p.image) ? (
-                      <video src={p.image} className="absolute inset-0 w-full h-full object-cover" muted loop playsInline autoPlay />
+                      <video
+                        src={buildVideoUrl(p.image, { isDesktop })}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
                     ) : (
                       <img src={p.image} className="absolute inset-0 w-full h-full object-cover" alt="" />
                     )}
@@ -305,7 +342,14 @@ function ProjectShowcase() {
                 <div className="col-span-4 col-start-5 z-10 flex justify-center">
                   <div className="cursor-target parallax-image relative w-[clamp(420px,30vw,680px)] aspect-[3/4]">
                     {isVideo(p.image) ? (
-                      <video src={p.image} className="absolute inset-0 w-full h-full object-cover" muted loop playsInline autoPlay />
+                      <video
+                        src={buildVideoUrl(p.image, { isDesktop })}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                      />
                     ) : (
                       <img src={p.image} className="absolute inset-0 w-full h-full object-cover" alt="" />
                     )}

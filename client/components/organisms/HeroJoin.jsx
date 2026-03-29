@@ -230,7 +230,7 @@ function IntroOverlay() {
       if (/\/upload\/.*(w_|f_|q_)/.test(src)) return src;
       return src.replace(
         "/image/upload/",
-        "/image/upload/w_1400,c_limit,f_auto,q_auto/"
+        "/image/upload/w_800,c_limit,f_auto,q_auto/"
       );
     });
   }, []);

@@ -5,6 +5,34 @@ function Galery() {
   const FRAME_GAP = 10;
 
   /* =========================
+     IMAGE OPTIMIZER CONFIG (INJECTED)
+  ========================= */
+  const IMAGE_CONFIG = {
+    quality: 70,
+    format: "auto",
+    width: {
+      mobile: 400,
+      desktop: 800,
+    },
+  };
+
+  const buildImageUrl = (url, { isMobile }) => {
+    if (!url.includes("cloudinary")) return url;
+
+    const width = isMobile
+      ? IMAGE_CONFIG.width.mobile
+      : IMAGE_CONFIG.width.desktop;
+
+    const transform = [
+      `f_${IMAGE_CONFIG.format}`,
+      `q_${IMAGE_CONFIG.quality}`,
+      `w_${width}`,
+    ].join(",");
+
+    return url.replace("/upload/", `/upload/${transform}/`);
+  };
+
+  /* =========================
      GRID LOGIC
   ========================= */
   const getGridColumns = () => (window.innerWidth < 640 ? 3 : 5);
@@ -316,7 +344,7 @@ function Galery() {
               >
                 <div className="w-full aspect-[3/4] overflow-hidden">
                   <img
-                    src={item.src}
+                    src={buildImageUrl(item.src, { isMobile })}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover"

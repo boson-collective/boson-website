@@ -1,6 +1,36 @@
 import { useRef, useEffect, useLayoutEffect } from "react";
 import { gsap, ScrollTrigger } from "../../lib/gsap";
 
+/* =========================
+   VIDEO OPTIMIZER (INJECTED)
+========================= */
+const VIDEO_CONFIG = {
+  quality: "auto",
+  format: "auto",
+  codec: "auto",
+  width: {
+    mobile: 720,
+    desktop: 1280,
+  },
+};
+
+const buildVideoUrl = (url, { isMobile }) => {
+  if (!url.includes("cloudinary")) return url;
+
+  const width = isMobile
+    ? VIDEO_CONFIG.width.mobile
+    : VIDEO_CONFIG.width.desktop;
+
+  const transform = [
+    `f_${VIDEO_CONFIG.format}`,
+    `q_${VIDEO_CONFIG.quality}`,
+    `vc_${VIDEO_CONFIG.codec}`,
+    `w_${width}`,
+  ].join(",");
+
+  return url.replace("/upload/", `/upload/${transform}/`);
+};
+
 function VideoSection() {
   const isMobile =
     typeof window !== "undefined"
@@ -31,7 +61,10 @@ function VideoSection() {
           }}
         >
           <video
-            src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov"
+            src={buildVideoUrl(
+              "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov",
+              { isMobile }
+            )}
             autoPlay
             loop
             muted
@@ -166,7 +199,10 @@ function VideoSection() {
       >
         <video
           ref={videoRef}
-          src="https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov"
+          src={buildVideoUrl(
+            "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov",
+            { isMobile }
+          )}
           autoPlay
           loop
           muted
@@ -228,77 +264,22 @@ function VideoSection() {
                   viewBox="0 0 100 100"
                   style={{ marginBottom: "14px" }}
                 >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="36"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="6"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <line
-                    x1="50"
-                    y1="14"
-                    x2="50"
-                    y2="34"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <line
-                    x1="86"
-                    y1="50"
-                    x2="66"
-                    y2="50"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <line
-                    x1="50"
-                    y1="86"
-                    x2="50"
-                    y2="66"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <line
-                    x1="14"
-                    y1="50"
-                    x2="34"
-                    y2="50"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="white" strokeWidth="1" />
+                  <circle cx="50" cy="50" r="6" fill="none" stroke="white" strokeWidth="1" />
+                  <line x1="50" y1="14" x2="50" y2="34" stroke="white" strokeWidth="1" />
+                  <line x1="86" y1="50" x2="66" y2="50" stroke="white" strokeWidth="1" />
+                  <line x1="50" y1="86" x2="50" y2="66" stroke="white" strokeWidth="1" />
+                  <line x1="14" y1="50" x2="34" y2="50" stroke="white" strokeWidth="1" />
                 </svg>
 
-                <div
-                  style={{
-                    height: "1px",
-                    background: "rgba(255,255,255,0.2)",
-                    marginBottom: "20px",
-                  }}
-                />
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
-                <h3
-                  className="font-[Code_Pro]"
-                  style={{ fontSize: "18px", marginBottom: "8px" }}
-                >
+                <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
                   Discover
                 </h3>
 
-                <p
-                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}
-                >
-                  Most projects fail because no one really looks at what’s
-                  happening day to day. We start by understanding how your
-                  content is actually used and where things begin to slip.
+                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
+                  Most projects fail because no one really looks at what’s happening day to day. We start by understanding how your content is actually used and where things begin to slip.
                 </p>
               </div>
 
@@ -311,66 +292,23 @@ function VideoSection() {
                   viewBox="0 0 100 100"
                   style={{ marginBottom: "14px" }}
                 >
-                  <rect
-                    x="20"
-                    y="20"
-                    width="60"
-                    height="60"
-                    rx="8"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
+                  <rect x="20" y="20" width="60" height="60" rx="8" fill="none" stroke="white" strokeWidth="1" />
                   <circle cx="35" cy="35" r="3" fill="white" />
                   <circle cx="65" cy="35" r="3" fill="white" />
                   <circle cx="50" cy="65" r="3" fill="white" />
-                  <line
-                    x1="35"
-                    y1="35"
-                    x2="65"
-                    y2="35"
-                    stroke="white"
-                    strokeWidth="0.8"
-                  />
-                  <line
-                    x1="65"
-                    y1="35"
-                    x2="50"
-                    y2="65"
-                    stroke="white"
-                    strokeWidth="0.8"
-                  />
-                  <line
-                    x1="50"
-                    y1="65"
-                    x2="35"
-                    y2="35"
-                    stroke="white"
-                    strokeWidth="0.8"
-                  />
+                  <line x1="35" y1="35" x2="65" y2="35" stroke="white" strokeWidth="0.8" />
+                  <line x1="65" y1="35" x2="50" y2="65" stroke="white" strokeWidth="0.8" />
+                  <line x1="50" y1="65" x2="35" y2="35" stroke="white" strokeWidth="0.8" />
                 </svg>
 
-                <div
-                  style={{
-                    height: "1px",
-                    background: "rgba(255,255,255,0.2)",
-                    marginBottom: "20px",
-                  }}
-                />
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
-                <h3
-                  className="font-[Code_Pro]"
-                  style={{ fontSize: "18px", marginBottom: "8px" }}
-                >
+                <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
                   Create
                 </h3>
 
-                <p
-                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}
-                >
-                  Once things are clear, we focus on structure. We turn ideas
-                  into content that’s easier to manage, repeat, and grow without
-                  starting from zero every time.
+                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.85 }}>
+                  Once things are clear, we focus on structure. We turn ideas into content that’s easier to manage, repeat, and grow without starting from zero every time.
                 </p>
               </div>
 
@@ -383,49 +321,21 @@ function VideoSection() {
                   viewBox="0 0 100 100"
                   style={{ marginBottom: "14px" }}
                 >
-                  <rect
-                    x="26"
-                    y="30"
-                    width="48"
-                    height="36"
-                    rx="4"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="1"
-                  />
-                  <line
-                    x1="20"
-                    y1="70"
-                    x2="80"
-                    y2="70"
-                    stroke="white"
-                    strokeWidth="1.2"
-                  />
+                  <rect x="26" y="30" width="48" height="36" rx="4" fill="none" stroke="white" strokeWidth="1" />
+                  <line x1="20" y1="70" x2="80" y2="70" stroke="white" strokeWidth="1.2" />
                 </svg>
 
-                <div
-                  style={{
-                    height: "1px",
-                    background: "rgba(255,255,255,0.2)",
-                    marginBottom: "20px",
-                  }}
-                />
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.2)", marginBottom: "20px" }} />
 
-                <h3
-                  className="font-[Code_Pro]"
-                  style={{ fontSize: "18px", marginBottom: "8px" }}
-                >
+                <h3 className="font-[Code_Pro]" style={{ fontSize: "18px", marginBottom: "8px" }}>
                   Deliver
                 </h3>
 
-                <p
-                  style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}
-                >
-                  Publishing is only part of the work. We test, adjust, and keep
-                  things moving so your content stays consistent as platforms
-                  and needs change.
+                <p style={{ fontSize: "14px", lineHeight: "1.6", opacity: 0.8 }}>
+                  Publishing is only part of the work. We test, adjust, and keep things moving so your content stays consistent as platforms and needs change.
                 </p>
               </div>
+
             </div>
           </div>
         </div>
