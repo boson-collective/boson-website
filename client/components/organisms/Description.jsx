@@ -59,7 +59,6 @@ function Description() {
       )
         return;
 
-      // 🔥 CORE FIX: MOBILE = SKIP TOTAL
       if (isMobile()) {
         clean();
         return;
@@ -84,7 +83,7 @@ function Description() {
           scrub: PROFILE.scrub,
         };
 
-        // TITLE
+        // ===== TITLE =====
         const titleSplit = SplitText.create(titleRef.current, {
           type: "lines",
           linesClass: "line",
@@ -97,11 +96,11 @@ function Description() {
           yPercent: 35,
           opacity: 0,
           duration: 1.1,
-          stagger: 0.1,
+          stagger: 0.08,
           ease: "power2.out",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 75%",
+            start: "top 80%",
             once: true,
           },
         });
@@ -112,13 +111,13 @@ function Description() {
           scrollTrigger: PARALLAX_ST,
         });
 
-        // DIVIDER
+        // ===== DIVIDER =====
         gsap.fromTo(
           dividerRef.current,
           { scaleX: 0, transformOrigin: "left center" },
           {
             scaleX: 1,
-            duration: 0.9,
+            duration: 0.8,
             ease: "power2.out",
             scrollTrigger: {
               trigger: dividerRef.current,
@@ -128,7 +127,14 @@ function Description() {
           }
         );
 
-        // BODY
+        // 🔥 FIX: DIVIDER IKUT PARALLAX
+        gsap.to(dividerRef.current, {
+          y: move(-20),
+          ease: "none",
+          scrollTrigger: PARALLAX_ST,
+        });
+
+        // ===== BODY =====
         bodyRef.current.querySelectorAll("[data-animate]").forEach((p) => {
           const split = SplitText.create(p, {
             type: "lines",
@@ -139,10 +145,10 @@ function Description() {
           splitsRef.current.push(split);
 
           gsap.from(split.lines, {
-            yPercent: 26,
+            yPercent: 24,
             opacity: 0,
-            duration: 1,
-            stagger: 0.05,
+            duration: 0.9,
+            stagger: 0.04,
             ease: "power1.out",
             scrollTrigger: {
               trigger: p,
@@ -152,20 +158,20 @@ function Description() {
           });
 
           gsap.to(p, {
-            y: move(-40),
+            y: move(-30),
             ease: "none",
             scrollTrigger: PARALLAX_ST,
           });
         });
 
-        // STATS
+        // ===== STATS =====
         const stats = statsRef.current.querySelectorAll("[data-stat]");
 
         gsap.from(stats, {
           opacity: 0,
-          y: 8,
+          y: 12,
           duration: 0.5,
-          stagger: 0.12,
+          stagger: 0.1,
           ease: "power2.out",
           scrollTrigger: {
             trigger: statsRef.current,
@@ -175,18 +181,30 @@ function Description() {
         });
 
         gsap.to(stats, {
-          y: move(-22),
+          y: move(-18),
           ease: "none",
           scrollTrigger: PARALLAX_ST,
+        });
+
+        /* ================= 🔥 COLLAPSE END ================= */
+        gsap.to(sectionRef.current, {
+          scale: 0.96,
+          opacity: 0.5,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "bottom 40%",
+            end: "bottom top",
+            scrub: true,
+          },
         });
       }, sectionRef);
 
       safeRefresh();
     };
 
-    // 🔥 INIT LOGIC
     if (isMobile()) {
-      build(); // langsung skip (no GSAP)
+      build();
     } else {
       document.fonts.ready.then(build);
     }
@@ -213,17 +231,17 @@ function Description() {
     <section
       ref={sectionRef}
       data-theme="light"
-      className="w-full bg-[#F3F4F5] text-neutral-900 py-12 lg:py-14 overflow-hidden"
+      className="w-full bg-[#F3F4F5] text-neutral-900 py-16 lg:py-20 overflow-hidden"
     >
-      <div className="max-w-screen mx-auto px-5 sm:px-6 lg:px-20">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-12 xl:px-16">
 
-        <div className="mb-10 lg:mb-14">
+        {/* TITLE */}
+        <div>
           <h1
             ref={titleRef}
-            className="font-[Code_Pro] font-bold tracking-tight leading-[1.05] sm:leading-[1.08]"
+            className="font-[Code_Pro] font-bold tracking-tight leading-[1.05] max-w-[22ch] sm:max-w-none"
             style={{
-              fontSize: "clamp(32px, 4.9vw, 134px)",
-              maxWidth: "100%",
+              fontSize: "clamp(32px, 4.6vw, 120px)",
             }}
           >
             We're a digital agency that helps brands stay{" "}
@@ -234,39 +252,43 @@ function Description() {
 
           <div
             ref={dividerRef}
-            className="mt-6 lg:mt-10 h-[1.5px] w-full bg-neutral-300"
+            className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-300"
           />
         </div>
 
-        <div className="grid gap-y-12 lg:flex lg:gap-x-20
-          [grid-template-areas:'body''stats']
-          lg:[grid-template-areas:none]">
+        {/* CONTENT */}
+        <div className="mt-12 lg:mt-16 grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-16">
 
+          {/* STATS */}
           <div
             ref={statsRef}
-            className="[grid-area:stats] w-full lg:flex-[0_0_42%] font-[Code_Pro]"
+            className="lg:col-span-6 font-[Code_Pro]"
           >
-            <div className="flex flex-wrap gap-x-8 gap-y-6 text-neutral-600">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-2">
 
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">100+</div>
-                <div className="text-xs uppercase tracking-widest">
+                <div className="text-[30px] lg:text-[42px] font-semibold leading-none">
+                  100+
+                </div>
+                <div className="mt-2 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
                   Projects delivered
                 </div>
               </div>
 
               <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">3</div>
-                <div className="text-xs uppercase tracking-widest">
+                <div className="text-[30px] lg:text-[42px] font-semibold leading-none">
+                  3
+                </div>
+                <div className="mt-2 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
                   Countries served
                 </div>
               </div>
 
-              <div data-stat>
-                <div className="text-[22px] font-medium text-neutral-900">
+              <div data-stat className="col-span-2 sm:col-span-3 lg:col-span-2">
+                <div className="text-[30px] lg:text-[42px] font-semibold leading-none">
                   2.5m+
                 </div>
-                <div className="text-xs uppercase tracking-widest">
+                <div className="mt-2 text-[11px] uppercase tracking-[0.18em] text-neutral-500">
                   Total audience reach
                 </div>
               </div>
@@ -274,18 +296,25 @@ function Description() {
             </div>
           </div>
 
-          <div
-            ref={bodyRef}
-            className="[grid-area:body] w-full lg:flex-[0_0_28rem] lg:ml-auto text-neutral-800 text-[17px] leading-[1.5] sm:leading-[1.6]"
-          >
-            <p data-animate>
-              Boson is an agency based in Bali, working with brands across
-              Qatar, Malaysia, and beyond. We build digital experiences that stay
-              sharp and consistent across every touchpoint — combining design,
-              development, and brand operations into one cohesive system.
-              This means fewer revisions, clearer decisions, and content that keeps
-              working even as your brand scales.
-            </p>
+          {/* BODY */}
+          <div className="lg:col-span-5 lg:col-start-8">
+            <div
+              ref={bodyRef}
+              className="text-neutral-800 text-[16px] sm:text-[17px] leading-[1.7] max-w-[36ch] sm:max-w-[520px]"
+            >
+              <p data-animate>
+                Boson is an agency based in Bali, working with brands across
+                Qatar, Malaysia, and beyond. We build digital experiences that stay
+                sharp and consistent across every touchpoint — combining design,
+                development, and brand operations into one cohesive system.
+              </p>
+
+              <p data-animate className="mt-6">
+                This means fewer revisions, clearer decisions, and content that keeps
+                working even as your brand scales. Every layer is designed to reduce
+                friction and maintain clarity as complexity grows.
+              </p>
+            </div>
           </div>
 
         </div>
