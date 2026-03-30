@@ -15,9 +15,6 @@ function ProjectShowcase() {
 
   const [isHoveringTarget, setIsHoveringTarget] = useState(false);
 
-  /* =========================
-     VIDEO OPTIMIZER (INJECTED)
-  ========================= */
   const VIDEO_CONFIG = {
     quality: "auto",
     format: "auto",
@@ -129,7 +126,34 @@ function ProjectShowcase() {
   }, []);
 
   /* =========================
-     CUSTOM CURSOR (ADDED)
+     PATCH 1: VIEWPORT VIDEO CONTROL
+  ========================= */
+  useEffect(() => {
+    const videos = document.querySelectorAll("video");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    videos.forEach((v) => observer.observe(v));
+
+    return () => {
+      videos.forEach((v) => observer.unobserve(v));
+    };
+  }, []);
+
+  /* =========================
+     CUSTOM CURSOR (UNCHANGED)
   ========================= */
   useEffect(() => {
     if (!isDesktop || !cursorRef.current) return;
@@ -261,7 +285,6 @@ function ProjectShowcase() {
   return (
     <section ref={sectionRef} className="relative w-full bg-black text-white overflow-hidden lg:h-screen">
 
-      {/* ================= CURSOR UI (ADDED) ================= */}
       {isDesktop && (
         <div
           ref={cursorRef}
@@ -287,7 +310,7 @@ function ProjectShowcase() {
           {randomizedProjects.map((p, i) => (
             <div key={i} className="relative w-full lg:w-screen min-h-screen flex-shrink-0">
 
-              {/* ================= MOBILE ================= */}
+              {/* MOBILE */}
               <div className="block lg:hidden px-5 pt-16 pb-12">
                 <div className="w-full max-w-[420px] mx-auto flex flex-col items-start gap-6">
 
@@ -299,11 +322,15 @@ function ProjectShowcase() {
                     {p.title}
                   </h2>
 
-                  <div className="cursor-target parallax-image relative w-full aspect-[3/4]">
+                  <div
+                    className="cursor-target parallax-image relative w-full aspect-[3/4]"
+                    style={{ willChange: "transform", transform: "translateZ(0)" }}
+                  >
                     {isVideo(p.image) ? (
                       <video
                         src={buildVideoUrl(p.image, { isDesktop })}
                         className="absolute inset-0 w-full h-full object-cover"
+                        style={{ willChange: "transform", transform: "translateZ(0)" }}
                         muted
                         loop
                         playsInline
@@ -328,7 +355,7 @@ function ProjectShowcase() {
                 </div>
               </div>
 
-              {/* ================= DESKTOP ================= */}
+              {/* DESKTOP */}
               <div className="hidden lg:grid relative mx-auto h-full px-[clamp(3rem,6vw,10rem)] pt-24 pb-32 grid-cols-12 gap-0">
 
                 <span className="col-span-12 font-[Code_Pro] text-xs tracking-widest text-white/50">
@@ -340,11 +367,15 @@ function ProjectShowcase() {
                 </h1>
 
                 <div className="col-span-4 col-start-5 z-10 flex justify-center">
-                  <div className="cursor-target parallax-image relative w-[clamp(420px,30vw,680px)] aspect-[3/4]">
+                  <div
+                    className="cursor-target parallax-image relative w-[clamp(420px,30vw,680px)] aspect-[3/4]"
+                    style={{ willChange: "transform", transform: "translateZ(0)" }}
+                  >
                     {isVideo(p.image) ? (
                       <video
                         src={buildVideoUrl(p.image, { isDesktop })}
                         className="absolute inset-0 w-full h-full object-cover"
+                        style={{ willChange: "transform", transform: "translateZ(0)" }}
                         muted
                         loop
                         playsInline

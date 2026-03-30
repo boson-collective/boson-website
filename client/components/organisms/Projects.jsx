@@ -85,6 +85,15 @@ export default function Projects() {
     offset: ["start start", "end end"],
   });
 
+  // 🔥 FIX: reactive progress (INI YANG BIKIN SEMUA NORMAL)
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    return scrollYProgress.on("change", (v) => {
+      setProgress(v);
+    });
+  }, [scrollYProgress]);
+
   /* ==================================================
      GLOBAL ROTATION
   ================================================== */
@@ -120,9 +129,8 @@ export default function Projects() {
   const windowLen = 0.16;
   const availableSpace = 1 - baseStart - windowLen;
 
-  const step = images.length > 0
-    ? availableSpace / images.length
-    : 0;
+  const step =
+    images.length > 0 ? availableSpace / images.length : 0;
 
   /* ==================================================
      IMAGE BURST
@@ -315,14 +323,24 @@ export default function Projects() {
           becomes clarity.
         </motion.div>
 
-        {images.map((src, i) => (
-          <ImageBurst
-            key={i}
-            src={src}
-            motionProps={motionPropsList[i]}
-            isMobile={isMobile}
-          />
-        ))}
+        {images.map((src, i) => {
+          const currentIndex = Math.floor(
+            (progress - baseStart) / step
+          );
+
+          const visibleRange = 2;
+
+          if (Math.abs(i - currentIndex) > visibleRange) return null;
+
+          return (
+            <ImageBurst
+              key={i}
+              src={src}
+              motionProps={motionPropsList[i]}
+              isMobile={isMobile}
+            />
+          );
+        })}
       </div>
     </motion.div>
   );
