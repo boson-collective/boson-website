@@ -74,50 +74,52 @@ function ServicesHero() {
       ctxRef.current = gsap.context(() => {
 
         /* =========================
-           BACKGROUND TRANSITION
+           DESKTOP ONLY SYSTEM
         ========================== */
-        gsap.from(sectionRef.current, {
-          backgroundColor: "#111",
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 100%",
-            end: "top 60%",
-            scrub: true,
-          },
-        });
+        if (!isMobile) {
+
+          // BG TRANSITION
+          gsap.from(sectionRef.current, {
+            backgroundColor: "#111",
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 100%",
+              end: "top 60%",
+              scrub: true,
+            },
+          });
+
+          // CONTENT CONTINUITY
+          gsap.from(contentRef.current, {
+            scale: 0.96,
+            opacity: 0.9,
+            filter: "blur(2px)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 90%",
+              end: "top 60%",
+              scrub: true,
+            },
+          });
+        }
 
         /* =========================
-           🔥 CONTENT CONTINUITY (KEY FIX)
-        ========================== */
-        gsap.from(contentRef.current, {
-          scale: 0.96,
-          opacity: 0.9,
-          filter: "blur(2px)", // 🔥 reduced blur
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 90%",
-            end: "top 60%",
-            scrub: true,
-          },
-        });
-
-        /* =========================
-           LABEL + DESC (EARLY)
+           LABEL + DESC
         ========================== */
         [labelRef.current, descRef.current].forEach((el) => {
           if (!el) return;
 
-          if (window.innerWidth <= 768) {
+          if (isMobile) {
             gsap.from(el, {
-              y: 30,
+              y: 20,
               opacity: 0,
-              duration: 0.9,
+              duration: 0.7,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: sectionRef.current,
-                start: "top 75%",
+                start: "top 85%",
                 once: true,
               },
             });
@@ -147,29 +149,43 @@ function ServicesHero() {
         });
 
         /* =========================
-           🔥 TITLE (DELAYED MOMENT)
+           TITLE
         ========================== */
         if (titleRef.current) {
-          const split = SplitText.create(titleRef.current, {
-            type: "lines",
-            linesClass: "line",
-            mask: "lines",
-          });
+          if (isMobile) {
+            gsap.from(titleRef.current, {
+              y: 20,
+              opacity: 0,
+              duration: 0.8,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 85%",
+                once: true,
+              },
+            });
+          } else {
+            const split = SplitText.create(titleRef.current, {
+              type: "lines",
+              linesClass: "line",
+              mask: "lines",
+            });
 
-          splitsRef.current.push(split);
+            splitsRef.current.push(split);
 
-          gsap.from(split.lines, {
-            yPercent: 35,
-            opacity: 0,
-            duration: 1,
-            stagger: 0.08,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 65%",
-              once: true,
-            },
-          });
+            gsap.from(split.lines, {
+              yPercent: 35,
+              opacity: 0,
+              duration: 1,
+              stagger: 0.08,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 65%",
+                once: true,
+              },
+            });
+          }
         }
 
         /* =========================
@@ -178,15 +194,15 @@ function ServicesHero() {
         const titles = sectionRef.current.querySelectorAll("[data-animate]");
 
         titles.forEach((el) => {
-          if (window.innerWidth <= 768) {
+          if (isMobile) {
             gsap.from(el, {
-              y: 24,
+              y: 16,
               opacity: 0,
-              duration: 0.9,
+              duration: 0.7,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
-                start: "top 85%",
+                start: "top 90%",
                 once: true,
               },
             });
@@ -226,7 +242,7 @@ function ServicesHero() {
             { scaleX: 0, transformOrigin: "left center" },
             {
               scaleX: 1,
-              duration: 0.7,
+              duration: 0.6,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
@@ -259,7 +275,7 @@ function ServicesHero() {
       splitsRef.current.forEach((s) => s.revert());
       if (ctxRef.current) ctxRef.current.revert();
     };
-  }, []);
+  }, [isMobile]);
 
   const services = [
     {
@@ -291,13 +307,12 @@ function ServicesHero() {
     >
       <div ref={contentRef}>
 
-        {/* 🔥 PAUSE ZONE (REDUCED) */}
-        <div ref={pauseRef} style={{ height: "8vh" }} />
+        <div ref={pauseRef} style={{ height: "6vh" }} />
 
         <div className="w-full px-6 sm:px-10 lg:px-20 pb-24">
 
           {/* TOP */}
-          <div className="grid grid-cols-12 items-start mb-20 lg:mb-32 gap-y-6">
+          <div className="grid grid-cols-12 items-start mb-16 lg:mb-32 gap-y-6">
 
             <div
               ref={labelRef}
