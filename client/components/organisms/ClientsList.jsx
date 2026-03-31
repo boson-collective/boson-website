@@ -29,7 +29,6 @@ function MarqueeRow({ reverse = false }) {
   const isMobile =
     typeof window !== "undefined" && window.innerWidth <= 768;
 
-  /* ===== MEASURE ===== */
   useLayoutEffect(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -58,13 +57,11 @@ function MarqueeRow({ reverse = false }) {
     };
   }, []);
 
-  /* ===== ANIMATION (SLOWED DOWN) ===== */
   useAnimationFrame((_, delta) => {
     const segmentWidth = segmentWidthRef.current;
     if (!segmentWidth) return;
 
-    // 🔥 SLOWER SPEED
-    const speed = isMobile ? 12 : 28;
+    const speed = isMobile ? 10 : 28;
 
     let next = reverse
       ? x.get() + (speed * delta) / 1000
@@ -79,7 +76,6 @@ function MarqueeRow({ reverse = false }) {
     x.set(next);
   });
 
-  /* ===== DATA ===== */
   const segment = useMemo(() => {
     const shuffled = [...logos].sort(() => 0.5 - Math.random());
     return [...shuffled, ...shuffled];
@@ -87,21 +83,15 @@ function MarqueeRow({ reverse = false }) {
 
   return (
     <div style={{ overflow: "hidden", width: "100%" }}>
-      <motion.div
-        ref={trackRef}
-        style={{
-          display: "flex",
-          x,
-        }}
-      >
+      <motion.div ref={trackRef} style={{ display: "flex", x }}>
         {[0, 1].map((seg) => (
           <div
             key={seg}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "clamp(60px, 8vw, 140px)",
-              paddingRight: "clamp(60px, 8vw, 140px)",
+              gap: isMobile ? "48px" : "clamp(80px, 10vw, 180px)",
+              paddingRight: isMobile ? "48px" : "clamp(80px, 10vw, 180px)",
             }}
           >
             {segment.map((src, i) => (
@@ -110,11 +100,10 @@ function MarqueeRow({ reverse = false }) {
                 src={src}
                 draggable={false}
                 style={{
-                  // 🔥 BIGGER LOGOS
-                  height: isMobile ? "36px" : "72px",
-                  width: "clamp(120px, 10vw, 180px)",
+                  height: isMobile ? "40px" : "96px",
+                  width: isMobile ? "auto" : "clamp(140px, 12vw, 220px)",
                   objectFit: "contain",
-                  opacity: 0.95,
+                  opacity: 0.9,
                   flexShrink: 0,
                 }}
               />
@@ -130,19 +119,31 @@ function MarqueeRow({ reverse = false }) {
    MAIN SECTION
 ========================= */
 export default function LogoMarqueeSection() {
+  const isMobile =
+    typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
     <section
       data-theme="dark"
-      className="w-full bg-black overflow-hidden"
-      style={{
-        padding: "8vh 0",
-      }}
+      className="w-full bg-black text-white overflow-hidden"
+      style={{ padding: isMobile ? "12vh 0" : "18vh 0" }}
     >
-      <div style={{ marginBottom: "4vh" }}>
-        <MarqueeRow reverse={false} />
+      {/* HEADER */}
+      <div className="flex justify-center mb-[8vh]">
+        <div className="font-[Code_Pro] text-[11px] tracking-[0.25em] uppercase text-white/50">
+          Brands We Work With
+        </div>
       </div>
 
-      <MarqueeRow reverse={true} />
+      {/* MARQUEE */}
+      <div>
+        <div style={{ marginBottom: isMobile ? "0" : "4vh" }}>
+          <MarqueeRow reverse={false} />
+        </div>
+
+        {/* ❌ HIDE SECOND ROW ON MOBILE */}
+        {!isMobile && <MarqueeRow reverse={true} />}
+      </div>
     </section>
   );
 }

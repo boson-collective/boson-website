@@ -215,7 +215,7 @@ function Description() {
       data-theme="light"
       className="w-full bg-[#F3F4F5] text-neutral-900 py-16 lg:py-20 overflow-hidden"
     >
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-12 xl:px-16">
+      <div className="max-w-[1400px] mx-auto px-5 ">
 
         {/* ================= HEADER LAYER ================= */}
         <div ref={headerRef}>

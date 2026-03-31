@@ -342,7 +342,6 @@ export default function WorksList() {
           },
         });
 
-        /* 🔥 ADDITIVE SAJA (TIDAK MENGUBAH APAPUN) */
         const rows = sectionRef.current.querySelectorAll(".works-row");
 
         gsap.from(rows, {
@@ -489,14 +488,15 @@ export default function WorksList() {
             padding: 4vh 6vw !important;
           }
 
+          /* 🔥 FIX: CENTER DI MOBILE */
           .works-title-wrapper {
             grid-column: auto !important;
-            justify-content: flex-start !important;
+            justify-content: center !important;
           }
 
           .works-title {
             font-size: 34px !important;
-            text-align: left !important;
+            text-align: center !important;
           }
 
           .hover-overlay {

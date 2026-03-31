@@ -21,6 +21,7 @@ import ServicesHero from "../components/organisms/ServicesHero";
 import BigHeading from "../components/organisms/BigHeading";
 import ProjectShowcase from "../components/organisms/ProjectShowcase";
 import WorksList from "../components/organisms/WorksList";
+import ClientsList from "../components/organisms/ClientsList";
 import Galery from "../components/organisms/Galery";
 
 export default function Page() {
@@ -190,6 +191,11 @@ export default function Page() {
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <WorksList />
+      </div>
+      
+      
+      <div style={{ position: "relative", zIndex: 2 }}>
+        <ClientsList/>
       </div>
 
       {/* ==================================================
