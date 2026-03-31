@@ -58,6 +58,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+      <meta name="google-site-verification" content="ocyXXal_HjmH7ekpfIDSFrb8baoJeG0-2TcCAL_RA_4" />
         {/* FONT */}
         <link
           href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap"
