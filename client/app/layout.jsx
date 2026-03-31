@@ -11,7 +11,7 @@ export const metadata = {
   metadataBase: new URL("https://boson.agency"), // ← GANTI DOMAIN LO
 
   title: {
-    default: "Boson Collective — Social Media Agency Bali",
+    default: "BOSON COLLECTIVE | Social Media Agency Bali",
     template: "%s | Boson Collective",
   },
 
@@ -19,7 +19,7 @@ export const metadata = {
     "Boson is a Bali-based social media agency helping brands grow through content, strategy, and consistent digital systems.",
 
   openGraph: {
-    title: "Boson Collective — Social Media Agency Bali",
+    title: "BOSON COLLECTIVE | Social Media Agency Bali",
     description:
       "Social media agency in Bali working with global brands.",
     url: "https://boson.agency",
@@ -37,7 +37,7 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Boson Collective — Social Media Agency Bali",
+    title: "BOSON COLLECTIVE | Social Media Agency Bali",
     description:
       "Social media agency in Bali working with global brands.",
     images: ["/og/main.jpg"],
