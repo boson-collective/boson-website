@@ -1,8 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
-
-
+import { useInView } from "react-intersection-observer";
 
 import { LoaderContext } from "../components/atoms/LoaderGate";
 
@@ -23,6 +22,18 @@ import ProjectShowcase from "../components/organisms/ProjectShowcase";
 import WorksList from "../components/organisms/WorksList";
 import ClientsList from "../components/organisms/ClientsList";
 import Galery from "../components/organisms/Galery";
+
+/* ==================================================
+   🔥 LAZY SECTION WRAPPER (ADDITIVE)
+================================================== */
+function LazySection({ children }) {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    rootMargin: "200px",
+  });
+
+  return <div ref={ref}>{inView ? children : null}</div>;
+}
 
 export default function Page() {
   const ready = useContext(LoaderContext);
@@ -61,7 +72,7 @@ export default function Page() {
   ================================================== */
   useLayoutEffect(() => {
     if (!ready) return;
-    if (isMobile) return; // 🚫 kill di mobile
+    if (isMobile) return;
 
     const footer = footerRef.current;
     if (!footer) return;
@@ -94,7 +105,7 @@ export default function Page() {
   useEffect(() => {
     if (!ready) return;
     if (!footerHeight) return;
-    if (isMobile) return; // 🚫 kill di mobile
+    if (isMobile) return;
 
     const footer = footerRef.current;
     if (!footer) return;
@@ -103,19 +114,29 @@ export default function Page() {
 
     footer.style.transform = `translateY(${OFFSET}px)`;
 
+    let ticking = false;
+
     const onScroll = () => {
-      const scrollY = window.scrollY;
-      const viewportH = window.innerHeight;
-      const docH = document.documentElement.scrollHeight;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const viewportH = window.innerHeight;
+          const docH = document.documentElement.scrollHeight;
 
-      const start = docH - viewportH - footerHeight;
-      const end = docH - viewportH;
+          const start = docH - viewportH - footerHeight;
+          const end = docH - viewportH;
 
-      let progress = (scrollY - start) / (end - start);
-      progress = Math.min(Math.max(progress, 0), 1);
+          let progress = (scrollY - start) / (end - start);
+          progress = Math.min(Math.max(progress, 0), 1);
 
-      const y = OFFSET * (1 - progress);
-      footer.style.transform = `translateY(${y}px)`;
+          const y = OFFSET * (1 - progress);
+          footer.style.transform = `translateY(${y}px)`;
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -158,51 +179,69 @@ export default function Page() {
         data-theme="dark"
         style={{ position: "relative", zIndex: 2, width: "100%" }}
       >
-        <BosonNarrative />
+        <LazySection>
+          <BosonNarrative />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Projects />
+        <LazySection>
+          <Projects />
+        </LazySection>
       </div>
- 
 
       {/* ==================================================
          DESCRIPTION
       ================================================== */}
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Description />
+        <LazySection>
+          <Description />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <VideoSection />
+        <LazySection>
+          <VideoSection />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <ServicesHero />
+        <LazySection>
+          <ServicesHero />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <BigHeading />
+        <LazySection>
+          <BigHeading />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <ProjectShowcase />
+        <LazySection>
+          <ProjectShowcase />
+        </LazySection>
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <WorksList />
+        <LazySection>
+          <WorksList />
+        </LazySection>
       </div>
-      
-      
+
       <div style={{ position: "relative", zIndex: 2 }}>
-        <ClientsList/>
+        <LazySection>
+          <ClientsList />
+        </LazySection>
       </div>
 
       {/* ==================================================
          GALERY
       ================================================== */}
       <div className="bg-neutral-950" style={{ position: "relative", zIndex: 2 }}>
-        <Galery />
+        <LazySection>
+          <Galery />
+        </LazySection>
       </div>
 
       {/* ==================================================
@@ -212,8 +251,6 @@ export default function Page() {
 
       {/* ==================================================
          FOOTER
-         - MOBILE: normal flow
-         - DESKTOP: fixed + reveal
       ================================================== */}
       {isMobile ? (
         <div style={{ position: "relative", zIndex: 2 }}>
