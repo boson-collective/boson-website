@@ -3,10 +3,14 @@ import { SplitText, ScrollTrigger, gsap } from "../../lib/gsap";
 
 function Description() {
   const sectionRef = useRef(null);
+
+  const headerRef = useRef(null);
   const titleRef = useRef(null);
-  const bodyRef = useRef(null);
   const dividerRef = useRef(null);
+
+  const contentRef = useRef(null);
   const statsRef = useRef(null);
+  const bodyRef = useRef(null);
 
   const splitsRef = useRef([]);
   const ctxRef = useRef(null);
@@ -34,14 +38,6 @@ function Description() {
       return window.innerWidth < 768 ? "top 92%" : "top 85%";
     };
 
-    const safeRefresh = () => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          ScrollTrigger.refresh();
-        });
-      });
-    };
-
     const clean = () => {
       splitsRef.current.forEach((s) => s.revert());
       splitsRef.current = [];
@@ -50,14 +46,7 @@ function Description() {
     };
 
     const build = () => {
-      if (
-        !sectionRef.current ||
-        !titleRef.current ||
-        !bodyRef.current ||
-        !dividerRef.current ||
-        !statsRef.current
-      )
-        return;
+      if (!sectionRef.current) return;
 
       if (isMobile()) {
         clean();
@@ -127,7 +116,6 @@ function Description() {
           }
         );
 
-        // 🔥 FIX: DIVIDER IKUT PARALLAX
         gsap.to(dividerRef.current, {
           y: move(-20),
           ease: "none",
@@ -186,7 +174,7 @@ function Description() {
           scrollTrigger: PARALLAX_ST,
         });
 
-        /* ================= 🔥 COLLAPSE END ================= */
+        // ===== COLLAPSE =====
         gsap.to(sectionRef.current, {
           scale: 0.96,
           opacity: 0.5,
@@ -199,15 +187,9 @@ function Description() {
           },
         });
       }, sectionRef);
-
-      safeRefresh();
     };
 
-    if (isMobile()) {
-      build();
-    } else {
-      document.fonts.ready.then(build);
-    }
+    document.fonts.ready.then(build);
 
     const onResize = () => {
       const w = window.innerWidth;
@@ -235,8 +217,14 @@ function Description() {
     >
       <div className="max-w-[1400px] mx-auto px-5 sm:px-6 lg:px-12 xl:px-16">
 
-        {/* TITLE */}
-        <div>
+        {/* ================= HEADER LAYER ================= */}
+        <div ref={headerRef}>
+          {/* OPTIONAL LABEL */}
+          <div className="mb-4 text-[11px] uppercase tracking-[0.18em] text-neutral-500 font-[Code_Pro]">
+            About
+          </div>
+
+          {/* TITLE */}
           <h1
             ref={titleRef}
             className="font-[Code_Pro] font-bold tracking-tight leading-[1.05] max-w-[22ch] sm:max-w-none"
@@ -249,23 +237,25 @@ function Description() {
             everything on track so you can stay{" "}
             <span className="font-light">focused</span> on what matters
           </h1>
-
-          <div
-            ref={dividerRef}
-            className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-300"
-          />
         </div>
 
-        {/* CONTENT */}
-        <div className="mt-12 lg:mt-16 grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-16">
+        {/* ================= BOUNDARY (HEADER → CONTENT) ================= */}
+        <div
+          ref={dividerRef}
+          className="mt-8 lg:mt-10 h-[1.5px] w-full bg-neutral-300"
+        />
 
-          {/* STATS */}
+        {/* ================= CONTENT LAYER ================= */}
+        <div
+          ref={contentRef}
+          className="mt-12 lg:mt-16 grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-16"
+        >
+          {/* STATS (unchanged) */}
           <div
             ref={statsRef}
             className="lg:col-span-6 font-[Code_Pro]"
           >
             <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-2">
-
               <div data-stat>
                 <div className="text-[30px] lg:text-[42px] font-semibold leading-none">
                   100+
@@ -292,11 +282,10 @@ function Description() {
                   Total audience reach
                 </div>
               </div>
-
             </div>
           </div>
 
-          {/* BODY */}
+          {/* BODY (unchanged positioning) */}
           <div className="lg:col-span-5 lg:col-start-8">
             <div
               ref={bodyRef}
@@ -316,8 +305,11 @@ function Description() {
               </p>
             </div>
           </div>
-
         </div>
+
+        {/* ================= END BOUNDARY (SYSTEM RHYTHM) ================= */}
+        <div className="mt-16 lg:mt-20 border-t border-neutral-200" />
+
       </div>
     </section>
   );

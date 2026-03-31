@@ -161,6 +161,18 @@ function Galery() {
     const ctx = gsap.context(() => {
       gsap.set(laneRefs.current, { force3D: true });
 
+      /* 🔥 NEW: ENTRY MOMENTUM (ADDITIVE ONLY) */
+      gsap.from(gridRef.current, {
+        opacity: 0,
+        y: 80,
+        duration: 1.2,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 85%",
+        },
+      });
+
       gsap.set(sectionRef.current, {
         backgroundColor: "#000",
         color: "#fff",
@@ -289,7 +301,6 @@ function Galery() {
   ========================= */
   return (
     <section ref={sectionRef} className="relative min-h-[480vh] overflow-hidden">
-      {/* GRID */}
       <div
         ref={gridRef}
         className="absolute inset-0 z-10 pointer-events-none grid"
@@ -300,7 +311,6 @@ function Galery() {
         ))}
       </div>
 
-      {/* PINNED TEXT */}
       <div
         ref={textPinRef}
         className="absolute top-0 left-0 w-screen h-screen flex items-center justify-center z-30 pointer-events-none"
@@ -324,7 +334,6 @@ function Galery() {
         </div>
       </div>
 
-      {/* IMAGES */}
       <div
         className="absolute inset-0 z-20 grid"
         style={{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }}
@@ -357,7 +366,6 @@ function Galery() {
         ))}
       </div>
 
-      {/* FADES */}
       <div
         ref={fadeTopRef}
         className="pointer-events-none absolute top-0 left-0 w-full h-[240px] z-40

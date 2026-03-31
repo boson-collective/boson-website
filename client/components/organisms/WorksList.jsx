@@ -342,6 +342,22 @@ export default function WorksList() {
           },
         });
 
+        /* 🔥 ADDITIVE SAJA (TIDAK MENGUBAH APAPUN) */
+        const rows = sectionRef.current.querySelectorAll(".works-row");
+
+        gsap.from(rows, {
+          y: 40,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.06,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            once: true,
+          },
+        });
+
       }, sectionRef);
     };
 
@@ -436,7 +452,7 @@ export default function WorksList() {
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
           />
 
-          <MarqueeOverlay item={item} active={hoveredIndex === i} buildImageUrl={buildImageUrl} isMobile={isMobile} />
+          <MarqueeOverlay item={item} active={hoveredIndex === i} />
 
           <div className="works-title-wrapper">
             <div className="works-title font-light">
@@ -491,5 +507,3 @@ export default function WorksList() {
     </section>
   );
 }
-
-
