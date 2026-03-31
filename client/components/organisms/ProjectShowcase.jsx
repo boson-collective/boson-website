@@ -125,9 +125,6 @@ function ProjectShowcase() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  /* =========================
-     PATCH 1: VIEWPORT VIDEO CONTROL
-  ========================= */
   useEffect(() => {
     const videos = document.querySelectorAll("video");
 
@@ -152,9 +149,6 @@ function ProjectShowcase() {
     };
   }, []);
 
-  /* =========================
-     CUSTOM CURSOR (UNCHANGED)
-  ========================= */
   useEffect(() => {
     if (!isDesktop || !cursorRef.current) return;
 
@@ -233,8 +227,9 @@ function ProjectShowcase() {
       const track = trackRef.current;
       const progressBar = progressRef.current;
 
+      /* 🔥 FIX 1: ROUND DISTANCE */
       const getScrollDistance = () =>
-        (slidesCount - 1) * window.innerWidth;
+        Math.round((slidesCount - 1) * window.innerWidth);
 
       const mainTween = gsap.to(track, {
         x: () => -getScrollDistance(),
@@ -243,35 +238,45 @@ function ProjectShowcase() {
           trigger: sectionRef.current,
           start: "top top",
           end: () => `+=${getScrollDistance()}`,
-          scrub: true,
+          scrub: 1, // 🔥 FIX 2
           pin: true,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          fastScrollEnd: true, // 🔥 FIX 3
           onUpdate(self) {
             gsap.set(progressBar, {
               scaleX: self.progress,
               transformOrigin: "left center",
             });
-            setActiveIndex(
-              Math.round(self.progress * (slidesCount - 1))
+
+            /* 🔥 FIX 4: STABLE INDEX */
+            const index = Math.min(
+              slidesCount - 1,
+              Math.floor(self.progress * slidesCount)
             );
+
+            setActiveIndex(index);
           },
         },
       });
 
       const parallax = (selector, fromX, toX) => {
         gsap.utils.toArray(selector).forEach((el) => {
-          gsap.fromTo(el, { x: fromX }, {
-            x: toX,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              containerAnimation: mainTween,
-              start: "left right",
-              end: "right left",
-              scrub: 0.6,
-            },
-          });
+          gsap.fromTo(
+            el,
+            { x: fromX },
+            {
+              x: toX,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el,
+                containerAnimation: mainTween,
+                start: "left right",
+                end: "right left",
+                scrub: 0.6,
+              },
+            }
+          );
         });
       };
 
