@@ -2,9 +2,9 @@ import { useLayoutEffect, useRef, useMemo } from "react";
 import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
 
 /* =========================
-   LOGOS
+   SOURCE LOGOS
 ========================= */
-const logos = [
+const allLogos = [
   "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068279/the-linea-logo.png",
   "/clients/hey-yolo/logo.png",
   "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068787/hidden-city-ubud-logo.png",
@@ -19,12 +19,24 @@ const logos = [
 ];
 
 /* =========================
-   MARQUEE ROW
+   SPLIT UNIQUE
 ========================= */
-function MarqueeRow({ reverse = false }) {
+function splitUnique(arr, parts = 3) {
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  const chunkSize = Math.ceil(arr.length / parts);
+
+  return Array.from({ length: parts }, (_, i) =>
+    shuffled.slice(i * chunkSize, (i + 1) * chunkSize)
+  );
+}
+
+/* =========================
+   MARQUEE (FIXED ENGINE)
+========================= */
+function Marquee({ logos, direction = "left", speed = 40 }) {
   const trackRef = useRef(null);
   const x = useMotionValue(0);
-  const segmentWidthRef = useRef(0);
+  const widthRef = useRef(0);
 
   const isMobile =
     typeof window !== "undefined" && window.innerWidth <= 768;
@@ -34,81 +46,63 @@ function MarqueeRow({ reverse = false }) {
     if (!el) return;
 
     const measure = () => {
-      const total = el.scrollWidth;
-      if (!total) return;
-      segmentWidthRef.current = total / 2;
+      widthRef.current = el.scrollWidth / 2;
     };
 
-    setTimeout(measure, 120);
-
-    const imgs = el.querySelectorAll("img");
-    imgs.forEach((img) => {
-      if (!img.complete) img.onload = measure;
-    });
+    setTimeout(measure, 100);
 
     const ro = new ResizeObserver(measure);
     ro.observe(el);
 
-    window.addEventListener("resize", measure);
-
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    return () => ro.disconnect();
   }, []);
 
   useAnimationFrame((_, delta) => {
-    const segmentWidth = segmentWidthRef.current;
-    if (!segmentWidth) return;
+    const w = widthRef.current;
+    if (!w) return;
 
-    const speed = isMobile ? 10 : 28;
+    const dir = direction === "left" ? -1 : 1;
+    const velocity = (isMobile ? speed * 0.6 : speed) * dir;
 
-    let next = reverse
-      ? x.get() + (speed * delta) / 1000
-      : x.get() - (speed * delta) / 1000;
+    let next = x.get() + (velocity * delta) / 1000;
 
-    if (reverse) {
-      if (next >= 0) next = -segmentWidth;
+    if (dir === -1) {
+      if (next <= -w) next += w;
     } else {
-      if (next <= -segmentWidth) next = 0;
+      if (next >= 0) next -= w;
     }
 
     x.set(next);
   });
 
-  const segment = useMemo(() => {
-    const shuffled = [...logos].sort(() => 0.5 - Math.random());
-    return [...shuffled, ...shuffled];
-  }, []);
+  const loop = useMemo(() => {
+    return [...logos, ...logos];
+  }, [logos]);
 
   return (
-    <div style={{ overflow: "hidden", width: "100%" }}>
-      <motion.div ref={trackRef} style={{ display: "flex", x }}>
-        {[0, 1].map((seg) => (
-          <div
-            key={seg}
+    <div className="overflow-hidden w-full">
+      <motion.div
+        ref={trackRef}
+        style={{
+          display: "flex",
+          x,
+          whiteSpace: "nowrap",
+        }}
+      >
+        {loop.map((src, i) => (
+          <img
+            key={i}
+            src={src}
+            draggable={false}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: isMobile ? "48px" : "clamp(80px, 10vw, 180px)",
-              paddingRight: isMobile ? "48px" : "clamp(80px, 10vw, 180px)",
+              height: isMobile ? "34px" : "88px",
+              width: "auto",
+              marginRight: isMobile ? "24px" : "clamp(80px, 10vw, 140px)",
+              objectFit: "contain",
+              flexShrink: 0,
+              opacity: 0.85,
             }}
-          >
-            {segment.map((src, i) => (
-              <img
-                key={`${seg}-${i}`}
-                src={src}
-                draggable={false}
-                style={{
-                  height: isMobile ? "40px" : "96px",
-                  width: isMobile ? "auto" : "clamp(140px, 12vw, 220px)",
-                  objectFit: "contain",
-                  opacity: 0.9,
-                  flexShrink: 0,
-                }}
-              />
-            ))}
-          </div>
+          />
         ))}
       </motion.div>
     </div>
@@ -118,31 +112,44 @@ function MarqueeRow({ reverse = false }) {
 /* =========================
    MAIN SECTION
 ========================= */
-export default function LogoMarqueeSection() {
+export default function LogoSection() {
   const isMobile =
     typeof window !== "undefined" && window.innerWidth <= 768;
 
+  const [row1, row2, row3] = useMemo(() => {
+    return splitUnique(allLogos, 3);
+  }, []);
+
   return (
     <section
-      data-theme="dark"
       className="w-full bg-black text-white overflow-hidden"
-      style={{ padding: isMobile ? "12vh 0" : "18vh 0" }}
+      style={{
+        paddingTop: isMobile ? "10vh" : "18vh",
+        paddingBottom: 0, // 🔥 ONLY CHANGE
+      }}
     >
       {/* HEADER */}
       <div className="flex justify-center mb-[8vh]">
-        <div className="font-[Code_Pro] text-[11px] tracking-[0.25em] uppercase text-white/50">
+        <div className="text-[11px] tracking-[0.25em] uppercase text-white/50">
           Brands We Work With
         </div>
       </div>
 
-      {/* MARQUEE */}
-      <div>
-        <div style={{ marginBottom: isMobile ? "0" : "4vh" }}>
-          <MarqueeRow reverse={false} />
-        </div>
+      {/* ROWS */}
+      <div className="space-y-[3vh]">
+        <Marquee logos={row1} direction="left" speed={40} />
+        <Marquee logos={row2} direction="right" speed={55} />
+        {!isMobile && (
+          <Marquee logos={row3} direction="left" speed={32} />
+        )}
+      </div>
 
-        {/* ❌ HIDE SECOND ROW ON MOBILE */}
-        {!isMobile && <MarqueeRow reverse={true} />}
+      {/* DESC */}
+      <div className="flex justify-center mt-[10vh] px-[6vw]">
+        <p className="text-center text-sm text-white/50 max-w-[480px] leading-relaxed">
+          A selection of brands we’ve worked with across different industries,
+          markets, and business scales.
+        </p>
       </div>
     </section>
   );
