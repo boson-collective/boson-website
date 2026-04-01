@@ -31,12 +31,12 @@ function splitUnique(arr, parts = 3) {
 }
 
 /* =========================
-   MARQUEE (FIXED ENGINE)
+   MARQUEE ENGINE
 ========================= */
 function Marquee({ logos, direction = "left", speed = 40 }) {
   const trackRef = useRef(null);
   const x = useMotionValue(0);
-  const widthRef = useRef(0);
+  const segmentWidthRef = useRef(0);
 
   const isMobile =
     typeof window !== "undefined" && window.innerWidth <= 768;
@@ -46,10 +46,12 @@ function Marquee({ logos, direction = "left", speed = 40 }) {
     if (!el) return;
 
     const measure = () => {
-      widthRef.current = el.scrollWidth / 2;
+      const first = el.children[0];
+      if (!first) return;
+      segmentWidthRef.current = first.scrollWidth;
     };
 
-    setTimeout(measure, 100);
+    measure();
 
     const ro = new ResizeObserver(measure);
     ro.observe(el);
@@ -58,7 +60,7 @@ function Marquee({ logos, direction = "left", speed = 40 }) {
   }, []);
 
   useAnimationFrame((_, delta) => {
-    const w = widthRef.current;
+    const w = segmentWidthRef.current;
     if (!w) return;
 
     const dir = direction === "left" ? -1 : 1;
@@ -66,51 +68,66 @@ function Marquee({ logos, direction = "left", speed = 40 }) {
 
     let next = x.get() + (velocity * delta) / 1000;
 
-    if (dir === -1) {
-      if (next <= -w) next += w;
-    } else {
-      if (next >= 0) next -= w;
-    }
+    if (dir === -1 && next <= -w) next += w;
+    if (dir === 1 && next >= 0) next -= w;
 
     x.set(next);
   });
 
-  const loop = useMemo(() => {
-    return [...logos, ...logos];
+  /* 🔥 EXTEND CONTENT */
+  const extended = useMemo(() => {
+    return [...logos, ...logos, ...logos];
   }, [logos]);
 
-  return (
-    <div className="overflow-hidden w-full">
-      <motion.div
-        ref={trackRef}
-        style={{
-          display: "flex",
-          x,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {loop.map((src, i) => (
+  const renderSegment = (key) => (
+    <div
+      key={key}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: isMobile ? "28px" : "clamp(100px, 8vw, 180px)", // 🔥 lebih renggang
+        paddingRight: isMobile ? "28px" : "clamp(100px, 8vw, 180px)",
+      }}
+    >
+      {extended.map((src, i) => (
+        <div
+          key={`${key}-${i}`}
+          style={{
+            width: isMobile ? "120px" : "240px",   // 🔥 BESARIN
+            height: isMobile ? "48px" : "120px",   // 🔥 BESARIN
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+          }}
+        >
           <img
-            key={i}
             src={src}
             draggable={false}
             style={{
-              height: isMobile ? "34px" : "88px",
-              width: "auto",
-              marginRight: isMobile ? "24px" : "clamp(80px, 10vw, 140px)",
+              maxWidth: "100%",
+              maxHeight: "100%",
               objectFit: "contain",
-              flexShrink: 0,
-              opacity: 0.85,
+              opacity: 0.9,
             }}
           />
-        ))}
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="overflow-hidden w-full">
+      <motion.div ref={trackRef} style={{ display: "flex", x }}>
+        {renderSegment("a")}
+        {renderSegment("b")}
       </motion.div>
     </div>
   );
 }
 
 /* =========================
-   MAIN SECTION
+   MAIN
 ========================= */
 export default function LogoSection() {
   const isMobile =
@@ -125,17 +142,15 @@ export default function LogoSection() {
       className="w-full bg-black text-white overflow-hidden"
       style={{
         paddingTop: isMobile ? "10vh" : "18vh",
-        paddingBottom: 0, // 🔥 ONLY CHANGE
+        paddingBottom: 0,
       }}
     >
-      {/* HEADER */}
       <div className="flex justify-center mb-[8vh]">
         <div className="text-[11px] tracking-[0.25em] uppercase text-white/50">
           Brands We Work With
         </div>
       </div>
 
-      {/* ROWS */}
       <div className="space-y-[3vh]">
         <Marquee logos={row1} direction="left" speed={40} />
         <Marquee logos={row2} direction="right" speed={55} />
@@ -144,9 +159,8 @@ export default function LogoSection() {
         )}
       </div>
 
-      {/* DESC */}
       <div className="flex justify-center mt-[10vh] px-[6vw]">
-        <p className="text-center text-sm text-white/50 max-w-[480px] leading-relaxed">
+        <p className="text-center text-sm text-white/50 max-w-[520px] leading-relaxed">
           A selection of brands we’ve worked with across different industries,
           markets, and business scales.
         </p>
