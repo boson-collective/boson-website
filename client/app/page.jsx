@@ -162,7 +162,7 @@ export default function Page() {
       {/* ==================================================
          HERO / TOP
       ================================================== */}
-      {/* <div
+      <div
         style={{
           position: "relative",
           zIndex: 2,
@@ -171,57 +171,57 @@ export default function Page() {
         }}
       >
         <HeroJoin />
-      </div> */}
+      </div>
 
       <Heading />
 
-      {/* <div
+      <div
         data-theme="dark"
         style={{ position: "relative", zIndex: 2, width: "100%" }}
       >
         <LazySection>
           <BosonNarrative />
         </LazySection>
-      </div> */}
+      </div>
 
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <Projects />
         </LazySection>
-      </div> */}
+      </div>
 
       {/* ==================================================
          DESCRIPTION
       ================================================== */}
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <Description />
         </LazySection>
-      </div> */}
+      </div>
 
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <VideoSection />
         </LazySection>
-      </div> */}
+      </div>
 
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <ServicesHero />
         </LazySection>
-      </div> */}
+      </div>
 
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <BigHeading />
         </LazySection>
-      </div> */}
+      </div>
 
-      {/* <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
           <ProjectShowcase />
         </LazySection>
-      </div> */}
+      </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <LazySection>
