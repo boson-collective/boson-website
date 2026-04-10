@@ -177,35 +177,7 @@ function MarqueeOverlay({ item, active }) {
     </motion.div>
   );
 }
-
-/* =========================
-   IMAGE OPTIMIZER (INJECTED)
-========================= */
-const IMAGE_CONFIG = {
-  quality: "auto",
-  format: "auto",
-  width: {
-    mobile: 480,
-    desktop: 900,
-  },
-};
-
-const buildImageUrl = (url, { isMobile }) => {
-  if (!url.includes("cloudinary")) return url;
-
-  const width = isMobile
-    ? IMAGE_CONFIG.width.mobile
-    : IMAGE_CONFIG.width.desktop;
-
-  const transform = [
-    `f_${IMAGE_CONFIG.format}`,
-    `q_${IMAGE_CONFIG.quality}`,
-    `w_${width}`,
-  ].join(",");
-
-  return url.replace("/upload/", `/upload/${transform}/`);
-};
-
+ 
 export default function WorksList() {
   const sectionRef = useRef(null);
   const headerRef = useRef(null);
@@ -223,14 +195,14 @@ export default function WorksList() {
       name: "Real Estate & Property",
       year: "2025",
       images: [
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068279/the-linea-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068306/the-linea-2.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824977/the-linea-logo_nhcydh.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824981/the-linea-2_o8soes.webp",
         "/clients/hey-yolo/logo.png",
         "/clients/hey-yolo/main.jpg",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068787/hidden-city-ubud-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915333/hidden-city-ubud-2.jpg",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069228/petra-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069229/petra-2.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809568/hidden-city-ubud-logo_dfmkch.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809562/hidden-city-ubud-2_fsutwf.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817123/petra-logo_eupldd.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817120/petra-2_urmgkk.webp",
       ],
     },
     {
@@ -238,10 +210,10 @@ export default function WorksList() {
       name: "Hospitality",
       year: "2025",
       images: [
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768899596/tender-touch-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768899597/tender-touch-9.jpg",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1769066430/hairaholic-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1769066538/hairaholic-2.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775823762/tender-touch-logo_eoyrk5.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775823775/tender-touch-9_ujx8bu.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/w_auto,f_auto,q_auto:best/v1775810969/hairaholic-logo_obvum7.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/w_auto,f_auto,q_auto:best/v1775810969/hairaholic-2_lsztjv.webp",
       ],
     },
     {
@@ -249,12 +221,12 @@ export default function WorksList() {
       name: "Food & Beverage",
       year: "2025",
       images: [
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816241/marroosh-logo_ptntzq.webp",
         "https://i.imgur.com/GnY6iYR.jpeg",
         "/clients/zai-cafe/logo.png",
         "https://i.imgur.com/F4vcyc5.jpeg",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067632/tea-time-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067634/tea-time-2.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824834/tea-time-logo_dmsl88.webp",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824832/tea-time-2_cgqk1i.webp",
       ],
     },
     {
@@ -262,8 +234,8 @@ export default function WorksList() {
       name: "Fashion & Beauty",
       year: "2025",
       images: [
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067253/newminatis-logo.png",
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067396/newminatis-2.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817628/newminatis-logo_mpctat.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817622/newminatis-2_sl0ry4.jpg",
       ],
     },
     {

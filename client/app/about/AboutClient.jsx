@@ -233,7 +233,6 @@ function ParallaxImage({
     offset: ['start end', 'end start'],
   })
 
-  // satu arah, bukan bolak-balik
   const y = useTransform(scrollYProgress, [0, 1], [-strength, strength])
 
   return (
@@ -242,13 +241,13 @@ function ParallaxImage({
         style={{ y }}
         className="absolute inset-0 will-change-transform"
       >
-        <Image
+        <img
           src={src}
           alt={alt}
-          fill
-          priority={priority}
-          sizes={sizes}
-          className="object-cover grayscale contrast-125 brightness-95"
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          className="w-full h-full object-cover grayscale contrast-125 brightness-95"
+          draggable={false}
         />
       </motion.div>
     </div>
@@ -262,9 +261,6 @@ function Team() {
   const sectionRef = useRef(null)
   const [isMobile, setIsMobile] = useState(false)
 
-  /* =========================
-     VIEWPORT CHECK (STABLE)
-  ========================= */
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)")
     const handle = (e) => setIsMobile(e.matches)
@@ -280,79 +276,79 @@ function Team() {
       name: "BRAHMA SATYA CARYA",
       roles: ["ACCOUNT MANAGER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896209/Brahma.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826598/Brahma_r3gl5n.webp",
     },
     {
       name: "PINGKAN",
       roles: ["PRODUCTION AND CREATIVE DIRECTOR"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/PIngkan.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826986/PIngkan_wnccfq.webp",
     },
     {
       name: "DEWI ICHSANI",
       roles: ["HUMAN RELATION AND GENERAL AFFAIRS"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dewi.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826582/Dewi_gmrihf.webp",
     },
     {
       name: "DIPSY",
       roles: ["VIDEOGRAPHER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896203/Dipsy.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826587/Dipsy_glienu.webp",
     },
     {
       name: "RAHMAT",
       roles: ["VIDEO EDITOR"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896206/Rahmat.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826992/Rahmat_yqet4h.webp",
     },
     {
       name: "LINTANG",
       roles: ["WEB DEVELOPER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896208/Lintang.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826974/Lintang_v35jxs.webp",
     },
     {
       name: "BAGAS",
       roles: ["VIDEOGRAPHER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896202/Arli.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826783/Bagas_ogki28.webp",
     },
     {
       name: "FLAOUDIA",
       roles: ["SOCIAL MEDIA MANAGER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896201/Flaudia.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826799/Flaudia_lvuyut.webp",
     },
     {
       name: "DIMAS",
       roles: ["GRAPHIC DESIGNER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896211/Dimas.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826789/Dimas_gq2gc2.webp",
     },
     {
       name: "BAGAS",
       roles: ["SOCIAL MEDIA MANAGER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896207/Bagas.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826783/Bagas_ogki28.webp",
     },
     {
       name: "FAUZI",
       roles: ["VIDEO EDITOR"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Fauzi.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826794/Fauzi_mautfv.webp",
     },
     {
       name: "EKATERINA BELIAEVA",
       roles: ["CHIEF EXECUTIVE OFFICER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896204/Kate.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826968/Kate_nr0k7a.webp",
     },
     {
       name: "MAHMOUD TURKOMANY",
       roles: ["FOUNDER"],
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto/v1768896205/Mahmoud.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775826980/Mahmoud_muum1p.webp",
     },
   ]
 
@@ -372,9 +368,6 @@ function Team() {
     { left: "6vw", top: "582vh", width: 28 },
   ]
 
-  /* =========================
-     MOBILE (FIXED LAYOUT)
-  ========================= */
   if (isMobile) {
     return (
       <section className="w-full bg-[#f3f4f5] text-black px-4 py-20">
@@ -387,19 +380,18 @@ function Team() {
               }`}
             >
               <div className="w-[74%]">
-
                 <div className="relative w-full aspect-[3/4] overflow-hidden">
-                  <Image
+                  <img
                     src={member.image}
                     alt={member.name}
-                    fill
-                    sizes="(max-width:768px) 74vw"
-                    className="object-cover grayscale contrast-125 brightness-95"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover grayscale contrast-125 brightness-95"
+                    draggable={false}
                   />
                 </div>
 
                 <div className="mt-5 border-b border-neutral-300 pb-5 font-[Code_Pro]">
-
                   <h3 className="text-[12px] font-medium tracking-[0.28em] uppercase">
                     {member.name}
                   </h3>
@@ -414,7 +406,6 @@ function Team() {
                       </p>
                     ))}
                   </div>
-
                 </div>
               </div>
             </div>
@@ -424,9 +415,6 @@ function Team() {
     )
   }
 
-  /* =========================
-     DESKTOP (UNCHANGED)
-  ========================= */
   return (
     <section
       ref={sectionRef}

@@ -14,39 +14,13 @@ function ProjectShowcase() {
   );
 
   const [isHoveringTarget, setIsHoveringTarget] = useState(false);
-
-  const VIDEO_CONFIG = {
-    quality: "auto",
-    format: "auto",
-    codec: "auto",
-    width: {
-      mobile: 480,
-      desktop: 960,
-    },
-  };
-
-  const buildVideoUrl = (url, { isDesktop }) => {
-    if (!url.includes("cloudinary")) return url;
-
-    const width = isDesktop
-      ? VIDEO_CONFIG.width.desktop
-      : VIDEO_CONFIG.width.mobile;
-
-    const transform = [
-      `f_${VIDEO_CONFIG.format}`,
-      `q_${VIDEO_CONFIG.quality}`,
-      `vc_${VIDEO_CONFIG.codec}`,
-      `w_${width}`,
-    ].join(",");
-
-    return url.replace("/upload/", `/upload/${transform}/`);
-  };
+ 
 
   const projects = [
     {
       title: "Sunny\nDevelopment",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Sunny_Vilage_-_Imgur_czxdgr.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775825912/sunny-family-main_mxddal.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A property development group delivering residential and hospitality projects with a focus on design, lifestyle, and long-term value",
@@ -55,7 +29,7 @@ function ProjectShowcase() {
     {
       title: "Novo\nAmpang",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812919/Novo_Ampang_-_Imgur_tcf27u.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775817526/novo-ampang-main_pbi8jb.mp4",
       meta: ["REAL ESTATE", "KUALA LUMPUR", "SOCIAL MEDIA MARKETING"],
       desc:
         "A premium residential development in Kuala Lumpur designed for urban living and investment-driven buyers",
@@ -64,7 +38,7 @@ function ProjectShowcase() {
     {
       title: "Hidden \nCity Ubud",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1770884815/hidden-city-ubud-main.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775809847/hidden-city-ubud-main_cwmmiw.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A development firm creating distinctive residential and hospitality projects driven by design, lifestyle, and long-term value",
@@ -73,7 +47,7 @@ function ProjectShowcase() {
     {
       title: "Little\nSoho",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1770885309/little-soho-main.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775816939/little-soho-main_lbj5qf.mp4",
       meta: ["REAL ESTATE", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A property development firm creating distinctive residential and hospitality destinations, driven by design excellence, elevated living experiences, and enduring investment value",
@@ -82,7 +56,7 @@ function ProjectShowcase() {
     {
       title: "Marroosh\nBali",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768898521/marroosh-main.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775816339/marroosh-main_ea34gz.mp4",
       meta: ["FOOD & BEVERAGE", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A Lebanese restaurant in Canggu offering authentic Middle Eastern cuisine in a warm, casual dining setting.",
@@ -91,7 +65,7 @@ function ProjectShowcase() {
     {
       title: "Shinobi\nSoirée",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1768812920/SHINOBI_-_Imgur_nn6mcd.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775825741/shinobi-main_rbaib5.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MANAGEMENT"],
       desc:
         "A club in Bali functioning as a music-oriented social venue, defined by its spatial layout, sound, and collective presence",
@@ -100,7 +74,7 @@ function ProjectShowcase() {
     {
       title: "Tender\nTouch",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/video/upload/q_auto,f_auto,vc_auto/v1768899602/tender-touch-main.mp4",
+        "https://res.cloudinary.com/djgu1bhef/video/upload/v1775823810/tender-touch-main_t6pvnn.mp4",
       meta: ["HOSPITALITY", "BALI", "SOCIAL MEDIA MARKETING"],
       desc:
         "A wellness and massage brand in Bali offering premium treatments focused on recovery, relaxation, and holistic care",
@@ -333,7 +307,7 @@ function ProjectShowcase() {
                   >
                     {isVideo(p.image) ? (
                       <video
-                        src={buildVideoUrl(p.image, { isDesktop })}
+                        src={p.image}
                         className="absolute inset-0 w-full h-full object-cover"
                         style={{ willChange: "transform", transform: "translateZ(0)" }}
                         muted
@@ -378,7 +352,7 @@ function ProjectShowcase() {
                   >
                     {isVideo(p.image) ? (
                       <video
-                        src={buildVideoUrl(p.image, { isDesktop })}
+                        src={p.image}
                         className="absolute inset-0 w-full h-full object-cover"
                         style={{ willChange: "transform", transform: "translateZ(0)" }}
                         muted

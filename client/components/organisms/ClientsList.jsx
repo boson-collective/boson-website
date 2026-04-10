@@ -5,16 +5,16 @@ import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
    SOURCE LOGOS
 ========================= */
 const allLogos = [
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068279/the-linea-logo.png",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824977/the-linea-logo_nhcydh.webp",
   "/clients/hey-yolo/logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769068787/hidden-city-ubud-logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769069228/petra-logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768899596/tender-touch-logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1769066430/hairaholic-logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/w_auto,f_auto,q_auto:best/v1768898518/marroosh-logo.png",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809568/hidden-city-ubud-logo_dfmkch.png",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817123/petra-logo_eupldd.webp",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775823762/tender-touch-logo_eoyrk5.webp",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/w_auto,f_auto,q_auto:best/v1775810969/hairaholic-logo_obvum7.webp",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816241/marroosh-logo_ptntzq.webp",
   "/clients/zai-cafe/logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067632/tea-time-logo.png",
-  "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067253/newminatis-logo.png",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824834/tea-time-logo_dmsl88.webp",
+  "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817628/newminatis-logo_mpctat.png",
   "/clients/private-jet-villa/logo.png",
 ];
 

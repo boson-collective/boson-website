@@ -62,7 +62,7 @@ function VideoSection() {
         >
           <video
             src={buildVideoUrl(
-              "https://res.cloudinary.com/dqdbkwcpu/video/upload/v1769158943/profile.mov",
+              "https://res.cloudinary.com/djgu1bhef/video/upload/v1775831236/profile_bofjlj.mov",
               { isMobile }
             )}
             autoPlay

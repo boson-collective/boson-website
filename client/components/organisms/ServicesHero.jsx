@@ -281,22 +281,22 @@ function ServicesHero() {
     {
       label: "Social Media Marketing",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1774779072/Screenshot_2026-01-27_at_10.28.02.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775825495/Screenshot_2026-01-27_at_10.28.02_atklfz.webp",
     },
     {
       label: "Content Production",
       image:
-        "https://i.pinimg.com/736x/2e/14/bd/2e14bda3c06055b6345f718e2ea23620.jpg",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775828212/2e14bda3c06055b6345f718e2ea23620_umdcgh.webp",
     },
     {
       label: "Brand Strategy",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484710/Screenshot_2026-01-27_at_10.31.37.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775828034/Screenshot_2026-01-27_at_10.31.37_cbwjja.webp",
     },
     {
       label: "Website Development",
       image:
-        "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769484844/Screenshot_2026-01-27_at_10.33.52.png",
+        "https://res.cloudinary.com/djgu1bhef/image/upload/v1775828038/Screenshot_2026-01-27_at_10.33.52_uxgjvl.webp",
     },
   ];
 

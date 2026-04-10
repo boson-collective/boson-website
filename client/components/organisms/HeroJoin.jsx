@@ -213,15 +213,15 @@ className="
 ========================================== */
 function IntroOverlay() {
   const IMAGES = [
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914152/novo-ampang-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900186/dwm-5.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768900188/dwm-4.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915060/2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768899598/tender-touch-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768914629/marroosh-12.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915333/hidden-city-ubud-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768913103/yolo-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768915808/hidden-city-ubud-3.jpg",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817515/novo-ampang-2_dchmx2.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775810172/dwm-5_rgbom8.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775810184/dwm-4_osbswl.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816870/little-soho-2_nvjlfy.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775823765/tender-touch-2_rgossm.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816237/marroosh-12_s2six6.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809562/hidden-city-ubud-2_fsutwf.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824331/yolo-2_rauoff.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809562/hidden-city-ubud-3_sbgr8s.webp",
   ];
 
   const OPTIMIZED_IMAGES = useMemo(() => {

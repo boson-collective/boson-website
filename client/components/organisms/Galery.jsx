@@ -5,34 +5,6 @@ function Galery() {
   const FRAME_GAP = 10;
 
   /* =========================
-     IMAGE OPTIMIZER CONFIG (INJECTED)
-  ========================= */
-  const IMAGE_CONFIG = {
-    quality: 70,
-    format: "auto",
-    width: {
-      mobile: 400,
-      desktop: 800,
-    },
-  };
-
-  const buildImageUrl = (url, { isMobile }) => {
-    if (!url.includes("cloudinary")) return url;
-
-    const width = isMobile
-      ? IMAGE_CONFIG.width.mobile
-      : IMAGE_CONFIG.width.desktop;
-
-    const transform = [
-      `f_${IMAGE_CONFIG.format}`,
-      `q_${IMAGE_CONFIG.quality}`,
-      `w_${width}`,
-    ].join(",");
-
-    return url.replace("/upload/", `/upload/${transform}/`);
-  };
-
-  /* =========================
      GRID LOGIC
   ========================= */
   const getGridColumns = () => (window.innerWidth < 640 ? 3 : 5);
@@ -49,30 +21,30 @@ function Galery() {
           col: 1,
           speed: -140,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png", top: "60vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "160vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png", top: "260vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png", top: "360vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808789/cta-2_ynhcum.webp", top: "60vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808792/cta-8_eddbpw.webp", top: "160vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808795/cta-14_k5wgby.webp", top: "260vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808790/cta-4_m0tbz2.webp", top: "360vh" },
           ],
         },
         {
           col: 2,
           speed: 120,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png", top: "100vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png", top: "200vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png", top: "300vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png", top: "400vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808794/cta-1_df18ii.webp", top: "100vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808790/cta-6_t71px6.webp", top: "200vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808795/cta-11_iesdr1.webp", top: "300vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808792/cta-12_u4fq7h.webp", top: "400vh" },
           ],
         },
         {
           col: 3,
           speed: -130,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png", top: "80vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png", top: "180vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png", top: "280vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "380vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808793/cta-10_uukfbe.webp", top: "80vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808794/cta-9_ybynu1.webp", top: "180vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808796/cta-17_d5pfk1.webp", top: "280vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808792/cta-8_eddbpw.webp", top: "380vh" },
           ],
         },
       ]
@@ -81,41 +53,41 @@ function Galery() {
           col: 1,
           speed: -160,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769891/cta-2.png", top: "220vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769894/cta-8.png", top: "380vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808789/cta-2_ynhcum.webp", top: "220vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808792/cta-8_eddbpw.webp", top: "380vh" },
           ],
         },
         {
           col: 2,
           speed: 120,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769911/cta-1.png", top: "80vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769890/cta-6.png", top: "300vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808794/cta-1_df18ii.webp", top: "80vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808790/cta-6_t71px6.webp", top: "300vh" },
           ],
         },
         {
           col: 3,
           speed: -140,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769901/cta-10.png", top: "160vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769899/cta-9.png", top: "280vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769914/cta-17.png", top: "420vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808793/cta-10_uukfbe.webp", top: "160vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808794/cta-9_ybynu1.webp", top: "280vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808796/cta-17_d5pfk1.webp", top: "420vh" },
           ],
         },
         {
           col: 4,
           speed: 100,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769902/cta-12.png", top: "120vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769912/cta-11.png", top: "340vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808792/cta-12_u4fq7h.webp", top: "120vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808795/cta-11_iesdr1.webp", top: "340vh" },
           ],
         },
         {
           col: 5,
           speed: -160,
           items: [
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769897/cta-4.png", top: "250vh" },
-            { src: "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1771769906/cta-14.png", top: "430vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808790/cta-4_m0tbz2.webp", top: "250vh" },
+            { src: "https://res.cloudinary.com/djgu1bhef/image/upload/v1775808795/cta-14_k5wgby.webp", top: "430vh" },
           ],
         },
       ];
@@ -161,7 +133,6 @@ function Galery() {
     const ctx = gsap.context(() => {
       gsap.set(laneRefs.current, { force3D: true });
 
-      /* 🔥 NEW: ENTRY MOMENTUM (ADDITIVE ONLY) */
       gsap.from(gridRef.current, {
         opacity: 0,
         y: 80,
@@ -353,7 +324,7 @@ function Galery() {
               >
                 <div className="w-full aspect-[3/4] overflow-hidden">
                   <img
-                    src={buildImageUrl(item.src, { isMobile })}
+                    src={item.src}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover"

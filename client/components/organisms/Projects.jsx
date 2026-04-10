@@ -4,34 +4,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-
-/* =========================
-   IMAGE OPTIMIZER (INJECTED)
-========================= */
-const IMAGE_CONFIG = {
-  quality: "auto",
-  format: "auto",
-  width: {
-    mobile: 480,
-    desktop: 900,
-  },
-};
-
-const buildImageUrl = (url, { isMobile }) => {
-  if (!url.includes("cloudinary")) return url;
-
-  const width = isMobile
-    ? IMAGE_CONFIG.width.mobile
-    : IMAGE_CONFIG.width.desktop;
-
-  const transform = [
-    `f_${IMAGE_CONFIG.format}`,
-    `q_${IMAGE_CONFIG.quality}`,
-    `w_${width}`,
-  ].join(",");
-
-  return url.replace("/upload/", `/upload/${transform}/`);
-};
+ 
 
 function ImageBurst({ src, motionProps, styleOverrides = {}, isMobile }) {
   return (
@@ -56,7 +29,7 @@ function ImageBurst({ src, motionProps, styleOverrides = {}, isMobile }) {
         ...styleOverrides,
       }}
     >
-      <img src={buildImageUrl(src, { isMobile })} style={{ width: "100%" }} />
+      <img src={src} style={{ width: "100%" }} />
     </motion.div>
   );
 }
@@ -108,17 +81,17 @@ export default function Projects() {
      IMAGES
   ================================================== */
   const images = [
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815480/hidden-city-ubud-5.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968402/little-soho-5.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770815566/little-brew-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816466/sunny-family-3.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768968403/little-soho-3.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1769067634/tea-time-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816274/novo-ampang-3.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770816770/alraimi-2.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817395/terra-auri-2.png",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1768969071/little-soho-9.jpg",
-    "https://res.cloudinary.com/dqdbkwcpu/image/upload/v1770817596/terra-auri-3.png",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775809563/hidden-city-ubud-5_m8mdqa.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816874/little-soho-5_lnxdj5.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775811115/little-brew-2_an5xru.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775825170/sunny-family-3_uzo62t.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816871/little-soho-3_wqtmwk.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824832/tea-time-2_cgqk1i.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775817520/novo-ampang-3_vckfpk.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775810925/alraimi-2_it2k0n.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824898/terra-auri-2_mv6toz.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775816884/little-soho-9_bo2idz.webp",
+    "https://res.cloudinary.com/djgu1bhef/image/upload/v1775824901/terra-auri-3_joylve.webp",
   ];
 
   /* ==================================================
