@@ -180,7 +180,7 @@ function Footer() {
       </div>
 
       {/* BRAND MASS */}
-      <div className="relative px-[6vw] pt-12 pb-20 sm:pb-24 border-t border-neutral-800">
+      <div className="relative px-[6vw] pt-12 pb-10 sm:pb-14 border-t border-neutral-800">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 sm:gap-y-12 items-end">
           <div className="lg:col-span-7">
             <img
